@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عن الأكاديمية | مهارات</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --shadow: 0 20px 25px -5px rgba(0, 0,0, 0.1);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0,0, 0.25);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo {
+            height: 70px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 8rem 5% 6rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100vw;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23e2e8f0"><polygon points="0,100 1000,0 1000,100"/></svg>');
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.25rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 35px 60px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        /* About Section */
+        .about {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 6rem auto;
+            padding: 0 5%;
+        }
+
+        .about .card {
+            background: var(--white);
+            padding: 3rem 2.5rem;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .about .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+
+        .about .card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .card p {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: var(--white);
+            padding: 4rem 5%;
+            text-align: center;
+            margin: 4rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stat-item h4 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 4rem 5% 2rem;
+            margin-top: 6rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-section p, .footer-section a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            line-height: 1.8;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--white);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-5px);
+        }
+
+        .contact-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Auth Buttons */
+        .login-buttons {
+          display: flex;
+          gap: 0.75rem;
+          align-items: center;
+        }
+        .login-btn, .register-btn {
+          border: none;
+          padding: 0.75rem 1.5rem;
+          color: white;
+          text-decoration: none;
+          border-radius: 25px;
+          font-weight: 600;
+          font-size: 0.95rem;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(37,99,235,0.3);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-family: 'Cairo', sans-serif;
+          cursor: pointer;
+        }
+        .login-btn {
+          background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        .register-btn {
+          background: linear-gradient(135deg, #10b981, #059669);
+          box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+        }
+        .login-btn:hover, .register-btn:hover {
+          transform: translateY(-2px);
+        }
+        .login-btn:hover {
+          box-shadow: 0 8px 25px rgba(37,99,235,0.4);
+        }
+        .register-btn:hover {
+          box-shadow: 0 8px 25px rgba(16,185,129,0.4);
+        }
+
+        /* Auth Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .auth-modal {
+            background: var(--white);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.8) translateY(-20px);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal-overlay.active .auth-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--secondary);
+            color: var(--primary);
+        }
+
+        .modal-tabs {
+            display: flex;
+            margin: 1rem 1.5rem 0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--secondary);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-form {
+            display: none;
+            padding: 0 1.5rem 1.5rem;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .modal-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: 'Cairo', sans-serif;
+            margin-top: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 3%;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .left-side {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            .login-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            .login-btn, .register-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .nav-links {
+                gap: 1.5rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .auth-modal {
+                width: 95%;
+                margin: 1rem;
+            }
+            .modal-tabs {
+                flex-direction: column;
+            }
+            .tab-btn {
+                width: 100%;
+            }
+            .hero {
+                padding: 6rem 3% 4rem;
+            }
+            .about {
+                grid-template-columns: 1fr;
+                margin: 4rem auto;
+                padding: 0 3%;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="right-side">
+             <ul class="nav-links">
+                <img src="logo_maher.png" class="logo" alt="مهارات Logo">
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="employee.html">الدورات التدريبية</a></li>
+                <li><a href="academy.html">عن الأكاديمية</a></li>
+            </ul>
+        </div>
+
+        <div class="left-side">
+            <div class="login-buttons">
+                <button id="loginBtnTrigger" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>تسجيل دخول</span>
+                </button>
+                <button id="registerBtnTrigger" class="register-btn">
+                    <i class="fas fa-user-plus"></i>
+                    <span>تسجيل</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="authModal" class="modal-overlay">
+      <div class="auth-modal">
+        <div class="modal-header">
+          <h3>تسجيل الدخول / التسجيل</h3>
+          <button class="modal-close" id="modalClose">&times;</button>
+        </div>
+        <div class="modal-tabs">
+          <button class="tab-btn active" data-tab="login">تسجيل دخول</button>
+          <button class="tab-btn" data-tab="register">تسجيل جديد</button>
+        </div>
+        
+        <form id="loginForm" class="modal-form active">
+          <div class="form-group">
+            <label>البريد الإلكتروني</label>
+            <input type="email" id="loginEmail" required placeholder="example@domain.com" data-msg="هذا الحقل مطلوب">
+            <div class="error-msg" id="loginEmailError"></div>
+          </div>
+          <div class="form-group">
+            <label>كلمة المرور</label>
+            <input type="password" id="loginPassword" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-sign-in-alt"></i> <span>دخول</span>
+          </button>
+        </form>
+
+        <form id="registerForm" class="modal-form">
+          <div class="form-group">
+            <label>الاسم الكامل</label>
+            <input type="text" id="regName" required placeholder="أحمد محمد" data-msg="هذا الحقل مطلوب">
+            <div class="error-msg" id="regNameError"></div>
+          </div>
+          <div class="form-group">
+            <label>البريد الإلكتروني</label>
+            <input type="email" id="regEmail" required placeholder="example@domain.com" data-msg="هذا الحقل مطلوب">
+            <div class="error-msg" id="regEmailError"></div>
+          </div>
+          <div class="form-group">
+            <label>رقم الهاتف</label>
+            <input type="tel" id="regPhone" required placeholder="05xxxxxxxx" data-msg="هذا الحقل مطلوب">
+            <div class="error-msg" id="regPhoneError"></div>
+          </div>
+          <div class="form-group">
+            <label>كلمة المرور</label>
+            <input type="password" id="regPassword" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-user-plus"></i> <span>تسجيل</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <header class="hero">
+        <h1>عن أكاديمية مهارات</h1>
+        <p>الوجهة الأولى لتطوير المهارات المهنية والاحترافية في العالم العربي</p>
+        <a href="#about" class="btn-primary">
+            <i class="fas fa-arrow-down"></i> تعرف على المزيد
+        </a>
+    </header>
+
+    <section class="about" id="about">
+        <div class="card">
+            <i class="fas fa-history" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <h3>تأسيسنا</h3>
+            <p>تأسست أكاديمية مهارات في 2023 بهدف تمكين الشباب العربي من المنافسة العالمية من خلال برامج تدريبية عالية الجودة.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-bullseye" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <h3>رؤيتنا</h3>
+            <p>أن نكون الرائدين في تطوير المهارات المهنية في المنطقة العربية ونساهم في بناء قادة المستقبل.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-users-cog" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <h3>فريقنا</h3>
+            <p>30 خبير ومدرب معتمد بمعدل خبرة 12 سنة في مجالات الإدارة والتكنولوجيا والتسويق.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-award" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <h3>إنجازاتنا</h3>
+            <p>أكثر من 5000 متدرب ناجح وشراكات مع 25 جهة دولية معترف بها.</p>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h4>5000+</h4>
+                <p>متدرب ناجح</p>
+            </div>
+            <div class="stat-item">
+                <h4>30</h4>
+                <p>خبير معتمد</p>
+            </div>
+            <div class="stat-item">
+                <h4>100%</h4>
+                <p>رضا المتدربين</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-graduation-cap"></i> مهارات</h3>
+                <p>منصتك لتطوير المهارات المهنية وتحقيق التميز في العمل.</p>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-link"></i> روابط مهمة</h3>
+                <a href="index.html">الرئيسية</a><br>
+                <a href="employee.html">الدورات التدريبية</a><br>
+                <a href="academy.html">عن الأكاديمية</a>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-phone"></i> تواصل معنا</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                        <div>هاتف: 0539600080</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div>skillsproject23@gmail.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+             <p>&copy; 2026 مهارات. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if(navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Auth Modal Functionality
+        function openModal() {
+            const authModal = document.getElementById('authModal');
+            if(authModal) {
+                authModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal() {
+            const authModal = document.getElementById('authModal');
+            if(authModal) {
+                authModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            // Clear forms and errors
+            document.querySelectorAll('.modal-form input').forEach(input => input.value = '');
+            document.querySelectorAll('.error-msg').forEach(msg => msg.style.display = 'none');
+        }
+
+        function switchTab(tab) {
+            // Update tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const selectedTab = document.querySelector(`[data-tab="${tab}"]`);
+            if(selectedTab) selectedTab.classList.add('active');
+            
+            // Update forms
+            document.querySelectorAll('.modal-form').forEach(form => form.classList.remove('active'));
+            const selectedForm = document.getElementById(tab + 'Form');
+            if(selectedForm) selectedForm.classList.add('active');
+        }
+
+        function validateField(input, errorId, rules) {
+            const value = input.value.trim();
+            let isValid = true;
+            let errorMsg = '';
+
+            if (rules.required && !value) {
+                isValid = false;
+                errorMsg = input.getAttribute('data-msg') || 'هذا الحقل مطلوب';
+            } else if (rules.minLength && value.length < rules.minLength) {
+                isValid = false;
+                errorMsg = 'الحد الأدنى للطول غير كافي';
+            } else if (rules.email && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|sa)$/i.test(value)) {
+                isValid = false;
+                errorMsg = 'صيغة البريد الإلكتروني غير صحيحة (يجب انتهاء بـ .com أو .sa)';
+            } else if (rules.phone && !/^05\d{8}$/.test(value.replace(/\D/g, ''))) {
+                isValid = false;
+                errorMsg = 'رقم الهاتف يجب أن يكون 10 أرقام يبدأ بـ 05';
+            }
+
+            const errorEl = document.getElementById(errorId);
+            if (errorEl) {
+                if (!isValid) {
+                    errorEl.textContent = errorMsg;
+                    errorEl.style.display = 'block';
+                } else {
+                    errorEl.style.display = 'none';
+                }
+            }
+            return isValid;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auth Modal Events
+            const loginBtnTrigger = document.getElementById('loginBtnTrigger');
+            if(loginBtnTrigger) {
+                loginBtnTrigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openModal();
+                    switchTab('login');
+                });
+            }
+
+            const registerBtnTrigger = document.getElementById('registerBtnTrigger');
+            if(registerBtnTrigger) {
+                registerBtnTrigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openModal();
+                    switchTab('register');
+                });
+            }
+
+            const modalClose = document.getElementById('modalClose');
+            if(modalClose) modalClose.addEventListener('click', closeModal);
+            
+            const authModal = document.getElementById('authModal');
+            if(authModal) {
+                authModal.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal-overlay')) closeModal();
+                });
+            }
+
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchTab(btn.dataset.tab);
+                });
+            });
+
+            // Form validation
+            document.querySelectorAll('.modal-form input').forEach(input => {
+                input.addEventListener('input', () => {
+                    const rules = {
+                        loginEmail: { email: true, required: true },
+                        regName: { required: true, minLength: 2 },
+                        regEmail: { email: true, required: true },
+                        regPhone: { phone: true, required: true }
+                    }[input.id] || {};
+                    validateField(input, input.id + 'Error', rules);
+                });
+            });
+
+            // Form submissions
+            const loginForm = document.getElementById('loginForm');
+            if(loginForm) {
+                loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const emailValid = validateField(document.getElementById('loginEmail'), 'loginEmailError', {email: true, required: true});
+                    if (emailValid && document.getElementById('loginPassword').value) {
+                        alert('تم تسجيل الدخول بنجاح! (محاكاة)');
+                        closeModal();
+                    }
+                });
+            }
+
+            const registerForm = document.getElementById('registerForm');
+            if(registerForm) {
+                registerForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const nameValid = validateField(document.getElementById('regName'), 'regNameError', {required: true, minLength: 2});
+                    const emailValid = validateField(document.getElementById('regEmail'), 'regEmailError', {email: true, required: true});
+                    const phoneValid = validateField(document.getElementById('regPhone'), 'regPhoneError', {phone: true, required: true});
+                    if (nameValid && emailValid && phoneValid && document.getElementById('regPassword').value) {
+                        alert('تم التسجيل بنجاح! (محاكاة)');
+                        closeModal();
+                    }
+                });
+            }
+
+            // Close on ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+        });
+    </script>
+</body>
+</html>

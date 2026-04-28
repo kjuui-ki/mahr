@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دورات الموظفين | مهارات</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --shadow: 0 20px 25px -5px rgba(0, 0,0, 0.1);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0,0, 0.25);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed; top: 0; width: 100%; background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px); z-index: 1000; padding: 1rem 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: var(--shadow); transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled { background: rgba(255, 255, 255, 0.98); box-shadow: var(--shadow-lg); }
+        .right-side { display: flex; align-items: center; gap: 2rem; }
+        .logo { height: 70px; width: auto; transition: transform 0.3s ease; }
+        .logo:hover { transform: scale(1.05); }
+        .nav-links { display: flex; list-style: none; gap: 2rem; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; font-size: 1rem; position: relative; transition: all 0.3s ease; padding: 0.5rem 0; }
+        .nav-links a::after { content: ''; position: absolute; bottom: 0; right: 0; width: 0; height: 2px; background: var(--primary); transition: width 0.3s ease; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a:hover { color: var(--primary); }
+
+        /* Profile Styles */
+        .profile-container { position: relative; }
+        .profile-header {
+            display: flex; align-items: center; gap: 1rem; cursor: pointer; padding: 1.2rem 1.5rem; border-radius: 30px;
+            background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(30px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.4); transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); position: relative; overflow: hidden;
+        }
+        .profile-header::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: left 0.6s; }
+        .profile-header:hover::before { left: 100%; }
+        .profile-header:hover { background: rgba(59, 130, 246, 0.25); border-color: rgba(255, 255, 255, 0.5); transform: translateY(-8px) scale(1.06); box-shadow: 0 35px 70px rgba(59, 130, 246, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6); }
+
+        .profile-avatar-container { position: relative; width: 45px; height: 45px; }
+        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); display: none; }
+        .profile-icon { font-size: 2.2rem; color: var(--text-light); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: block; }
+        .job-seeker-badge { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); }
+
+        .profile-dropdown {
+            position: absolute; top: calc(100% + 12px); left: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(35px) saturate(200%); border-radius: 28px; box-shadow: 0 35px 80px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.25); min-width: 320px; max-width: 400px; opacity: 0; visibility: hidden; transform: translateY(-20px) scale(0.92); transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 1001; border: 1px solid rgba(255, 255, 255, 0.2); overflow: hidden;
+        }
+        .profile-container:hover .profile-dropdown, .profile-dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        .profile-info { padding: 2rem 1.5rem; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.08); position: relative; }
+        .profile-info::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 2px; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 1px; }
+
+        .editable-section { position: relative; display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding-top: 1.5rem; }
+        .editable-section label, .static-info label { font-weight: 600; color: var(--text-dark); min-width: 60px; font-size: 0.95rem; }
+        .editable-name { flex: 1; padding: 0.5rem 1rem; border: 2px solid transparent; border-radius: 8px; background: var(--secondary); font-weight: 500; cursor: pointer; transition: all 0.3s ease; min-height: 24px; text-align: right; }
+        .editable-name.editing { border-color: var(--primary); background: white; outline: none; cursor: text; }
+        .edit-name-btn { background: var(--primary); color: white; border: none; padding: 0.5rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; transition: all 0.3s ease; }
+        .edit-name-btn:hover { background: var(--primary-dark); transform: scale(1.05); }
+
+        .static-info { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; padding: 0.75rem; background: var(--secondary); border-radius: 8px; }
+        .static-info span { flex: 1; color: var(--text-light); font-size: 0.95rem; text-align: right; }
+
+        .profile-actions { margin-top: 1rem; padding: 1.5rem; }
+        .profile-edit-btn { display: flex; justify-content: center; align-items: center; gap: 0.5rem; width: 100%; padding: 1rem 1.5rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; border: none; margin-bottom: 0.5rem; font-family: 'Cairo', sans-serif; font-size: 1rem; }
+        .profile-edit-btn:hover { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-danger:hover { background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2); }
+
+        /* Courses Section */
+        .courses { max-width: 1400px; margin: 8rem auto 4rem; padding: 0 5%; }
+        .courses h2 { text-align: center; font-size: 2.5rem; margin-bottom: 3rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .courses-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+
+        .course-card { background: var(--white); border-radius: 20px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
+        .course-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: var(--shadow-lg); }
+        .course-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
+        .course-img { width: 100%; height: 150px; object-fit: contain; border-radius: 12px; margin-bottom: 1rem; }
+        .course-card h3 { font-size: 1.1rem; font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem; }
+
+        .load-more-container { text-align: center; margin: 3rem 0; }
+        .btn-load-more { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 1rem 3rem; border-radius: 50px; font-weight: 600; font-size: 1.1rem; cursor: pointer; box-shadow: var(--shadow); transition: all 0.3s ease; font-family: 'Cairo', sans-serif; }
+        .btn-load-more:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow-y: auto; background-color: rgba(0,0,0,0.8); animation: fadeIn 0.3s; }
+        .modal-content { position: relative; margin: 5% auto; padding: 0; max-width: 950px; background: var(--white); border-radius: 24px; box-shadow: var(--shadow-lg); }
+        .modal-main-content { display: flex; gap: 2rem; padding: 2.5rem; align-items: flex-start; }
+        
+        .modal-course-image { flex-shrink: 0; width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary); box-shadow: var(--shadow); }
+        .modal-content-right { flex: 1; }
+        .modal-title { font-size: 1.8rem; margin-bottom: 1rem; color: var(--text-dark); }
+        
+        .terms { background: var(--secondary); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.95rem; border-right: 4px solid var(--primary); }
+        .objective { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 1rem; line-height: 1.6; }
+        .objective h3 { margin-bottom: 1rem; font-size: 1.3rem; }
+
+        .axes { list-style: none; padding: 0; }
+        .axes li { padding: 0.75rem 0; padding-right: 1.5rem; position: relative; border-bottom: 1px solid var(--secondary); }
+        .axes li:last-child { border-bottom: none; }
+        .axes li::before { content: '▸'; color: var(--primary); font-size: 1.2rem; position: absolute; right: 0; top: 0.75rem; transform: scaleX(-1); }
+
+        .modal-buttons { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; }
+        
+        /* أزرار النافذة المنبثقة مع التحريك والشريط */
+        .btn-register { 
+            position: relative; overflow: hidden; /* لإخفاء الشريط خارج الزر */
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+            color: white; padding: 1rem 2.5rem; border-radius: 50px; border: none; 
+            font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s; 
+            font-family: 'Cairo', sans-serif; display: flex; align-items: center; gap: 0.5rem; 
+        }
+        .btn-register:hover:not(.disabled):not(.registered) { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        
+        /* شريط التحميل داخل الزر */
+        .btn-register .progress-bar {
+            position: absolute; bottom: 0; left: 0; height: 5px; 
+            background: rgba(255, 255, 255, 0.8); width: 0;
+            border-radius: 0 0 50px 50px;
+        }
+
+        /* حالة التحميل */
+        .btn-register.loading { cursor: not-allowed; opacity: 0.9; }
+
+        /* حالة التمام */
+        .btn-register.registered { background: linear-gradient(135deg, #10b981, #059669); cursor: default; }
+        .btn-register.registered:hover { transform: none; box-shadow: none; }
+
+        .btn-close { background: var(--secondary); color: var(--text-dark); border: 1px solid var(--text-light); padding: 1rem 2rem; border-radius: 50px; cursor: pointer; font-weight: 600; font-size: 1rem; transition: all 0.3s; font-family: 'Cairo', sans-serif; display: flex; align-items: center; gap: 0.5rem; }
+        .btn-close:hover { background: var(--text-light); color: var(--white); }
+
+        /* Footer */
+        .footer { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 4rem 5% 2rem; margin-top: 6rem; }
+        .footer-content { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; margin-bottom: 2rem; }
+        .footer-section h3 { font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .footer-section p, .footer-section a { color: rgba(255,255,255,0.9); text-decoration: none; line-height: 1.8; transition: color 0.3s ease; }
+        .footer-section a:hover { color: var(--white); }
+        .contact-info { display: flex; flex-direction: column; gap: 1rem; }
+        .contact-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 12px; transition: all 0.3s ease; }
+        .contact-item:hover { background: rgba(255,255,255,0.2); transform: translateX(-5px); }
+        .contact-icon { width: 45px; height: 45px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem 3%; flex-direction: column; gap: 1rem; }
+            .nav-links { gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+            .courses-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+            .modal-main-content { flex-direction: column; text-align: center; gap: 1.5rem; align-items: center; }
+            .footer-content { grid-template-columns: 1fr; gap: 2rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="right-side">
+            <img src="logo_maher.png" class="logo" alt="مهارات Logo">
+            <ul class="nav-links">
+                <li><a href="home_2.html">الرئيسية</a></li>
+                <li><a href="employee_2.html">الدورات التدريبية</a></li>
+                <li><a href="academy_2.html">عن الأكاديمية</a></li>
+            </ul>
+        </div>
+        <div class="left-side">
+            <div class="profile-container" id="profileContainer">
+                <div class="profile-header" id="profileHeader">
+                    <div class="profile-avatar-container">
+                        <img id="profilePic" src="" class="profile-avatar" alt="ملف التعريف">
+                        <i id="profileIcon" class="fas fa-user-circle profile-icon"></i>
+                    </div>
+                    <span class="job-seeker-badge">موظف</span>
+                </div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="profile-info">
+                        <div class="editable-section">
+                            <label>الاسم:</label>
+                            <div id="editableName" class="editable-name" contenteditable="false">أحمد محمد</div>
+                            <button id="editNameBtn" class="edit-name-btn" title="تعديل الاسم"><i class="fas fa-edit"></i></button>
+                        </div>
+                        <div class="static-info">
+                            <label>الإيميل:</label>
+                            <span id="profileEmail">ahmed@example.com</span>
+                        </div>
+                        <div class="static-info">
+                            <label>الهاتف:</label>
+                            <span id="profilePhone">0539600080</span>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <label for="profileUpload" class="profile-edit-btn">
+                            <i class="fas fa-camera"></i> تعديل الصورة
+                        </label>
+                        <input type="file" id="profileUpload" accept="image/*" hidden>
+                        <button id="logoutBtn" class="profile-edit-btn btn-danger">
+                            <i class="fas fa-sign-out-alt"></i> تسجيل خروج
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="courses">
+        <h2>جميع الدورات المتاحة</h2>
+        <div class="courses-grid" id="coursesGrid"></div>
+        <div class="load-more-container">
+            <button id="loadMore" class="btn-load-more">أظهر المزيد</button>
+        </div>
+    </section>
+
+    <div id="courseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-main-content">
+                <img id="modalImg" class="modal-course-image" src="" alt="">
+                <div class="modal-content-right">
+                    <h2 id="modalTitle" class="modal-title"></h2>
+                    <div id="modalTerms" class="terms"></div>
+                    <div id="modalObjective" class="objective"></div>
+                    <ul id="modalAxes" class="axes"></ul>
+                    <div class="modal-buttons">
+                        <button id="modalRegister" class="btn-register">
+                            <span class="progress-bar" id="registerProgress"></span>
+                            <i class="fas fa-user-plus" id="registerIcon"></i> 
+                            <span id="registerText">تسجيل في الدورة</span>
+                        </button>
+                        <button class="btn-close" id="btnCloseModal">
+                            <i class="fas fa-times"></i> إغلاق
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-graduation-cap"></i> مهارات</h3>
+                <p>منصتك لتطوير المهارات المهنية وتحقيق التميز في العمل.</p>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-link"></i> روابط مهمة</h3>
+                <a href="home_2.html">الرئيسية</a><br>
+                <a href="employee_2.html">الدورات التدريبية</a><br>
+                <a href="academy_2.html">عن الأكاديمية</a>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-phone"></i> تواصل معنا</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                        <div>هاتف: 0539600080</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div><strong>إيميل:</strong> skillsproject23@gmail.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 مهارات. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        // مصفوفة الدورات الفعلية 
+        let coursesData = [
+            {
+                title: 'الذكاء الاصطناعي',
+                img: 'img-maher/1.jpeg',
+                terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب مهارات الذكاء الاصطناعي.',
+                axes: [
+                    'المفاهيم الأساسية للذكاء الاصطناعي.',
+                    'التعلم الآلي(Machine Learning).',
+                    'التعلم العميق(Deep Learning).',
+                    'الشبكات العصبية(Neural Networks).',
+                    'معالجة اللغة الطبيعية (Natural Language Processing).',
+                    'الروبوتات والتحكم الآلي (Robotics and Automation).',
+                    'خوارزميات الذكاء الاصطناعي المتقدمة.',
+                    'تطبيقات الذكاء الاصطناعي في الصناعة والتجارة',
+                    'الأخلاقيات والتحديات القانونية في الذكاء الاصطناعي.',
+                    'مستقبل الذكاء الاصطناعي وتطوره.',
+                ]
+            },
+            {   
+                title: 'الأمن السيبراني',
+                img: 'img-maher/2.png',
+                terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'الحصول على شهادة PMP المعترف بها عالمياً لإدارة المشاريع بنجاح.',
+                axes: [
+                    'أساسيات أمن المعلومات والجرائم اإللكترونية.',
+                    'أنواع الهجمات اإللكترونية التي تواجه المنشآت.',
+                    'تحديد نقاط الضعف في الشبكات والخدمات اإللكترونية.',
+                    'تقنيات اختبار أمان الشبكة وِّحلول الدفاع عن الهجمات',
+                    'المخاطر المرتبطة بنقل المعلومات ومعالجتها وتخزينها.',
+                    'تقنيات الدفاع اإللكتروني التطبيقية وخدماته.',
+                    'مهارات صد الهجمات اإللكترونية من خالل تطبيقات اإلنترنت.',
+                    'التعامل مع القضايا األخالقية والقانونية في مجال أمن المعلومات.',
+                    'تقييم االختراقات المحلية والدولية المحتملة لنظم المعلومات وتحليلها.',
+                    'ِّحماية شبكات الحاسب والمعلومات من التهديدات واالقتحامات الداخلية والخارجية.',
+                    'المهارات الالزمة إلدارة مشاريع أمن المعلومات.',
+                    'فهم طبيعة التحقيق الجنائي الرقمي وأساليبه.',
+                ]
+            },
+            {
+                title: 'تحليل البيانات',
+                img: 'img-maher/3.jpg',
+               terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدربين مهارات تحليل البيانات وتطبيقاتها في مجاالت متعددة.',
+                axes: [
+                    'أنواع تحليل البيانات وأدواتها.',
+                    'مهارات التعامل مع البيانات الضخمة.',
+                    'مهارات تحليل الشبكات',
+                    'تحليل البيانات باستخدام الذكاء االصطناعي.',
+                ]
+            },
+            {
+                title: ' مهارات توظيف الأوفيس في العمل الإداري',
+                img: 'img-maher/4.png',
+               terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب مهارات توظيف الأوفيس في العمل الداري.',
+                axes: [
+                    'مقدمة عن استخدام برامج الأوفيس في العمل الإداري.',
+                    'استخدام برنامج Word لإعداد الوثائق والمستندات الإدارية وتنسيقها.',
+                    'استخدام برنامج Excel لإدارة البيانات وإعداد الجدول والمخططات الإحصائية.',
+                    'استخدام برنامج PowerPoint لإنشاء عروض تقديمية متميزة',
+                    'إعداد البريد الإلكتروني وإدارته باستخدام برنامج Outlook.',
+                    'استخدام برنامج Access لإدارة قواعد البيانات وتنضيمها.',
+                    'تحسين الكفاءة والإنتاجية باستخدام اختصارات لوِّحة المفاتيح.',
+                    'تنظيم الملفات والمجلدات في أوفيس وإدارتها.',
+                     'ِّحفظ المستندات والبيانات المهمة وِّحمايتها.',
+                     'التعامل مع المشكالت الشائعة في استخدام الأوفيس وِّحلها.',
+                ]
+            },
+            {
+                title: 'إدخال البيانات',
+                img: 'img-maher/5.png',
+               terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدربين مهارات إدخال البيانات وتطبيقاتها في مجالات متعددة',
+                axes: [
+                    'مكونات جهاز الحاسب الآلي.',
+                    'الجلسة الصحيحة للكتابة.',
+                    'برنامج مدرب الطباعة.',
+                    'إدخال البيانات بشكل سريع ودقيق.',
+                    'فوائد توظيف تطبيقات الأوفيس في العملية الإدارية.',
+                    'الواجهات الرئيسة لتطبيق مايكروسوفت وورد.',
+                    'مهارات استخدام تطبيق مايكروسوفت وورد من خلال الأمثلة والتدريبات',
+                ]
+            },
+            {
+                title: 'إدارة المكاتب الألكترونية',
+                img: 'img-maher/6.png',
+               terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب المهارات اللازمة للأعمال المكتبية الإلكترونية وإدارتها',
+                axes: [
+                    'مفهوم السكرتارية الحديثة.',
+                    'مبادئ نظم المعلومات الإدارية.',
+                    'مهارات التعامل مع المرؤوسين.',
+                    'مهارات التعامل مع الرؤساء.',
+                    'مهارات التعامل مع المراجعين.',
+                    'مفهوم العلاقات العامة وأهميتها.',
+                    'مهارات تجنب الأخطاء الإدارية.',
+                    'مهارات إدارة الوقت.',
+                    'الأرشفة الإلكترونية',
+                ]
+            },
+            {
+                title: 'إدارة المخاطر والأزمات',
+                img: 'img-maher/7.png',
+               terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب مهارات إدارة المخاطر والأزمات، ورسم وتنفيذ خطط تتناسب مع المؤسسات وأهدافها العامة',
+                axes: [
+                    'ماهية المخاطر والأزمات.',
+                    'خصائص المخاطر والأزمات.',
+                    'ِّحدوث المخاطر والأزمات في بيئة العمل.',
+                    'أنواع المخاطر والأزمات.',
+                    'أسباب المخاطر والأزمات وآثارها.',
+                    'أسس مواجهة المخاطر والأزمات.',
+                    'الإستراتيجيات المناسبة لأدارة المخاطر والأزمات.',
+                    'إستراتيجيات مواجهة المخاطر والأزمات.',
+                    'مسؤوليات فرق المخاطر والأزمات ومهامها.',
+                    'آليات عمل فرق المخاطر والأزمات.',
+                    'خطط إدارة المخاطر والأزمات وكيفية إعدادها.',
+                ]
+            },
+            {
+                title: 'بناء وإدارة فرق العمل',
+                img: 'img-maher/8.png',
+               terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب مهارات بناء فرق العمل وإدارتها',
+                axes: [
+                    'مفهوم فريق العمل والمفاهيم والمصطلحات الإدارية المهمة للممارسة الإدارية الصحيحة في مجال القيادة الإدارية لفرق العمل.',
+                    'دورة ديناميكيات المجموعات ودورة ِّحياة فريق العمل ومكوناتها.',
+                    'إستراتيجيات إدارة فرق العمل.',
+                    'الأدوات الإدارية التي تسهم في نجاح فريق العمل.',
+                    'بعض النقاط المهمة لبناء فريق العمل.',
+                    'أهم طرق تحفيز الفريق وبناء الالتزام لديهم.',
+                    'ممارسة الأدوات الإدارية المستخدمة في أعمال فرق العمل.',
+                    'إستراتيجيات مواجهة المخاطر والأزمات.',
+                ]
+            },
+            {
+                title: 'إدارة الموارد البشرية',
+                img: 'img-maher/9.png',
+               terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب مهارات إدارة الموارد البشرية',
+                axes: [
+                    'مقدمة في إدارة الموارد البشرية.',
+                    'توظيف الموظفين واختيارهم.',
+                    'تقييم الأداء وإدارة الأداء.',
+                    'تطوير الموظفين وتدريبهم.',
+                    'إدارة العلاقات العمالية والقانون العمالي.',
+                    'تصميم الوظائف وتحليلها.',
+                    'تخطيط الموارد البشرية.',
+                    'إدارة التغيير والابتكار في الموارد البشرية.',
+                    'إدارة الأجور والمزايا.',
+                    'إدارة الثقافة التنظيمية والتنمية الأستراتيجية.',
+                ]
+            },
+            {
+                title: 'إدارة الأزمات المالية',
+                img: 'img-maher/10.png',
+               terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب مهارات إدارة الأزمات المالية',
+                axes: [
+                    'مفهوم الأزمات المالية وتحليل أسبابها وتأثيرها في الشركات والأسواق المالية.',
+                    'تقييم المخاطر المالية ووضع إستراتيجيات للتعامل معها في حالةالأزمات المالية.',
+                    'تطوير خطط الطوارئ المالية والأجراءات الأحترازية للتصدي للأزمات المالية.',
+                    'إدارة السيولة والتخطيط لأدارة النقدية خلال فترات الأزمات المالية',
+                    'تقييم الأصول والالتزامات، وتحليل الهيكل المالي لتحديد القدرة على تحمل الأزمات المالية.',
+                    'إستراتيجيات التعامل مع الديون وإدارة التسويات المالية خلال الأزمات للتعامل مع هاذا التأثير.',
+                    'أدوات وتقنيات رصد الأداء المالي وتقييمه خلال فترات الأزمات.',
+                    'خطط استعادة الكيان المالي بعد الأزمات وضمان استمرارية الأعمال.',
+                    'تقييم الدروس المستفادة من الأزمات المالية وتطوير إستراتيجيات للتحسين المستقبلي والوقاية من الأزمات المالية.',
+                ]
+            },
+            
+            {
+                title: 'إعداد التقارير المالية',
+                img: 'img-maher/11.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'تنمية قدرات المتدربين على إعداد التقارير المالية واستخدامها في عملية التحليل المالي',
+                axes: [
+                    ' مفهوم التقارير المالية والتحليل المالي.',
+                    ' أهمية التحليل المالي.',
+                    'أنواع التقارير المالية.',
+                    'المفاهيم الأساسية في المحاسبة المالية.',
+                    'تأثير الضرائب والالتزامات المالية في هيكل التقارير المالية.',
+                    ' الشفافية والتواصل الفعال في توضيح التقارير المالية.',
+                    ' دقة إعداد التقارير المالية  وموثوقيتها.',
+                    'فهم المخاطر المالية وإدارتها.',
+                    ' صناعة قرارات إستراتيجية بناء على المعلومات المالية',
+                    'إعداد التقارير المالية وتطبيق التحليل المالي الصحيح.',
+                ]
+            },
+            {
+                title: 'إدارة المشاريع الاحترافية',
+                img: 'img-maher/12.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: ' إكساب المتدرب  مهارات إدارة المشاريع',
+                axes: [
+                    ' مفهوم المشروع.',
+                    'نطاق المشروع.',
+                    'أنشطة المشروع.',
+                    'إدارة المعنيين بالمشروع وخطة تحديدهم.',
+                    'إدارة فريق العمل وتطويره.',
+                    'إدارة المخاطر وتحليلها.',
+                    'وضع خطة الاستجابة للمخاطر وتطبيقها.',
+                    'إدارة جودة المشاريع وضبطها.',
+                ]
+            },
+            {
+                title: 'القيادة التنظيمية في اتخاذ القرار',
+                img: 'img-maher/13.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'تنمية مهارات المتدرب في مجال القيادة التنظيمية في اتخاذ القرار; لجعلهم قادرين على التأثير في الاخرين لتحقيق أهداف العمل بكفاءة وفاعلية.',
+                axes: [
+                    ' اتجاهات فهم القيادة.',
+                    'أنماط القيادة وخصائص القادة الفاعلين.',
+                    'صناعة التأثير وتطبيق فنون القادة بفعالية.',
+                    'القيادة التحويلية.',
+                    'القيادة الخادمة.',
+                    'مشكلة ضعف القيادة وِّحلها.',
+                    'تحليل دور القائد بوصفه محفزاً للتغير.',
+                    'بناء منظومة العمل المؤسسي.',
+                    'تأهيل قادة المستقبل.',
+                    'اتخاذ القرارات الجريئة',
+                ]
+            },
+            {
+                title: 'النجاح الوظيفي وتنظيم وتطوير اساليب العمل',
+                img: 'img-maher/14.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب مهارات  النجاح الوظيفي وتنظيم وتطوير أساليب العمل وتبسيط الأجراءات.',
+                axes: [
+                    ' مفهوم النجاح الوظيفي.',
+                    'مراِّحل الحياة الوظيفية.',
+                    'الجانب التطويري والسلوكي للنجاح الوظيفي.',
+                    'مهارات النجاح الوظيفي.',
+                    'عوامل أساسية للنجاح الوظيفي.',
+                    'الاستقرار في الوظيفة.',
+                    'المفاهيم الحديثة في التنظيم والتطوير لأساليب العمل.',
+                    'أساليب العمل.',
+                    'مهارات تبسيط الإجراءات في العمل.',
+                    'شبكات الأعمال و تنظيم العمل.',
+                ]
+            },
+            {
+                title: 'التطوير الإدري',
+                img: 'img-maher/15.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب مهارات التطوير الإداري',
+                axes: [
+                    ' مفهوم التطوير الإداري وأهميته في تحسين الأداء المؤسسي.',
+                    'دور المديرين والقادة في تحليل اِّحتياجات التطوير الإداري.',
+                    'تصميم برامج التطوير الإداري وتنفيذها بما يتناسب مع احتياجات المؤسسة.',
+                    'مهارات القيادة والإدارة لدى المديرين والقادة.',
+                    'الثقافة التنظيمية والقيم الإدارية المؤسسية.',
+                    'اتخاذ القرارات الإستراتيجية والتكتيكية.',
+                    'الابتكار والإبداع في سياق الإدارة والقيادة.',
+                    'مهارات إدارة التغيير والتحول المؤسسي.',
+                    'التعامل مع التحديات والمشكلات التي قد تواجه المديرين والقادة في عملية التطوير الإداري.',
+                    'تقييم نتائج التطوير الإداري وقياس تأثيرها في الأداء والنتائج المؤسسية.',
+                ]
+            },
+            {
+                title: 'التخطيط الاستراتيجي',
+                img: 'img-maher/16.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب اهم المفاهيم التقليدية والحديثة والمحاور الاساسية في التخطيط الاستراتيجي, والتنسيق بين الاستراتيجيات والمستويات الإدارية وكذلك خطوات التخطيطالإستراتيجي وإدارته بما يتوافق مع أهداف المؤسسة و رسالتها.',
+                axes: [
+                    ' مفهوم التخطيط الإستراتيجي وأهدافه وفوائده.',
+                    'أساسيات التخطيط الإستراتيجي وأهميته.',
+                    'تصميم برامج التطوير الإداري وتنفيذها بما يتناسب مع احتياجات المؤسسة.',
+                    'عناصر التخطيط الإستراتيجي وأبعاده.',
+                    'الثقافة التنظيمية والقيم الإدارية المؤسسية.',
+                    'أساليب التخطيط الإستراتيجي ومراحله وخطواته.',
+                    'تحليل البيئة الخارجية والداخلية للمؤسسة.',
+                    'تحديد رؤية المؤسسة ورسالتها والعناصر الواجب توافرها.',
+                    'وضع الأهداف الإستراتيجية وصياغتها.',
+                    'مشكلات التخطيط الإستراتيجي وصعوباتها وكيفية معالجتها.',
+                    ' خطوات التخطيط الإستراتيجي الفعال.',
+                ]
+            },
+            {
+                title: 'الكتابة الوظيفية للمؤسسات والشركات',
+                img: 'img-maher/17.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: ' إكساب المتدرب مهارات  إعداد النماذج الإدارية (الخطابات - التقارير -المذكرات - محاضر الاجتماعات...) وصياغتها ومراجعتها',
+                axes: [
+                    ' الاتصال والتواصل في الكتابة الوظيفية.',
+                    'الكتابة الوظيفية والكتابة الإبداعية.',
+                    'النماذج الإدارية المختلفة بناء على الأصول الفنية الإدارية.',
+                    'الصياغة اللغوية والإملائية الصحيحة في الكتابة الوظيفية.',
+                    'كتابة المحتوى الوظيفي وصياغته.',
+                    'كتابة المحاضر والتقارير الإدارية وصياغتها',
+                    'نظام المراسلات الإلكترونية والتواصل الوظيفي الإلكتروني.',
+                    'أساسيات التواصل الوظيفي عبر البريد الإلكتروني.',
+                    'آلية صياغة الردود وكتابة البريد الرسمي.',
+                ]
+            },
+            {
+                title: 'خدمة العملاء',
+                img: 'img-maher/18.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: ' إكساب المتدرب مفاهيم خدمة العملاء ومبادئها، ومهارات التواصل',
+                axes: [
+                    ' أساليب الاتصال وعناصره وعوائقه وكيفية التغلب عليها.',
+                    'أنواع الاتصال ومكونات عملية الاتصال.',
+                    'مهارات الإنصات وقواعد الإنصات الجيد.',
+                    'مهارات الحديث والتعامل مع مشكلات الحديث.',
+                    'مهارات الحوار مع الآخرين وجذب انتباههم.',
+                    'لغة الجسد في الاتصال وأنواع الاتصالات غير اللفظية.',
+                    'مهارات الإدراك الحسي والتغذية المرتدة.',
+                    'مفهوم خدمة العملاء وأهمية رضا العميل.',
+                    'إستراتيجيات التميز في خدمة العملاء والتعامل مع اعتراضاتهم',
+                    'طبيعة التسويق وأهمية العلاقات العامة في التأثير في الجماهير.'
+                ]
+            },
+            {
+                title: 'استخدام نموذج الجودة الأروبي في تطوير وتقييم الاداء المؤسسي',
+                img: 'img-maher/19.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدربين المعارف والمهارات اللازمة التي تمكنهم من فهم تطبيق نموذج الجودة الأوروبي في تقييم وتطوير الأداء المؤسسي EFQM بكفاءة.',
+                axes: [
+                    ' التميز في أداء المؤسسات وأهميته.',
+                    'أهمية نموذج الجودة الأوروبي EFQM واهدافة.',
+                    'مكونات نموذج الجودة الأوروبي وعناصره.',
+                    'المعايير الأساسية لنموذج الجودة الأوروبي: القيادة، والسياسات والإستراتيجيات, والموارد البشرية، والموارد والعمليات، ونتائج المتعلمين.',
+                    'الدول التي تتبنى تطبيق نموذج الجودة الأوروبي، وما حققته من إنجازات.',
+                    'آليات إدارة التميز وفق النموذج الأوروبي.',
+                    'نظام تقييم المؤسسات وفق النموذج الأوروبي.',
+                    'تقييم المؤسسات وفق النموذج الأوروبي وتطويرها.',
+                    'أهم التحديات التي تحد من التميز والجودة في أداء المؤسسات وتطويرها، وكيفية التغلب على هذه التحديات.',
+                ]
+            },
+            {
+                title: 'أحكام نظام العمل السعودي',
+                img: 'img-maher/20.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب أحكام نظام العمل السعودي وتعديلاته، وإكسابهم مهارات صياغة عقود العمل، وقدرات الترافع في القضايا العُمالية.',
+                axes: [
+                    ' الأحكام العامة لعقد العمل.',
+                    'صياغة عقد العمل واللإلمام بـ (موضوع العقد ومدته – التزامات الطرفين - العقد محدد المدة - العقد غير محدد المدة -  فترة التجربة -الإجازة السنوية - الرعاية الطبية -  التأمينات للمواطن والمقيم -  أحكام عمل المرأة - مكافأة نهاية الخدمة – الإخطارات والإشعارات).',
+                    'الجوانب القانونية المترتبة على انتهاء أو إنهاء العلاقة العمالية.',
+                    'تطبيقات قضائية على حالات عملية.',
+                ]
+            },
+            {
+                title: 'المسؤولية القانونية للممارسات الصحية',
+                img: 'img-maher/21.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: ' إكساب المتدرب معارف خاصة بالمسؤولية القانونية الواردة بنظام مزاولة المهن الصحية.',
+                axes: [
+                    ' اختصاصات الهيئة الصحية الشرعية والعقوبات التأديبية في حالة المخالفات المهنية.',
+                    'نظام التأمين التعاوني ضد الأخطاء المهنية الطبية الإلزامي.',
+                    'الضوابط الشرعية والقانونية لإجراء التجارب الطبية على المرضى.',
+                    'الحصول على موافقة قانونية من المريض، مع توثيق علمه وإدراكه الكامل بطبيعة التجربة وما قد يترتب عليها من مخاطر.',
+                    'التجربة تحقق مصلحة المريض.',
+                    'الأخطاء المهنية الصحية التي ترفع بها المطالبة بالحق الخاص (دية -تعويض – إرش).',
+                    'الأخطاء المهنية الصحية التي ينتج عنها وفاة أو تلف عضو من أعضاء الجسم، أو فقد منفعته، أو بعضها',
+                    'الأعمال الطبية التي يسمح للطبيب بممارستها دون مسؤولية قانونية، والفروق بين الأصول العلمية في العالج ومسؤولية الممارس الطبي عنها.',
+                    'تفادي ّ حالات المسؤولية المدنية التقصيرية والجنائية للممارس الصحي.',
+                    'تفادي المسؤولية المدنية والجنائية الناشئة عن نقل الدم والتحاليل الطبية وتركيبات الأسنان والأخطاء في الأشعة.'
+                ]
+             },
+            {
+                title: 'الأمن الصناعي',
+                img: 'img-maher/22.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: ' إكساب المتدرب  مهارات الأمن الصناعي والصحة والسلامة.',
+                axes: [
+                    ' مفهوم الأمان والسلامة.',
+                    'أهداف السلامة وأهميتها.',
+                    'إجراءات السلامة وواجباتها.',
+                    'مهام حارس السلامة ومسؤولياتها.',
+                    'مهارات وصفات شخصية لرجل السلامة.',
+                    'لوائح السلامة واشتراطاتها.',
+                    'الوقاية ومكافحة الحرائق.',
+                    'تصنيف المخاطر وتحليلها.',
+                    'ضغوط العمل ومهارات التعامل معها.',
+                    'حلول لضغوط العمل.'
+                ]
+             },
+            {
+                title: 'الصحة والسلامة المهنية(OSHA)',
+                img: 'img-maher/23.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: ' إكساب المتدرب  مهارات الصحة والسلامة المهنية.',
+                axes: [
+                    ' أهداف برنامج السلامة والصحة المهنية.',
+                    'طرق الوقاية من الحوادث في العمل.',
+                    'أنواع الحوادث والإصابات في العمل.',
+                    'دور مسؤول السلامة والصحة المهنية في مواقع العمل.',
+                    'أنواع المخاطر في المؤسسات وطرق تجنبها.',
+                    'التخطيط لعناصر الإنتاج لمنع الحوادث.',
+                    'أنواع الحرائق.',
+                    'أنواع طفايات الحريق.',
+                    'تحليل المخاطر في بيئة العمل.',
+                    'خطة الإخلاء والطوارئ بالمنظمات.', 
+                    'تعريفات مسالك الهروب'               
+                ]
+             },
+            {
+                title: 'دمج التقنية في التعليم والتدريب',
+                img: 'img-maher/24.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: ' إكساب المتدرب في المؤسسات التعليمية المعارف والمهارات الخاصة بعملية دمج التكنولوجيا في التعليم والتدريب.',
+                axes: [
+                    ' البيئة التعليمية والتدريبية وأنواعها ودمج التكنولوجيا في التعليم.',
+                    'التحولات التي عجلت بعملية دمج التكنولوجيا في التعليم.',
+                    '  نماذج دمج التكنولوجيا في التعليم والتدريب، وتطبيق نموذج TPACK.',
+                    'المستحدثات التكنولوجية وخصائصها والقاعات التفاعلية الذكية.',
+                    'التعليم الإلكتروني وأشكاله وأنظمة إدارة التعلم.',
+                    'الوسائط المتعددة وطرق استخدامها في التعليم.',
+                    'الفصول الافتراضية وأنواعها.',
+                    'التعليم المتنقل وتطبيقاته في التعليم.',
+                    'الواقع المعزز وخصائصه وبرامجه في التعليم.',
+                ]
+             },
+            {
+                title: 'التعليم الأكتروني في مواجة الأزمات و المخاطر',
+                img: 'img-maher/25.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب في المؤسسات التعليمية مهارات التعليم والتدريب الإلكتروني وأنظمتها في المؤسسات التعليمية.',
+                axes: [
+                    ' مفهوم الأزمات والكوارث وتصنيفاتهما.',
+                    'مواجهة الأزمات والكوارث في المؤسسات التعليمية.',
+                    'أساليب الاستجابة للأزمات في المؤسسات التعليمية.',
+                    'أسس إدارة الأزمات في المؤسسات التعليمية ومقوماتها.',
+                    'ِّحلول مقترحة لإدارة الأزمات في المؤسسات التعليمية.',
+                    'التعليم عن بعد، والتعليم المفتوح، والتعليم الإلكتروني في الأزمات.',
+                    'أهداف التعليم عن بعد في الأزمات وفوائدها.',
+                    'مفهوم التعليم الإلكتروني ومميزاته.',
+                    'أنواع أنظمة إدارة التعلم الألكتروني.',
+                    'استخدام نظام Moodel و Blackboard في التعليم والتدريب الإلكتروني (ورشة عمل).',
+                ]
+             },
+            {
+                title: 'إدارة البيئة الصفية',
+                img: 'img-maher/26.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب في المؤسسات التعليمية مهارات إدارة البيئة الصفية',
+                axes: [
+                    'مفهوم الإدارة الصفية وتطبيقاتها.',
+                    'مفهوم إدارة بيئة التعلم.',
+                    'أهمية الإدارة الصفية الفعالة.',
+                    'أهم معايير الإدارة الصفية الناجحة للمعلم.',
+                    'العوامل المؤثرة في الإدارة الصفية.',
+                    'المشكلات الصفية وأساليب التعامل معها.',
+                    'إجراءات تنفيذ الدرس.',          
+                ]
+             },
+            {
+                title: 'تصميم وإنتاج المحتوى الرقمي في التعليم والتدريب',
+                img: 'img-maher/27.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب في المؤسسات التعليمية مهارات صناعة المحتوى الرقمي ومبادئه.',
+                axes: [
+                    'مفهوم الأتصال ومرتكزات التعلم.',
+                    'أنواع المحتوى الرقمي.',
+                    'الأدوات والحلول الرقمية في صناعة المحتوى الرقمي.',
+                    'التعامل مع مهارات صناعة المحتوى الرقمي.',
+                    'أدوات تحليل التفاعل الرقمي.',
+                    'استخدام مهارات تحليل البيانات واتخاذ القرار.',
+                    'معرفة دور البيانات الضخمة والذكاء الاصطناعي في صناعة المحتوى الرقمي.',  
+                    'التمييز بين أنواع الجماهير وطرق صناعة المحتوى الرقمي المناسب لكل جمهور.',
+                    'تحديد مصفوفة المحتوى الرقمي.',        
+                ]
+             },
+            {
+                title: 'تصميم وإنتاج الكتاب الإلكتروني التفاعلي ',
+                img: 'img-maher/28.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب في المؤسسات التعليمية الأسس والمهارات العملية في تصميم الكتاب الإلكتروني وإنتاجه.',
+                axes: [
+                    'مفاهيم في الكتاب الإلكتروني التفاعلي.',
+                    'تاريخ تطور الكتاب الإلكتروني التفاعلي.',
+                    'مميزات الكتاب الإلكتروني التفاعلي.',
+                    'استعراض بعض أشكال الكتب الإلكترونية.',
+                    'معايير تصميم الكتاب الإلكتروني التفاعلي وإنتاجه.',
+                    'أشهر تطبيقات إنتاج الكتاب الإلكتروني التفاعلي.',
+                    'تصميم  كتاب  إلكتروني تفاعلي باستخدام نموذج  التصميم التعليمي ADDIE.',  
+                    'إنتاج  الكتاب  الإلكتروني التفاعلي باستخدام  برنامج Filp PDF.',
+                    'ورشة عمل الإنتاج كتاب إلكتروني تفاعلي في تخصص المتدرب.',        
+                ]
+             },
+            {
+                title: 'التعليم النشط',
+                img: 'img-maher/29.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب في المؤسسات التعليمية مهارات التعلم النشط.',
+                axes: [
+                    'مفهوم التعلم النشط.',
+                    'أسس التعلم النشط وعوائده.',
+                    'عوائق قد تعترض التعلم النشط.',
+                    'دور كل من المعلم والمتعلم في التعلم النشط.',
+                    'إستراتيجيات التعلم النشط.',
+                    'طريقة تطبيق إستراتيجيات التعلم النشط.',
+                    'كيف تصبح متعلماً نشطً ؟',  
+                ]
+             },
+            {
+                title: 'استخدام أدوات جوجل في التعليم',
+                img: 'img-maher/30.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب في المؤسسات التعليمية الأسس والمهارات العملية في استخدام أدوات جوجل.',
+                axes: [
+                    'مفهوم تطبيقات جوجل التعليمية.',
+                    'استخدام أبرز تطبيقات جوجل التعليمية.',
+                    'بريد جوجل Google Gmail- محرك البحث جوجل Google search - Google Scholar  -  Google Video- خرئط جوجل - تقويم جوجل - ترجمة جوجل Google - Google Books - Google Earth - Google Translate -Art Project - مدونة قوقل blogger - مستندات جوجل  مواقع جوجل -Google Sites - Google classroom - لفصول الافتراضية في Google Hangouts - التخزين السحابي Google Drive - استبانات واختبارات جوجل Google form',
+                ]
+             },
+            {
+                title: 'التعليم عبر الجوال والاجهزة اللوحية',
+                img: 'img-maher/31.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'تمكين المتدرب من اكتساب الأسس النظرية والمهارات العملية للتعليم عبر الجـــــوال والأجهزة اللوحية',
+                axes: [
+                    'تعريف التعليم باستخدام الجوال والأجهزة اللوحية.',
+                    'التطور التاريخي للتعليم عبر الجوال والأجهزة اللوحية.',
+                    'مميزات التعليم عبر الجوال والأجهزة اللوحية.',
+                    'تحديات التعليم عبر الجوال والأجهزة اللوحية.',
+                    'تطبيقات التعليم عبر الجوال والأجهزة اللوحية.',
+                    'Moodle Mobile تطبيق - (LMS) تطبيقات نظام إدارة التعلم .',
+                    'تطبيقات خاصة بإدارة الفصل.', 
+                    'تطبيق إدارة الفصل - ClassDojo - تطبيق إدارة الفصل teacher kit ',  
+                    'تطبيقات متخصصة في عدة مجالات : Google Keep - Evernote - OneNote - PowerPoint - Duolingo - Babbel - ThingLink - Babbel Comic Puppets Lite - Video Editor - Animoto Video Editor - Smart Voice Recorder - tape-a-talk - lensoo create - Explain Everything - MINDOMO',  
+                    'التصميم التعليمي للتعليم عبر الجوال والأجهزة اللوحية.',  
+                    'نموذج تصميم التعليم العام (ADDIE).',   
+                ]
+             },
+            {
+                title: 'التقويم من أجل التعليم',
+                img: 'img-maher/32.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب في المؤسسات التعليمية مهـــــارات التقويم من أجل التعليم.',
+                axes: [
+                    'مفهوم التقويم وأساليبه.',
+                    'مبادئ التقويم في التعليم.',
+                    'الفرق بين التقويم التربوي والتقويم التعليمي.',
+                    'طرق التقويم من أجل التعليم وأدواته.',
+                    'مواصفات التقويم الجيد.',
+                    'Moodle Mobile تطبيق - (LMS) تطبيقات نظام إدارة التعلم .',
+                    'تطبيقات خاصة بإدارة الفصل.', 
+                    'تطبيق إدارة الفصل - ClassDojo - تطبيق إدارة الفصل teacher kit ',  
+                    'تطبيقات متخصصة في عدة مجالات : Google Keep - Evernote - OneNote - PowerPoint - Duolingo - Babbel - ThingLink - Babbel Comic Puppets Lite - Video Editor - Animoto Video Editor - Smart Voice Recorder - tape-a-talk - lensoo create - Explain Everything - MINDOMO.',  
+                    'التصميم التعليمي للتعليم عبر الجوال والأجهزة اللوحية.',  
+                    'نموذج تصميم التعليم العام (ADDIE).',   
+                ]
+             },
+            {
+                title: 'تصميم وإنتاج الواقع المعزز',
+                img: 'img-maher/33.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب المهارات العملية في إنتاج الواقع المعزز.',
+                axes: [
+                    'الواقع المعزز.',
+                    'خصائص الواقع المعزز.',
+                    'النظريات التربوية التي يقوم عليها الواقع المعزز.',
+                    'أهمية تقنية الواقع المعزز.',
+                    'أنواع الواقع المعزز.',
+                    'الفرق بين الواقع المعزز والواقع الافتراضي.',
+                    'استخدام الواقع المعزز في المجالات المختلفة.', 
+                    'استخدام الواقع المعزز في مجال التعليم.',  
+                    'استخدام الواقع المعزز في التدريس.',  
+                    'وسائل وتطبيقات الواقع المعزز في التعليم.',  
+                    'الأجهزة الحديثة التي تستخدم الواقع المعزز في تدريس المواد المختلفة.',  
+                    'مفهوم التصميم التعليمي ونظرياته ونماذجه.',
+                    'أهمية التصميم التعليمي وفوائده.',
+                    'أشهر نماذج التصميم التعليمي.',
+                    'مشروع تطبيقي.', 
+                ]
+             },
+            {
+                title: 'مهارات التدريس الفعال',
+                img: 'img-maher/34.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب مهارات التدريس الفعال',
+                axes: [
+                    'مفهوم التدريس الفعال وأبعاده المختلفة.',
+                    'خصائص التدريس الفعال وشروطه.',
+                    'صفات المعلم الفعال والقدرات المهنية المطلوبة.',
+                    'مهارات التدريس الفعال، بما في ذلك التخطيط ونقل المعلومات.',
+                    'القدرة على تسيير الدرس بشكل منظم، وتحفيز التفكير لدى الطالب.',
+                    'مهارات التعزيز وإثارة الدافعية لدى الطالب.',
+                    'مهارات تنويع المثيرات التعليمية واستخدام الأسئلة بفعالية.', 
+                    'تقييم فعالية التدريس وإنهاء الدرس بشكل مناسب.',  
+                    'الإستراتيجيات الحديثة للتعلم.',  
+                    'خطوات التدريس الإبداعي.',  
+                ]
+             },
+            {
+                title: 'إدارة عمليات التفتيش والرقابة',
+                img: 'img-maher/35.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدربين المعارف والمهارات والسلوكيات الواجب توافرها لدى المفتشين والمراقبين السعوديين العاملين في القطاع الخاص، والموكل إليهم أعمال الرقابة نيابة عن الجهات الحكومية، وتدريبهم على مهارات عالية ومتخصصة لممارسة العمل في مجال الرقابة والتفتيش',
+                axes: [
+                    'المفاهيم الأساسية في مجال التفتيش والرقابة وفقاً للمعايير المحلية والدولية.',
+                    'الضوابط والأطر العامة للحياد والنزاهة والاستقلال والشفافية.',
+                    'مفهوم عملية التفتيش والرقابة وخصائصها.',
+                    'أهداف عملية التفتيش والرقابة.',
+                    'السياسات والإجراءات التنظيمية الخاصة بعملية التفتيش والرقابة على المنشآت.',
+                    'المنظور الشرعي لعملية الرقابة والتفتيش.',
+                    'معايير الجودة الخاصة بعملية التفتيش والمراقبة.', 
+                    'المهارات الواجب توافرها في فريق التفتيش والمراقبة الميداني.',  
+                    'الأساليب والطرق الحديثة في عملية التفتيش والمراقبة',  
+                    'مهارات إعداد خطة التفتيش والمراقبة.',  
+                    'التحديات والعقبات التي تواجه عملية التفتيش والرقابة.', 
+                ]
+             },
+            {
+                title: 'مكافحة الاحتيال المصرفي',
+                img: 'img-maher/36.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدربين المعارف والمهارات الالزمة لمكافحة جرائم االِّحتيال في القطاع المصرفي.',
+                axes: [
+                    'الاحتيال المصرفي وأنواعه المختلفة ومخاطره',
+                    'الأسباب والعوامل التي تسهم في وقوع جرائم الاحتيال.',
+                    'الأطر القانونية والتنظيمية المحلية والدولية المتعلقة بمكافحة الاحتيال.',
+                    'أدوار ومسؤوليات موظفي المصرف في مختلف الإدارات للوقاية من الاحتيال.',
+                    'تنفيذ إجراءات العناية الواجبة (KYC/CDD) للتحقق من هوية العمالء والحد من مخاطر الاحتيال.',
+                    'مؤشرات وعلامات الإنذار المبكر (Red Flags) المرتبطة باألنشطة الاحتيالية المحتمله',
+                    'تحليل أساليب الأحتيال الشائعة في العمليات المصرفية (االئتمان،التحويلات، البطاقات، الاحتيال الإلكتروني).', 
+                    'آليات الرقابة الداخلية المتاحة لمنع وقوع الاحتيال.',  
+                    'التعامل مع العملاء المشتبه بهم، أو الحالات المشبوهة وفقاً لسياسات المصرف وإجراءاته.',  
+                    'توثيق الحالات المشبوهة وإعداد تقارير واضحة وموجزة لرفعها للجهات المعنية داخلياً.',  
+                    'نشر الوعي بمخاطر الاحتيال بين الزمالء والعملاء.', 
+                ]
+             },
+            {
+                title: 'الجودة الشاملة',
+                img: 'img-maher/37.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'يهدف البرنامج إلى إكســاب المتدربيــن المهارات والمعارف اللازمه لتطبيق مبادئ الجودة الشاملة؛ بوصفها إستراتيجية فعالة لتحقيق التميز المؤسسي والتطوير المستمر في الأداء، من خلال ربط أهداف الجودة بالرؤية والرسالة الإستراتيجية للمؤسسة.',
+                axes: [
+                    'مفهوم الجودة الشاملة.',
+                    'أسس الأدارة الإستراتيجية لتحسين الجودة الشاملة.',
+                    'أدوات وتقنيات تقييم الجودة الشاملة.',
+                    'الاتجاهات العالمية في مجال الجودة الشاملة.',
+                    'المهارات األساسية إلعداد وتنفيذ خطط تطبيق الجودة الشاملة (Plans Action).',
+                    'إستراتيجيات تحسين الأداء المؤسسي وتحقيق الاستدامة.',
+                    'دراسة الحالات، وتحديد أفضل الممارسات في تطبيق الجودة الشاملة.', 
+                    'صياغة إستراتيجيات مؤسسية قائمة على مفاهيم الجودة الشاملة.',  
+                    'توِّحيد ثقافة الجودة الشاملة على مختلف مستويات المنظمة.',  
+                ]
+             },
+            {
+                title: 'مكافحة الفساد الأداري والمالي',
+                img: 'img-maher/38.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكســاب المتدربيــن المهارات اللازمة لمكافحة الفساد الإداري والمالي.',
+                axes: [
+                    'مفهوم الجودة الشاملة.',
+                    'مفهوم الفساد المالي والإداري: تعريفه، ومظاهره، وأسبابه.',
+                    'أثر الفساد وانعكاساته على النواحي الاقتصادية والاجتماعية والإدارية.',
+                    'الحكم الصالح: المفهوم، والمبادئ الأساسية، وأهميته في التنمية.',
+                    'المساءلة المجتمعية: مفهومها، وأهدافها، وأدواتها.',
+                    'الفساد وأخلاقيات العمل: العلاقة بين الالتزام المهني ومكافحة الفساد.',
+                    'عوامل الوقاية من الفساد: الفردية والمؤسسية.', 
+                    'الرقابة في المؤسسات: المفهوم، والوظائف، والدور التنظيمي.',  
+                    'أنواع الرقابة: الداخلية، والخارجية، والوقائية، والعالجية.',  
+                    'إستراتيجيات مكافحة الفساد: أساليب، ونماذج، وتجارب عالمية.',  
+                    'وسائل وأدوات معالجة الفساد المالي والإداري: تطبيقات عملية وحلول مقترحة.',    
+                ]
+             },
+            {
+                title: 'مؤشرات قياس الأداء KPIS',
+                img: 'img-maher/39.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'تزويد المشاركين بالمعرفة اللازمة لفهم مؤشرات الأداء وتطبيقها بشكل فعال؛ مما يساعد على تحسين اتخاذ القرارات وتحقيق الأهداف الإستراتيجية.',
+                axes: [
+                    'مفهوم مؤشرات الأداء وأهميتها في قياس الأداء المؤسسي ودعم اتخاذ القرار وتحقيق الأهداف الإستراتيجية.',
+                    'أنواع مؤشرات الأداء وتصنيفاتها من حيث المستوى، والطبيعة، وطرق القياسي.',
+                    'الفرق بين مؤشرات الأداء الرئيسة والعوامل الحرجة للنجاح، ودور كل منهما في تحقيق النتائج.',
+                    'العلاقة بين الأهداف الإستراتيجية والمخاطر ومؤشرات الأداء في المتابعة و الرقابة.',
+                    'النموذج المفاهيمي الذي يربط الأهداف بالعوامل الحرجة للنجاح، ثم بمؤشرات الأداءالقابلة للقياس.',
+                    'الخطوات المنهجية لتصميم مؤشرات أداء فعالة، واختيار مؤشرات مناسبة ومرتبطة بالأهداف التنظيمية وفق نموذج SMART.',
+                    'إعداد الجداول العملية لمؤشرات الأداء متضمنة: اسم المؤشر، وهدفه، وآلية قياسه، ومصدر البيانات، وتكرار القياس.', 
+                    'آليات جمع بيانات المؤشرات وتنظيفها ومعالجتها باستخدام أدوات تحليل البيانات المناسبة.',  
+                    'تمثيل نتائج المؤشرات بالرسوم البيانية وإعداد تقارير مبسطة ومرئية لعرضها على أصحاب القرار.',  
+                    'دمج مؤشرات الأداء في العمليات التشغيلية، ومراجعتها وتحديثها دوريًا، ومعالجة التحديات، وبناء خطة تحسين مستدامة قابلة للتطبيق.',  
+                ]
+             },
+            {
+                title: 'إدارة المبيعات والمشتريات',
+                img: 'img-maher/40.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب  المهارات اللازمة لشغل وظائف المبيعات والمشتريات في الشركات.',
+                axes: [
+                    'مقدمة إلى المبيعات والمشتريات.',
+                    'مهارات التواصل والتفاوض.',
+                    'التكنولوجيا وأدواتها في المبيعات.',
+                    'التكنولوجيا في المشتريات.',
+                    'التجارة الإلكترونية والمبيعات الرقمية.',
+                    'إدارة العلاقات مع العملاء والموردين.',
+                    'المهارات المالية في المبيعات والمشتريات.', 
+                    'إدارة الجودة وخدمة العملاء.',  
+                    'التطبيقات العملية والتحضير للتوظيف.',  
+                ]
+             },
+            {
+                title: 'إدارةالمطاعم',
+                img: 'img-maher/41.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب  المهارات الالزمة لشغل وظائف إدارية في المطاعم.',
+                axes: [
+                    'تخطيط الأعمال وتنظيم المطعم.',
+                    'إدارة العمليات اليومية.',
+                    'التغذية وسالمة الأغذية.',
+                    'التسويق والعلاقات العامة.',
+                    'الخدمة وتجربة العملاء.',
+                    'إدارة الموارد البشرية.',
+                    'التمويل والمحاسبة.', 
+                    'القوانين والتشريعات.',  
+                    'التطوير والابتكار المستمر.',  
+                ]
+             },
+            {
+                title: 'إدارةالفنادق',
+                img: 'img-maher/42.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب  المهارات اللازمة لشغل الوظائف الإدارية في الفنادق.',
+                axes: [
+                    'مقدمة في إدارة الفنادق.',
+                    'التخطيط والتنظيم الفندقي.',
+                    'إدارة الخدمات الفندقية.',
+                    'التسويق والبيع في القطاع الفندقي.',
+                    'إدارة الموارد البشرية في الفنادق.',
+                    'إدارة الجودة والرضا الفندقي.',
+                    'التكنولوجيا في إدارة الفنادق.', 
+                    'إدارة العمليات الفندقية.',  
+                    'الأمن والسلامة في الفنادق.',  
+                    'الاستدامة والمسؤولية الاجتماعية في الفنادق.', 
+                ]
+             },
+            {
+                title: 'منسق فعاليات',
+                img: 'img-maher/43.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب  المهارات اللازمة لشغل وظيفة منسق فعاليات.',
+                axes: [
+                    'التخطيط المبدئي وإعداد الجدول الزمني.',
+                    'إدارة الميزانية والموارد.',
+                    'اختيار المكان والتنسيق اللوجستي.',
+                    'التسويق والترويج.',
+                    'تقنيات التسجيل وإدارة الجمهور .',
+                    'إدارة المتحدثين والمحتوى.',
+                    'التكنولوجيا واستخدام الأدوات الحديثة.', 
+                    'التقييم والمتابعة بعد الفعالية.',  
+                    'الاعتبارات الأخلاقية والمهنية.',  
+                ]
+             },
+            {
+                title: 'الباريستا',
+                img: 'img-maher/44.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب المهارات اللازمة لشغل وظيفة الباريستا.',
+                axes: [
+                    'تاريخ القهوة ومصادرها.',
+                    'معرفة القهوة المختصة.',
+                    'التخزين الصحيح للقهوة.',
+                    'تذوق النكهات وتمييزها.',
+                    'إتقان طرق التحضير المختلفة.',
+                    'تحضير الإسبريسو وتقييمه.',
+                    'اختيار الماء المناسب للمقهى.', 
+                    'تبخير الحليب وتكوين اللاتيه آرت.',  
+                    'مهارات الباريستا المحترف.',  
+                    'إدارة المقهى.',  
+                ]
+             },
+            {
+                title: 'مشغل ألعاب ترفيهية',
+                img: 'img-maher/45.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب  المهارات اللازمة لشغل وظيفة مشغل الألعاب الترفيهية.',
+                axes: [
+                    'مفهوم السياحة.',
+                    'شركات الألعاب الترفيهية.',
+                    'قواعد نظام العمل في شركات الألعاب الترفيهية.',
+                    'تطبيق عملي على تشغيل الألعاب الترفيهية..',
+                    'أسس الأمن والسلامة في تشغيل الألعاب الترفيهية.',
+                    ' أنواع الألعاب الترفيهية.',
+                    'تكنولوجيا الألعاب الإلكترونية.', 
+                    'إدارة منصات الألعاب.',  
+                    'أخلاقيات الألعاب الترفيهية وقوانينها.',   
+                ]
+             },
+            {
+                title: 'إدارة بيوت الثقافة.',
+                img: 'img-maher/46.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب المهارات اللازمة لشغل وظيفة إدارة بيوت الثقافة.',
+                axes: [
+                    'بيوت الثقافة وأهدافها ودورها الثقافي في المجتمع.',
+                    'تأثير بيوت الثقافة في التنمية الثقافية والاجتماعية.',
+                    'دور المسرح، والسينما، والفنون، والحرف اليدوية في نشر الثقافة.',
+                    'مفهوم الهوية الثقافية ومقوماتها ونظرياتها.',
+                    'سمات الإدارة الناجحة في بيوت الثقافة وعناصرها.',
+                    'التخطيط الإستراتيجي وأولويات بيوت الثقافة وقياس نجاح الخطط.',
+                    'مفهوم الجودة الشاملة وتطبيقاتها في بيوت الثقافة.', 
+                    'إستراتيجيات إدارة الكوادر البشرية وتطوير المهارات في بيئات الثقافة.',  
+                    'مفهوم الملكية الفكرية، وحقوق المؤلف، وآليات حماية الملكية الفكرية في المملكة.',  
+                    'أسس التسويق الثقافي وإستراتيجياته وكتابة المحتوى التسويقي الثقافي.',  
+                ]
+             },
+            {
+                title: 'المبيعات الهاتفية',
+                img: 'img-maher/47.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                objective: 'إكساب المتدرب المهارات اللازمة لشغل وظيفة المبيعات الهاتفية.',
+                axes: [
+                    'مفهوم المبيعات الهاتفية وأهميتها.',
+                    'مهارات التواصل الفعال والاستماع النشط لفهم اِّحتياجات العملاء.',
+                    'مهارات الإقناع والتأثير أثناء المكالمات الهاتفية.',
+                    'إدارة الوقت وتنظيم الجداول اليومية لتقليل الوقت المهدر.',
+                    'التخطيط المسبق ومعرفة الجمهور المستهدف.',
+                    'صياغة السيناريوهات البيعية بكفاءة.',
+                    'مهارة بناء الثقة مع العملاء في بداية المكالمات.', 
+                    'تحليل اِّحتياجات العميل وتقديم حلول تلبي توقعاته.',  
+                    'التعامل مع الاعتراضات البيعية بفعالية وإغلاق الصفقات بنجاح.',  
+                    'بناء علاقات طويلة المدى مع العملاء وتعزيز الولاء.',  
+                    'استخدام أدوات التكنولوجيا، مثل: برامج إدارة علاقات العملاء (CRM)، وتقنيات تحليل الأداء؛ لتحسين النتائج.',  
+                    'مهارة التعامل مع أنماط العملاء المختلفة وتلبية احتياجاتهم بمرونة.',  
+                ]
+             },
+            {
+                title: 'مشرف السكن الجماعي',
+                img: 'img-maher/48.png',
+               terms: ' شهادة معتمدة | مدة الدورة 30 ايام | بمعدل 100 ساعة تدريبية',
+                objective: 'إكساب المتدرب  المهارات اللازمة لشغل وظيفة مشرف سكن جماعي.',
+                axes: [
+                    'مفهوم المبيعات الهاتفية وأهميتها.',
+                    'مفاهيم السكن والفرق بين المسكن والمبنى وأهمية السكن.',
+                    'الحق في السكن اللائق وفقا  لقانون حقوق الإنسان.',
+                    'أنواع السكن واّحتياجات السكن.',
+                    'مفهوم السكن الجماعي وبرنامج السكن الجماعي للافراد في المملكة.',
+                    'تصنيف السكن الجماعي ومهام مشرف السكن الجماعي.',
+                    'الشروط الصحية والفنية والسلامة اللازمة في السكن الجماعي.', 
+                    'متطلبات إصدار ترخيص السكن الجماعي والتنظيم المكاني والفني والمعماري.',  
+                    'متطلبات الوقاية والحماية من الحرائق في السكن الجماعي.',  
+                    'لائحة المخالفات والغرامات الخاصة بالمراقبة والمتابعة في السكن الجماعي.',  
+                    'تطبيق المهارات الإدارية، والقيادية، والتقنية لمشرف السكن الجماعي بما يشمل التواصل، والصحة والسلامة، والصيانة، والأمن.',   
+                ]
+             },
+            {
+                title: 'مشرف مهارات البيع لمنتجات التغذية واللياقة',
+                img: 'img-maher/49.png',
+               terms: ' شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 5 ساعة تدريبية',
+                objective: 'إكساب المتدربين المعارف والمهارات اللازمة لبيع منتجات التغذية واللياقة باحتراف من خلال فهم المنتج والعميل، وتطوير مهارات العرض، والإقناع، وبناء العلاقات.',
+                axes: [
+                    'تصنيف الفئات المختلفة من المنتجات الصحية والمكملات الغذائية ِّحسب نوع الاستخدام والفئة المستهدفة.',
+                    'تحليل آليات عمل منتجات إنقاص الوزن وّحوارق الدهون من خلال فهم المكونات النشطة وتأثيرها الفسيولوجي.',
+                    'أنواع مكملات البروتين والأحماض الأمينية، وتحديد المناسب منها لكل هدف صحي أو رياضي.',
+                    'مكونات الغذاء الأساسية وعلاقتها بالصحة العامة واحتياجات الجسم اليومي.',
+                    'مبادئ التغذية الصحية في إدارة الوزن من خلال بناء نظام غذائي متوازن يدعم فقدان الدهون دون التأثير في الصحة',
+                    'مهارات التواصل الفعال بالعملاء والزملاء من خلال فهم عناصر التواصل اللفظي وغير اللفظي.',
+                    'توظيف ما تم تعلمه في مواقف عملية واقعية من خلال أنشطة تطبيقية تحاكي بيئة العمل داخل شركة الوزن المثالي.', 
+                    'الاحترافية والشفافية والجودة في تقديم المشورة الغذائية والبيع المسؤول.',  
+                    'تمكين المتدربين من إعداد حلول واستشارات مخصصة لكل عميل بناء على فهم دقيق لاحتياجاته وسلوكياته الشرائية.',  
+                ]
+             }
+        ];
+
+        let currentLimit = 9;
+        
+        // مصفوفة لحفظ فهارس الدورات التي تم التسجيل فيها خلال التصفح
+        let registeredCourses = new Set();
+        let registrationTimeout; // متغير لحفظ العداد
+
+        const modal = document.getElementById('courseModal');
+        const coursesGrid = document.getElementById('coursesGrid');
+        const loadMoreBtn = document.getElementById('loadMore');
+        const btnClose = document.getElementById('btnCloseModal');
+        const btnRegister = document.getElementById('modalRegister');
+        const registerIcon = document.getElementById('registerIcon');
+        const registerText = document.getElementById('registerText');
+        const registerProgress = document.getElementById('registerProgress');
+
+        function createCourseCards() {
+            coursesGrid.innerHTML = ''; 
+            for(let i = 0; i < coursesData.length; i++) {
+                if(i >= currentLimit) break;
+                const course = coursesData[i];
+                const card = document.createElement('div');
+                card.className = 'course-card';
+                card.innerHTML = `
+                    <img class="course-img" src="${course.img}" alt="${course.title}">
+                    <h3>${course.title}</h3>
+                `;
+                card.onclick = () => openModal(i);
+                coursesGrid.appendChild(card);
+            }
+            loadMoreBtn.style.display = currentLimit >= coursesData.length ? 'none' : 'block';
+        }
+
+        function openModal(index) {
+            const course = coursesData[index];
+            document.getElementById('modalImg').src = course.img;
+            document.getElementById('modalTitle').textContent = course.title;
+            document.getElementById('modalTerms').textContent = course.terms;
+            
+            document.getElementById('modalObjective').innerHTML = `<h3>الهدف العام للدورة</h3><p>${course.objective}</p>`;
+            
+            const axesEl = document.getElementById('modalAxes');
+            axesEl.innerHTML = '';
+            course.axes.forEach(axis => {
+                const li = document.createElement('li');
+                li.textContent = axis;
+                axesEl.appendChild(li);
+            });
+
+            // إعادة تعيين حالة الزر تماماً
+            btnRegister.classList.remove('registered', 'loading');
+            btnRegister.disabled = false;
+            registerProgress.style.transition = 'none'; // إلغاء الأنيميشن فوراً للعودة للصفر
+            registerProgress.style.width = '0';
+            clearTimeout(registrationTimeout); // إيقاف أي عداد سابق لو كان يعمل
+            
+            // التحقق إذا كان الموظف قد سجل مسبقاً في الدورة
+            if (registeredCourses.has(index)) {
+                btnRegister.classList.add('registered');
+                registerIcon.className = 'fas fa-check-circle';
+                registerText.textContent = 'تم التسجيل في الدورة';
+                btnRegister.disabled = true;
+                registerProgress.style.width = '100%';
+            } else {
+                registerIcon.className = 'fas fa-user-plus';
+                registerText.textContent = 'تسجيل في الدورة';
+            }
+
+            // وظيفة الضغط على الزر
+            btnRegister.onclick = function() {
+                // منع التكرار إذا كان الزر يحمل جاري التحميل أو مسجل مسبقاً
+                if (!registeredCourses.has(index) && !btnRegister.classList.contains('loading')) {
+                    
+                    // 1. تفعيل حالة التحميل (Loading)
+                    btnRegister.classList.add('loading');
+                    registerIcon.className = 'fas fa-spinner fa-spin'; // أيقونة الدوران
+                    registerText.textContent = 'جاري التسجيل...';
+                    btnRegister.disabled = true;
+                    
+                    // 2. تشغيل شريط التحميل ليمتلئ خلال 5 ثواني
+                    setTimeout(() => {
+                        registerProgress.style.transition = 'width 2s linear';
+                        registerProgress.style.width = '100%';
+                    }, 5); // تأخير بسيط لضمان التقاط متصفحك للحركة
+
+                    // 3. إنهاء التسجيل بعد 5 ثواني
+                    registrationTimeout = setTimeout(() => {
+                        registeredCourses.add(index);
+                        btnRegister.classList.remove('loading');
+                        btnRegister.classList.add('registered');
+                        registerIcon.className = 'fas fa-check-circle';
+                        registerText.textContent = 'تم التسجيل في الدورة';
+                        registerProgress.style.transition = 'none'; // تثبيت الشريط
+                    }, 3000); // 5000 ملي ثانية = 5 ثواني
+                }
+            };
+
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        btnClose.onclick = closeModal;
+        window.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+        loadMoreBtn.onclick = () => {
+            currentLimit += 9;
+            createCourseCards();
+        };
+
+        // Profile System
+        function initProfile() {
+            const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+            const editableName = document.getElementById('editableName');
+            const profileEmail = document.getElementById('profileEmail');
+            const profilePhone = document.getElementById('profilePhone');
+            const profilePic = document.getElementById('profilePic');
+            const profileIcon = document.getElementById('profileIcon');
+
+            if(editableName) editableName.textContent = profileData.name || 'أحمد محمد';
+            if(profileEmail) profileEmail.textContent = profileData.email || 'ahmed@example.com';
+            if(profilePhone) profilePhone.textContent = profileData.phone || '0539600080';
+            
+            if (profileData.pic || profileData.photo) {
+                profilePic.src = profileData.pic || profileData.photo;
+                profilePic.style.display = 'block';
+                if(profileIcon) profileIcon.style.display = 'none';
+            } else {
+                profilePic.style.display = 'none';
+                if(profileIcon) profileIcon.style.display = 'block';
+            }
+        }
+
+        function setupNameEditing() {
+            const editableName = document.getElementById('editableName');
+            const editBtn = document.getElementById('editNameBtn');
+            if(!editableName || !editBtn) return;
+
+            const saveChanges = () => {
+                if (!editableName.isContentEditable) return; 
+                const newName = editableName.textContent.trim();
+                if (newName.length >= 2) {
+                    const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+                    profileData.name = newName;
+                    localStorage.setItem('profileData', JSON.stringify(profileData));
+                } else {
+                    alert('الاسم يجب أن يكون حرفين على الأقل');
+                    editableName.textContent = JSON.parse(localStorage.getItem('profileData') || '{}').name || 'أحمد محمد';
+                }
+                editableName.contentEditable = false;
+                editableName.classList.remove('editing');
+                editBtn.style.display = 'flex';
+            };
+
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                editableName.contentEditable = true;
+                editableName.classList.add('editing');
+                editableName.focus();
+                const range = document.createRange();
+                range.selectNodeContents(editableName);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                editBtn.style.display = 'none';
+            });
+                
+            editableName.addEventListener('blur', saveChanges);
+            editableName.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveChanges(); } });
+        }
+
+        function handleProfileUpload(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+                    profileData.pic = event.target.result;
+                    try {
+                        localStorage.setItem('profileData', JSON.stringify(profileData));
+                        const profilePic = document.getElementById('profilePic');
+                        if(profilePic) { profilePic.src = event.target.result; profilePic.style.display = 'block'; }
+                        const profileIcon = document.getElementById('profileIcon');
+                        if(profileIcon) profileIcon.style.display = 'none';
+                    } catch (err) {
+                        alert('حجم الصورة كبير جداً، يرجى اختيار صورة ذات مساحة أقل (أقل من 2 ميجابايت).');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+            e.target.value = '';
+        }
+
+        function logout() {
+            localStorage.removeItem('profileData');
+            window.location.href = 'index.html'; 
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initProfile();
+            setupNameEditing();
+            createCourseCards();
+
+            document.getElementById('profileHeader')?.addEventListener('click', () => {
+                document.getElementById('profileDropdown').classList.toggle('active');
+            });
+            
+            document.getElementById('profileUpload')?.addEventListener('change', handleProfileUpload);
+            document.getElementById('logoutBtn')?.addEventListener('click', logout);
+
+            window.addEventListener('scroll', () => {
+                document.getElementById('navbar')?.classList.toggle('scrolled', window.scrollY > 50);
+            });
+
+            document.addEventListener('click', (e) => {
+                const profileContainer = document.getElementById('profileContainer');
+                const dropdown = document.getElementById('profileDropdown');
+                if (profileContainer && dropdown && !profileContainer.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

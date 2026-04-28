@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-ar="تسجيل الدخول | مهارات" data-en="Login | Maher">تسجيل الدخول | مهارات</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --shadow: 0 20px 25px -5px rgba(0, 0,0, 0.1);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0,0, 0.25);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        /* LTR English Support */
+        body.en, [lang="en"] {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+
+        /* Navbar identical */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo {
+            height: 70px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--secondary);
+            padding: 0.5rem;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-lang {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-lang.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Blue Slider */
+        .blue-slider {
+            height: 80px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            overflow: hidden;
+            margin-top: 80px;
+            position: relative;
+        }
+
+        .blue-slider-track {
+            display: flex;
+            animation: scroll 20s linear infinite;
+            height: 100%;
+            align-items: center;
+        }
+
+        .blue-slider-track img {
+            height: 60px;
+            margin: 0 3rem;
+            flex-shrink: 0;
+            filter: brightness(0) invert(1);
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Main Landing Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 5%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 50%), 
+                        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .hero > * {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 1s ease;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .hero .subtitle {
+            font-size: 1.6rem;
+            margin-bottom: 3rem;
+            opacity: 0.95;
+            max-width: 600px;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        .login-choices {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeInUp 1s ease 0.4s both;
+            margin-bottom: 2rem;
+        }
+
+        .user-type-btn {
+            flex: 1;
+            min-width: 280px;
+            padding: 1.5rem 3rem;
+            border-radius: 24px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.3rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .user-type-employee {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .user-type-seeker {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .user-type-btn.active {
+            border-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.3);
+        }
+
+        .user-type-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 35px 70px rgba(0,0,0,0.3);
+        }
+
+        .user-type-btn .icon {
+            font-size: 1.8rem;
+        }
+
+        .seeker-note {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin: 1rem 0 2rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .seeker-note i {
+            font-size: 1.2rem;
+        }
+
+        .login-form {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.2);
+            max-width: 500px;
+            width: 100%;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.95);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1.25rem 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-light);
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.5rem;
+            border-radius: 24px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.3rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, var(--white), #f8fafc);
+            color: var(--primary);
+            border: none;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-cta {
+            padding: 1.25rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary-cta {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-primary-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 30px 60px rgba(255,255,255,0.4);
+        }
+
+        .btn-secondary-cta {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+
+        .btn-secondary-cta:hover {
+            background: var(--white);
+            color: var(--primary);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 6rem 5%;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            font-size: 1.25rem;
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0.95;
+        }
+
+        /* Footer identical */
+        .footer {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            padding: 4rem 5% 2rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-section p, .footer-section a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            line-height: 1.8;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--white);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-5px);
+        }
+
+        .contact-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-buttons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+.login-btn, .register-btn {
+  padding: 0.75rem 1.5rem;
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37,99,235,0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Cairo', sans-serif;
+}
+.login-btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+.register-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+}
+.login-btn:hover, .register-btn:hover {
+  transform: translateY(-2px);
+}
+.login-btn:hover {
+  box-shadow: 0 8px 25px rgba(37,99,235,0.4);
+}
+.register-btn:hover {
+  box-shadow: 0 8px 25px rgba(16,185,129,0.4);
+}
+
+@media (max-width: 768px) {
+  .login-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem 3%; flex-direction: column; gap: 1rem; }
+            .nav-links { gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+            .cta-buttons { flex-direction: column; align-items: center; }
+            .features-grid { grid-template-columns: 1fr; }
+            .footer-content { grid-template-columns: 1fr; gap: 2rem; }
+            .blue-slider-track img { margin: 0 1.5rem; height: 50px; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="right-side">
+<ul class="nav-links">
+                <img src="logo_maher.png" class="logo" alt="مهارات Logo">
+                <li><a href="index.html" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+                <li><a href="employee.html" data-ar="الدورات التدريبية" data-en="Employee Login">الدورات التدريبية</a></li>
+                <li><a href="academy.html" data-ar="عن الأكاديمية" data-en="About Academy">عن الأكاديمية</a></li>
+            </ul>
+        </div>
+<div class="left-side">
+            <div class="login-buttons">
+                <a href="index.html" class="login-btn" data-ar="تسجيل دخول" data-en="Login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span data-ar="تسجيل دخول" data-en="Login">تسجيل دخول</span>
+                </a>
+                <a href="rgstr.html" class="register-btn" data-ar="تسجيل" data-en="Register">
+                    <i class="fas fa-user-plus"></i>
+                    <span data-ar="تسجيل" data-en="Register">تسجيل</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Blue Slider -->
+    <div class="blue-slider">
+        <div class="blue-slider-track">
+            <img src="logoHOME.png" alt="Logo 1">
+            <img src="logo26.png" alt="Logo 2">
+            <img src="logo (2).png" alt="Logo 3">
+            <img src="logoHOME.png" alt="Logo 4">
+            <img src="logo26.png" alt="Logo 5">
+            <img src="logo (2).png" alt="Logo 6">
+        </div>
+    </div>
+
+    <!-- Main Hero -->
+    <section class="hero">
+        <h2 data-ar="تسجيل الدخول أو إنشاء حساب" data-en="Login or Create Account">تسجيل الدخول أو إنشاء حساب</h2>
+        <p class="subtitle" data-ar="اختر نوع حسابك وأدخل بياناتك للبدء" data-en="Choose your account type and enter your details to get started">اختر نوع حسابك وأدخل بياناتك للبدء</p>
+        
+        <div class="login-choices">
+            <button class="user-type-btn user-type-employee active" data-type="employee">
+                <i class="fas fa-briefcase icon"></i>
+                <span data-ar="موظف" data-en="Employee">موظف</span>
+            </button>
+            <button class="user-type-btn user-type-seeker" data-type="seeker">
+                <i class="fas fa-user-graduate icon"></i>
+                <span data-ar="باحث عن عمل" data-en="Job Seeker">باحث عن عمل</span>
+            </button>
+        </div>
+
+        <div class="seeker-note" id="seekerNote" style="display: none;">
+            <i class="fas fa-info-circle"></i>
+            <span data-ar="*ليس مسجل في التأمينات الاجتماعية" data-en="*Not registered in social insurance">*ليس مسجل في التأمينات الاجتماعية</span>
+        </div>
+
+        <form class="login-form" id="loginForm">
+<div class="form-group">
+                <label data-ar="الاسم الكامل" data-en="Full Name">الاسم الكامل</label>
+                <input type="text" id="fullName" name="fullName" placeholder="أحمد محمد علي" required>
+                <div class="error-message" id="nameError" data-ar="الاسم مطلوب (2 أحرف على الأقل)" data-en="Name required (min 2 chars)">الاسم مطلوب (2 أحرف على الأقل)</div>
+            </div>
+            <div class="form-group">
+                <label data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
+                <input type="email" id="email" placeholder="example@domain.com" required>
+                <div class="error-message" id="emailError" data-ar="الإنجليزية فقط | يجب أن يحتوي على @ وينتهي بـ .COM/.SA" data-en="English only | Must contain @ and end with .COM/.SA">الإنجليزية فقط | يجب أن يحتوي على @ وينتهي بـ .COM/.SA</div>
+            </div>
+
+            <div class="form-group">
+                <label data-ar="رقم الجوال" data-en="Phone Number">رقم الجوال</label>
+                <input type="tel" id="phone" placeholder="05" required>
+                <div class="error-message" id="phoneError" data-ar="يجب أن يكون 10 أرقام ويبدأ بـ 05" data-en="Must be 10 digits starting with 05">يجب أن يكون 10 أرقام ويبدأ بـ 05</div>
+            </div>
+
+            <div class="form-group">
+                <label data-ar="كلمة المرور" data-en="Password">كلمة المرور</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn" data-ar="تسجيل الدخول / إنشاء حساب" data-en="Login / Create Account">
+                <i class="fas fa-sign-in-alt"></i>
+                <span data-ar="تسجيل الدخول / إنشاء حساب" data-en="Login / Create Account">تسجيل الدخول / إنشاء حساب</span>
+            </button>
+        </form>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3 data-ar="مهارات" data-en="Maher"><i class="fas fa-graduation-cap"></i> مهارات</h3>
+                <p data-ar="منصتك لتطوير المهارات المهنية وتحقيق التميز في العمل.">منصتك لتطوير المهارات المهنية وتحقيق التميز في العمل.</p>
+            </div>
+            <div class="footer-section">
+                <h3 data-ar="روابط مهمة" data-en="Important Links"><i class="fas fa-link"></i> روابط مهمة</h3>
+                <a href="index.html" data-ar="الرئيسية" data-en="Home">الرئيسية</a><br>
+                <a href="employee.html" data-ar="الدورات التدريبية" data-en="Employee Courses">الدورات التدريبية</a><br>
+                <a href="academy.html" data-ar="عن الأكاديمية" data-en="About">عن الأكاديمية</a>
+            </div>
+            <div class="footer-section">
+                <h3 data-ar="تواصل معنا" data-en="Contact Us"><i class="fas fa-phone"></i> تواصل معنا</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                        <div data-ar="هاتف: 0539600080" data-en="Phone: 0539600080">هاتف: 0539600080</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div data-ar="skillsproject23@gmail.com" data-en="skillsproject23@gmail.com">skillsproject23@gmail.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+             <p data-ar="© 2026 مهارات. جميع الحقوق محفوظة." data-en="© 2026 Maher. All rights reserved.">&copy; 2026 مهارات. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Language System identical
+        function initLanguage() {
+            const savedLang = localStorage.getItem('lang') || 'ar';
+            updateLanguage(savedLang);
+            document.querySelector(`[data-lang='${savedLang}']`).classList.add('active');
+            document.querySelector(`[data-lang='${savedLang === 'ar' ? 'en' : 'ar'}']`).classList.remove('active');
+        }
+
+        function updateLanguage(lang) {
+            localStorage.setItem('lang', lang);
+            document.documentElement.lang = lang;
+            document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.body.classList.toggle('en', lang === 'en');
+            document.querySelectorAll('[data-ar]').forEach(el => {
+                el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en || el.dataset.ar;
+            });
+        }
+
+        // Form validation and functionality
+function validateName(name) {
+            return name.trim().length >= 2;
+        }
+
+        function validateEmail(email) {
+            // English characters only + format validation
+            const englishOnly = /^[a-zA-Z0-9@._-]+$/.test(email);
+            const hasAt = email.includes('@');
+            const endsWithValid = email.endsWith('.COM') || email.endsWith('.com') || email.endsWith('.SA') || email.endsWith('.sa');
+            return englishOnly && hasAt && endsWithValid;
+        }
+
+        function validatePhone(phone) {
+            const phoneNum = phone.replace(/\D/g, '');
+            return phoneNum.length === 10 && phoneNum.startsWith('05');
+        }
+
+function updateFormValidation() {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const nameError = document.getElementById('nameError');
+            const emailError = document.getElementById('emailError');
+            const phoneError = document.getElementById('phoneError');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Name validation
+            if (fullName && !validateName(fullName)) {
+                nameError.style.display = 'block';
+            } else {
+                nameError.style.display = 'none';
+            }
+
+            // Email validation
+            if (email && !validateEmail(email)) {
+                emailError.style.display = 'block';
+            } else {
+                emailError.style.display = 'none';
+            }
+
+            // Phone validation
+            if (phone && !validatePhone(phone)) {
+                phoneError.style.display = 'block';
+            } else {
+                phoneError.style.display = 'none';
+            }
+
+            // Enable/disable submit button
+            const password = document.getElementById('password').value;
+            submitBtn.disabled = !(fullName && validateName(fullName) && email && validateEmail(email) && phone && validatePhone(phone) && password);
+        }
+
+        // Navbar scroll
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Language system
+            document.querySelectorAll('.btn-lang').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const lang = btn.dataset.lang;
+                    document.querySelectorAll('.btn-lang').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateLanguage(lang);
+                });
+            });
+            initLanguage();
+
+            // User type selection
+            document.querySelectorAll('.user-type-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.user-type-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    const seekerNote = document.getElementById('seekerNote');
+                    if (btn.dataset.type === 'seeker') {
+                        seekerNote.style.display = 'flex';
+                    } else {
+                        seekerNote.style.display = 'none';
+                    }
+                });
+            });
+
+            // Form validation
+            document.getElementById('fullName').addEventListener('input', updateFormValidation);
+            document.getElementById('email').addEventListener('input', updateFormValidation);
+            document.getElementById('phone').addEventListener('input', updateFormValidation);
+            document.getElementById('password').addEventListener('input', updateFormValidation);
+
+            // Form submission
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fullName = document.getElementById('fullName').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const password = document.getElementById('password').value;
+                const userType = document.querySelector('.user-type-btn.active')?.dataset.type || 'employee';
+                const submitBtn = document.getElementById('submitBtn');
+                const originalText = submitBtn.innerHTML;
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري المعالجة...</span>';
+
+                // Try sign in first
+                const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+                if (!signInError && signInData.user) {
+                    // Fetch profile from users table
+                    const { data: profile } = await supabase
+                        .from('users')
+                        .select('full_name, phone, user_type')
+                        .eq('id', signInData.user.id)
+                        .single();
+
+                    localStorage.setItem('profileData', JSON.stringify({
+                        name: profile?.full_name || fullName,
+                        email: email,
+                        phone: profile?.phone || phone,
+                        userType: profile?.user_type || userType
+                    }));
+
+                    alert(`مرحباً ${profile?.full_name || fullName}! تم تسجيل الدخول بنجاح.`);
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                // User not found - create new account
+                const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+
+                if (signUpError) {
+                    alert('خطأ: ' + signUpError.message);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    return;
+                }
+
+                // Update profile data (the trigger already created the row)
+                const userId = signUpData.user?.id;
+                if (userId) {
+                    // Sign in immediately to get a session (needed for RLS update)
+                    const { error: autoSignInError } = await supabase.auth.signInWithPassword({ email, password });
+
+                    if (!autoSignInError) {
+                        const { error: updateError } = await supabase.from('users').update({
+                            full_name: fullName,
+                            phone: phone,
+                            user_type: userType
+                        }).eq('id', userId);
+
+                        if (updateError) {
+                            console.error('Update error:', updateError);
+                        }
+                    }
+                }
+
+                // Save to localStorage so home_2.html can display profile
+                localStorage.setItem('profileData', JSON.stringify({
+                    name: fullName,
+                    email: email,
+                    phone: phone,
+                    userType: userType
+                }));
+
+                alert(`تم إنشاء الحساب بنجاح يا ${fullName}!`);
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>
+

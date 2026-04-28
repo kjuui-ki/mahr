@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | مهارات</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --shadow: 0 10px 15px -3px rgba(0, 0,0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0,0, 0.15);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        /* Navbar - الشعار بجانب الروابط */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 0.8rem 5%;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .right-side {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Main Landing Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 7rem 5% 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 50%), 
+                        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+
+        .hero > * {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            animation: fadeInUp 1s ease;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .hero .subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            max-width: 500px;
+            animation: fadeInUp 1s ease 0.2s both;
+            transition: all 0.3s ease;
+        }
+
+        .login-choices {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            animation: fadeInUp 1s ease 0.4s both;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 460px;
+        }
+
+        .user-type-btn {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 16px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .user-type-employee {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .user-type-seeker {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .user-type-btn.active {
+            border-color: var(--white);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.4);
+            transform: scale(1.03);
+        }
+
+        .user-type-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(0,0,0,0.2);
+        }
+
+        .user-type-btn .icon {
+            font-size: 1.2rem;
+        }
+
+        .seeker-note {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            max-width: 350px;
+        }
+
+        .forms-container {
+            max-width: 460px;
+            width: 100%;
+            margin: 0 auto;
+            transition: all 0.5s ease;
+        }
+
+        .login-form {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.8rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.5);
+            animation: fadeInUp 0.6s ease;
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 1200px;
+            overflow: hidden;
+            text-align: right;
+            color: var(--text-dark);
+        }
+
+        .login-form:not(.active) {
+            display: none;
+            opacity: 0;
+            transform: translateY(15px);
+            max-height: 0;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(37,99,235,0.15);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            font-size: 0.95rem;
+            font-family: 'Cairo', sans-serif;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-light);
+            opacity: 0.6;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            display: none;
+            font-weight: 600;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 16px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            margin-top: 1rem; 
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37,99,235,0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--text-light);
+            box-shadow: none;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 0.8rem; 
+            padding: 1rem;
+            background: var(--secondary);
+            border-radius: 16px;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .auth-switch p {
+            margin: 0;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .auth-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.4rem 1rem;
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .auth-switch a:hover {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(37, 99, 235, 0.2);
+            border-color: transparent;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            padding: 3rem 5% 1.5rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-section p, .footer-section a {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            line-height: 1.8;
+            transition: color 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .footer-section a:hover {
+            color: var(--white);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.6rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(-5px);
+        }
+
+        .contact-icon {
+            width: 35px;
+            height: 35px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem 3%; flex-direction: column; gap: 1rem; }
+            .right-side { flex-direction: column; gap: 1rem; }
+            .nav-links { gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+            .login-choices { flex-direction: column; align-items: center; gap: 0.8rem; }
+            .user-type-btn { width: 100%; max-width: 100%; }
+            .footer-content { grid-template-columns: 1fr; gap: 1.5rem; }
+            .hero { padding-top: 9rem; }
+            .forms-container { max-width: 95%; }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="right-side">
+            <img src="logo_maher.png" class="logo" alt="مهارات Logo">
+            <ul class="nav-links">
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="employee.html">الدورات التدريبية</a></li>
+                <li><a href="academy.html">عن الأكاديمية</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 id="mainTitle">إنشاء حساب جديد</h1>
+        <p class="subtitle" id="mainSubtitle">اختر نوع حسابك وأدخل بياناتك للبدء في رحلة تطوير مهاراتك</p>
+        
+        <div class="login-choices" id="signupTabs">
+            <button class="user-type-btn user-type-employee active" data-type="employee">
+                <i class="fas fa-briefcase icon"></i>
+                <span>موظف</span>
+            </button>
+            <button class="user-type-btn user-type-seeker" data-type="seeker">
+                <i class="fas fa-user-graduate icon"></i>
+                <span>باحث عن عمل</span>
+            </button>
+        </div>
+
+        <div class="seeker-note" id="seekerNote" style="display: none;">
+            <i class="fas fa-info-circle"></i>
+            <span>* يشترط ألا يكون مسجلاً في التأمينات الاجتماعية</span>
+        </div>
+
+        <div class="forms-container">
+            <form class="login-form active" id="employeeForm">
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="empFullName" placeholder="الاسم الثنائي على الأقل" required>
+                    <div class="error-message" id="empNameError">الاسم مطلوب (حرفين على الأقل)</div>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="empEmail" placeholder="example@domain.com" required>
+                    <div class="error-message" id="empEmailError">يجب إدخال بريد إلكتروني صحيح ينتهي بـ .com أو .sa</div>
+                </div>
+                <div class="form-group">
+                    <label>رقم الجوال</label>
+                    <input type="tel" id="empPhone" placeholder="05xxxxxxxx" required>
+                    <div class="error-message" id="empPhoneError">يجب أن يتكون من 10 أرقام ويبدأ بـ 05</div>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="empPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="submit-btn" id="empSubmit" disabled>
+                    <i class="fas fa-user-plus"></i>
+                    <span>إنشاء حساب موظف</span>
+                </button>
+            </form>
+
+            <form class="login-form" id="seekerForm" style="display: none;">
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="seekFullName" placeholder="الاسم الثنائي على الأقل" required>
+                    <div class="error-message" id="seekNameError">الاسم مطلوب (حرفين على الأقل)</div>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="seekEmail" placeholder="example@domain.com" required>
+                    <div class="error-message" id="seekEmailError">يجب إدخال بريد إلكتروني صحيح ينتهي بـ .com أو .sa</div>
+                </div>
+                <div class="form-group">
+                    <label>رقم الجوال</label>
+                    <input type="tel" id="seekPhone" placeholder="05xxxxxxxx" required>
+                    <div class="error-message" id="seekPhoneError">يجب أن يتكون من 10 أرقام ويبدأ بـ 05</div>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="seekPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="submit-btn" id="seekSubmit" disabled>
+                    <i class="fas fa-user-plus"></i>
+                    <span>إنشاء حساب باحث عن عمل</span>
+                </button>
+            </form>
+
+            <form class="login-form" id="loginOnlyForm" style="display: none;">
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" placeholder="example@domain.com" required>
+                    <div class="error-message" id="loginEmailError">يجب إدخال بريد إلكتروني صحيح ينتهي بـ .com أو .sa</div>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <div class="error-message" id="loginAuthError" style="text-align: center; margin-bottom: 1rem; font-size: 0.95rem;">البريد الإلكتروني أو كلمة المرور غير صحيحة.</div>
+                <button type="submit" class="submit-btn" id="loginSubmit" disabled>
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>تسجيل الدخول</span>
+                </button>
+            </form>
+
+            <div class="auth-switch">
+                <p id="switchToLoginText">
+                    لديك حساب بالفعل؟ 
+                    <a href="#" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a>
+                </p>
+                <p id="switchToSignupText" style="display: none;">
+                    ليس لديك حساب؟ 
+                    <a href="#" id="showSignupBtn"><i class="fas fa-user-plus"></i> إنشاء حساب جديد</a>
+                </p>
+            </div>
+            
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-graduation-cap"></i> مهارات</h3>
+                <p>منصتك لتطوير المهارات المهنية وتحقيق التميز في العمل.</p>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-link"></i> روابط مهمة</h3>
+                <a href="index.html">الرئيسية</a><br>
+                <a href="employee.html">الدورات التدريبية</a><br>
+                <a href="academy.html">عن الأكاديمية</a>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-phone"></i> تواصل معنا</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                        <div>هاتف: 0539600080</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div>skillsproject23@gmail.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+             <p>&copy; 2026 مهارات. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        // دالة التحقق الأساسية
+        function validateName(name) {
+            return name.trim().length >= 2;
+        }
+
+        function validateEmail(email) {
+            const englishOnly = /^[a-zA-Z0-9@._-]+$/.test(email);
+            const hasAt = email.includes('@');
+            const validEnding = email.toLowerCase().endsWith('.com') || email.toLowerCase().endsWith('.sa');
+            return englishOnly && hasAt && validEnding;
+        }
+
+        function validatePhone(phone) {
+            return /^05\d{8}$/.test(phone);
+        }
+
+        // التحقق لنموذج الموظف 
+        function validateEmployeeForm() {
+            const name = document.getElementById('empFullName').value;
+            const email = document.getElementById('empEmail').value;
+            const phone = document.getElementById('empPhone').value;
+            const password = document.getElementById('empPassword').value;
+
+            document.getElementById('empNameError').style.display = (name && !validateName(name)) ? 'block' : 'none';
+            document.getElementById('empEmailError').style.display = (email && !validateEmail(email)) ? 'block' : 'none';
+            document.getElementById('empPhoneError').style.display = (phone && !validatePhone(phone)) ? 'block' : 'none';
+
+            const isValid = validateName(name) && validateEmail(email) && validatePhone(phone) && password.length > 0;
+            document.getElementById('empSubmit').disabled = !isValid;
+        }
+
+        // التحقق لنموذج الباحث عن عمل 
+        function validateSeekerForm() {
+            const name = document.getElementById('seekFullName').value;
+            const email = document.getElementById('seekEmail').value;
+            const phone = document.getElementById('seekPhone').value;
+            const password = document.getElementById('seekPassword').value;
+
+            document.getElementById('seekNameError').style.display = (name && !validateName(name)) ? 'block' : 'none';
+            document.getElementById('seekEmailError').style.display = (email && !validateEmail(email)) ? 'block' : 'none';
+            document.getElementById('seekPhoneError').style.display = (phone && !validatePhone(phone)) ? 'block' : 'none';
+
+            const isValid = validateName(name) && validateEmail(email) && validatePhone(phone) && password.length > 0;
+            document.getElementById('seekSubmit').disabled = !isValid;
+        }
+
+        // التحقق لنموذج تسجيل الدخول فقط
+        function validateLoginForm() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            document.getElementById('loginEmailError').style.display = (email && !validateEmail(email)) ? 'block' : 'none';
+
+            const isValid = validateEmail(email) && password.length > 0;
+            document.getElementById('loginSubmit').disabled = !isValid;
+        }
+
+        // تأثير نزول الصفحة 
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // التبديل بين إنشاء حساب (موظف / باحث عن عمل)
+            const employeeBtn = document.querySelector('.user-type-employee');
+            const seekerBtn = document.querySelector('.user-type-seeker');
+            const employeeForm = document.getElementById('employeeForm');
+            const seekerForm = document.getElementById('seekerForm');
+            const seekerNote = document.getElementById('seekerNote');
+            
+            document.querySelectorAll('.user-type-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.user-type-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    if (btn.dataset.type === 'employee') {
+                        employeeForm.classList.add('active');
+                        seekerForm.classList.remove('active');
+                        seekerNote.style.display = 'none';
+                        setTimeout(() => seekerForm.style.display = 'none', 200);
+                        employeeForm.style.display = 'block';
+                    } else {
+                        employeeForm.classList.remove('active');
+                        seekerForm.classList.add('active');
+                        seekerNote.style.display = 'flex';
+                        setTimeout(() => employeeForm.style.display = 'none', 200);
+                        seekerForm.style.display = 'block';
+                    }
+                });
+            });
+
+            // التبديل بين إنشاء حساب وتسجيل الدخول
+            const showLoginBtn = document.getElementById('showLoginBtn');
+            const showSignupBtn = document.getElementById('showSignupBtn');
+            const loginOnlyForm = document.getElementById('loginOnlyForm');
+            const signupTabs = document.getElementById('signupTabs');
+            
+            const switchToLoginText = document.getElementById('switchToLoginText');
+            const switchToSignupText = document.getElementById('switchToSignupText');
+            
+            const mainTitle = document.getElementById('mainTitle');
+            const mainSubtitle = document.getElementById('mainSubtitle');
+
+            showLoginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                mainTitle.textContent = "تسجيل الدخول";
+                mainSubtitle.textContent = "أهلاً بك مجدداً في منصة مهارات، أدخل بياناتك للمتابعة";
+                
+                signupTabs.style.display = 'none';
+                seekerNote.style.display = 'none';
+                employeeForm.classList.remove('active');
+                employeeForm.style.display = 'none';
+                seekerForm.classList.remove('active');
+                seekerForm.style.display = 'none';
+                
+                loginOnlyForm.style.display = 'block';
+                setTimeout(() => loginOnlyForm.classList.add('active'), 10);
+                
+                switchToLoginText.style.display = 'none';
+                switchToSignupText.style.display = 'flex';
+            });
+
+            showSignupBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                mainTitle.textContent = "إنشاء حساب جديد";
+                mainSubtitle.textContent = "اختر نوع حسابك وأدخل بياناتك للبدء في رحلة تطوير مهاراتك";
+                
+                signupTabs.style.display = 'flex';
+                
+                loginOnlyForm.classList.remove('active');
+                loginOnlyForm.style.display = 'none';
+                
+                if (employeeBtn.classList.contains('active')) {
+                    employeeForm.style.display = 'block';
+                    setTimeout(() => employeeForm.classList.add('active'), 10);
+                } else {
+                    seekerForm.style.display = 'block';
+                    seekerNote.style.display = 'flex';
+                    setTimeout(() => seekerForm.classList.add('active'), 10);
+                }
+                
+                switchToLoginText.style.display = 'flex';
+                switchToSignupText.style.display = 'none';
+            });
+
+            // إضافة مستمعي الأحداث
+            ['empFullName', 'empEmail', 'empPhone', 'empPassword'].forEach(id => {
+                document.getElementById(id).addEventListener('input', validateEmployeeForm);
+            });
+
+            ['seekFullName', 'seekEmail', 'seekPhone', 'seekPassword'].forEach(id => {
+                document.getElementById(id).addEventListener('input', validateSeekerForm);
+            });
+
+            ['loginEmail', 'loginPassword'].forEach(id => {
+                document.getElementById(id).addEventListener('input', validateLoginForm);
+            });
+
+            // دالة معالجة إنشاء الحساب المحدثة لتدعم التوجيه حسب نوع المستخدم
+            function handleSubmission(btnId, nameId, emailId, phoneId, passwordId, userType) {
+                const name = document.getElementById(nameId).value;
+                const email = document.getElementById(emailId).value;
+                const phone = document.getElementById(phoneId).value;
+                const password = document.getElementById(passwordId).value;
+                
+                const submitBtn = document.getElementById(btnId);
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري معالجة الطلب...</span>';
+                
+                setTimeout(() => {
+                    // جلب المستخدمين الحاليين أو إنشاء مصفوفة جديدة
+                    let users = JSON.parse(localStorage.getItem('maharat_users')) || [];
+                    
+                    // التحقق مما إذا كان البريد الإلكتروني مسجل مسبقاً
+                    if(users.some(u => u.email === email)) {
+                        alert("هذا البريد الإلكتروني مسجل لدينا بالفعل!");
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                        return;
+                    }
+
+                    // إنشاء كائن المستخدم الجديد مع حفظ نوع الحساب
+                    const newUser = { name: name, email: email, phone: phone, password: password, type: userType };
+                    users.push(newUser);
+                    localStorage.setItem('maharat_users', JSON.stringify(users));
+                    
+                    // تسجيل الدخول التلقائي بعد التخزين
+                    localStorage.setItem('profileData', JSON.stringify({
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        type: userType
+                    }));
+
+                    // التوجيه بناءً على نوع الحساب المختار
+                    if (userType === 'seeker') {
+                        window.location.href = 'home_1.html';
+                    } else {
+                        window.location.href = 'home_2.html';
+                    }
+                }, 1500);
+            }
+
+            // التعامل مع أزرار الإرسال (إنشاء حساب) - إرسال نوع المستخدم للدالة
+            document.getElementById('employeeForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleSubmission('empSubmit', 'empFullName', 'empEmail', 'empPhone', 'empPassword', 'employee');
+            });
+
+            document.getElementById('seekerForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleSubmission('seekSubmit', 'seekFullName', 'seekEmail', 'seekPhone', 'seekPassword', 'seeker');
+            });
+
+            // التعامل مع زر الإرسال (تسجيل الدخول فقط)
+            document.getElementById('loginOnlyForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                const submitBtn = document.getElementById('loginSubmit');
+                const authError = document.getElementById('loginAuthError');
+                
+                // إخفاء رسالة الخطأ إن كانت ظاهرة
+                authError.style.display = 'none';
+                
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري التحقق...</span>';
+                
+                setTimeout(() => {
+                    // جلب قاعدة بيانات المستخدمين الوهمية من LocalStorage
+                    let users = JSON.parse(localStorage.getItem('maharat_users')) || [];
+                    
+                    // البحث عن مستخدم يتطابق بريده وكلمة مروره مع المدخلات
+                    const validUser = users.find(u => u.email === email && u.password === password);
+                    
+                    if (validUser) {
+                        // تسجيل دخول ناجح وحفظ بيانات الجلسة مع نوع المستخدم
+                        localStorage.setItem('profileData', JSON.stringify({
+                            name: validUser.name,
+                            email: validUser.email,
+                            phone: validUser.phone,
+                            type: validUser.type || 'employee' // في حال كان الحساب قديماً ولم يحفظ نوعه
+                        }));
+
+                        // توجيه المستخدم لصفحته الصحيحة عند تسجيل الدخول أيضاً
+                        if (validUser.type === 'seeker') {
+                            window.location.href = 'home_1.html';
+                        } else {
+                            window.location.href = 'home_2.html';
+                        }
+                    } else {
+                        // فشل تسجيل الدخول
+                        authError.style.display = 'block';
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                }, 1200);
+            });
+        });
+    </script>
+</body>
+</html>

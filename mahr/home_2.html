@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة مهارات | الموظف</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --shadow: 0 20px 25px -5px rgba(0, 0,0, 0.1);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0,0, 0.25);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .right-side { display: flex; align-items: center; gap: 2rem; }
+
+        .logo { height: 70px; width: auto; transition: transform 0.3s ease; }
+        .logo:hover { transform: scale(1.05); }
+
+        .nav-links { display: flex; list-style: none; gap: 2rem; align-items: center; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: 0; right: 0;
+            width: 0; height: 2px; background: var(--primary); transition: width 0.3s ease;
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a:hover { color: var(--primary); }
+
+        /* Profile Styles */
+        .profile-container { position: relative; }
+
+        .profile-header {
+            display: flex; align-items: center; gap: 1rem; cursor: pointer;
+            padding: 1.2rem 1.5rem; border-radius: 30px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative; overflow: hidden;
+        }
+
+        .profile-header::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s;
+        }
+        .profile-header:hover::before { left: 100%; }
+
+        .profile-header:hover {
+            background: rgba(59, 130, 246, 0.25); border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-8px) scale(1.06);
+            box-shadow: 0 35px 70px rgba(59, 130, 246, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .profile-avatar-container { position: relative; width: 45px; height: 45px; }
+        .profile-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); display: none; }
+        .profile-icon { font-size: 2.2rem; color: var(--text-light); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: block; }
+        .job-seeker-badge { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); }
+
+        .profile-dropdown {
+            position: absolute; top: calc(100% + 12px); left: 0; 
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(35px) saturate(200%);
+            border-radius: 28px; box-shadow: 0 35px 80px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.25);
+            min-width: 320px; max-width: 400px; opacity: 0; visibility: hidden;
+            transform: translateY(-20px) scale(0.92); transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1001; border: 1px solid rgba(255, 255, 255, 0.2); overflow: hidden;
+        }
+
+        .profile-container:hover .profile-dropdown, .profile-dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        .profile-info { padding: 2rem 1.5rem; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.08); position: relative; }
+        .profile-info::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 60px; height: 2px; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 1px; }
+
+        .editable-section { position: relative; display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding-top: 1.5rem; }
+        .editable-section label, .static-info label { font-weight: 600; color: var(--text-dark); min-width: 60px; font-size: 0.95rem; }
+        
+        .editable-name {
+            flex: 1; padding: 0.5rem 1rem; border: 2px solid transparent; border-radius: 8px;
+            background: var(--secondary); font-weight: 500; cursor: pointer; transition: all 0.3s ease; min-height: 24px; text-align: right;
+        }
+        .editable-name.editing { border-color: var(--primary); background: white; outline: none; cursor: text; }
+        
+        .edit-name-btn {
+            background: var(--primary); color: white; border: none; padding: 0.5rem; border-radius: 6px; cursor: pointer;
+            font-size: 0.9rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; transition: all 0.3s ease;
+        }
+        .edit-name-btn:hover { background: var(--primary-dark); transform: scale(1.05); }
+
+        .static-info { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; padding: 0.75rem; background: var(--secondary); border-radius: 8px; }
+        .static-info span { flex: 1; color: var(--text-light); font-size: 0.95rem; text-align: right; }
+
+        .profile-actions { margin-top: 1rem; padding: 1.5rem; }
+        .profile-edit-btn {
+            display: flex; justify-content: center; align-items: center; gap: 0.5rem; width: 100%;
+            padding: 1rem 1.5rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white;
+            border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; border: none; margin-bottom: 0.5rem; font-family: 'Cairo', sans-serif; font-size: 1rem;
+        }
+        .profile-edit-btn:hover { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-danger:hover { background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2); }
+
+        /* Hero Section */
+        .hero { text-align: center; padding: 8rem 5% 6rem; max-width: 1200px; margin: 0 auto; position: relative; }
+        .hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100vw; height: 100%; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23e2e8f0"><polygon points="0,100 1000,0 1000,100"/></svg>'); z-index: -1; }
+        .hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700; margin-bottom: 1.5rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: fadeInUp 1s ease; }
+        .hero p { font-size: 1.25rem; color: var(--text-light); max-width: 700px; margin: 0 auto 3rem; animation: fadeInUp 1s ease 0.2s both; }
+
+        .btn-primary {
+            display: inline-block; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white;
+            padding: 1.25rem 3rem; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1.1rem; box-shadow: var(--shadow-lg); transition: all 0.3s ease; animation: fadeInUp 1s ease 0.4s both;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 35px 60px 12px rgba(37, 99, 235, 0.4); }
+
+        /* About Section */
+        .about { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 3rem; max-width: 1200px; margin: 6rem auto; padding: 0 5%; }
+        .card { background: var(--white); padding: 3rem 2.5rem; border-radius: 24px; text-align: center; box-shadow: var(--shadow); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
+        .card:hover { transform: translateY(-15px) scale(1.02); box-shadow: var(--shadow-lg); }
+        .card h3 { font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-dark); }
+        .card p { color: var(--text-light); margin-bottom: 2rem; line-height: 1.8; }
+
+        /* Partners */
+        .partners-section { background: var(--white); padding: 4rem 5%; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 4rem; }
+        .partners-title { font-size: 2.2rem; font-weight: 700; margin-bottom: 2.5rem; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .partners-slider { overflow: hidden; position: relative; height: 120px; }
+        .partners-track { display: flex; align-items: center; animation: scrollPartners 20s linear infinite; }
+        .partners-track:hover { animation-play-state: paused; }
+        .partner-logo { width: 140px; height: 70px; object-fit: contain; margin: 0 25px; flex-shrink: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .partner-logo:hover { transform: scale(1.08); }
+        @keyframes scrollPartners { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* Footer */
+        .footer { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 4rem 5% 2rem; margin-top: 6rem; }
+        .footer-content { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; margin-bottom: 2rem; }
+        .footer-section h3 { font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .footer-section p, .footer-section a { color: rgba(255,255,255,0.9); text-decoration: none; line-height: 1.8; transition: color 0.3s ease; }
+        .footer-section a:hover { color: var(--white); }
+        .contact-info { display: flex; flex-direction: column; gap: 1rem; }
+        .contact-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 12px; transition: all 0.3s ease; }
+        .contact-item:hover { background: rgba(255,255,255,0.2); transform: translateX(-5px); }
+        .contact-icon { width: 45px; height: 45px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem 3%; flex-direction: column; gap: 1rem; }
+            .right-side { flex-direction: column; gap: 1rem; }
+            .nav-links { gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+            .profile-dropdown { left: 50%; right: auto; transform: translateX(-50%) translateY(-10px); min-width: 280px; width: 90vw; }
+            .profile-container:hover .profile-dropdown, .profile-dropdown.active { transform: translateX(-50%) translateY(0); }
+            .hero { padding: 6rem 3% 4rem; }
+            .about { grid-template-columns: 1fr; margin: 4rem auto; padding: 0 3%; }
+            .footer-content { grid-template-columns: 1fr; gap: 2rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="right-side">
+            <img src="logo_maher.png" class="logo" alt="مهارات Logo">
+            <ul class="nav-links">
+                <li><a href="home_2.html">الرئيسية</a></li>
+                <li><a href="employee_2.html">الدورات التدريبية</a></li>
+                <li><a href="academy_2.html">عن الأكاديمية</a></li>
+            </ul>
+        </div>
+
+        <div class="left-side">
+            <div class="profile-container" id="profileContainer">
+                <div class="profile-header" id="profileHeader">
+                    <div class="profile-avatar-container">
+                        <img id="profilePic" src="" class="profile-avatar" alt="ملف التعريف">
+                        <i id="profileIcon" class="fas fa-user-circle profile-icon"></i>
+                    </div>
+                    <span class="job-seeker-badge">موظف</span>
+                </div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="profile-info">
+                        <div class="editable-section">
+                            <label>الاسم:</label>
+                            <div id="editableName" class="editable-name" contenteditable="false">أحمد محمد</div>
+                            <button id="editNameBtn" class="edit-name-btn" title="تعديل الاسم"><i class="fas fa-edit"></i></button>
+                        </div>
+                        <div class="static-info">
+                            <label>الإيميل:</label>
+                            <span id="profileEmail">ahmed@example.com</span>
+                        </div>
+                        <div class="static-info">
+                            <label>الهاتف:</label>
+                            <span id="profilePhone">0539600080</span>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <label for="profileUpload" class="profile-edit-btn">
+                            <i class="fas fa-camera"></i> تعديل الصورة
+                        </label>
+                        <input type="file" id="profileUpload" accept="image/*" hidden>
+                        <button id="logoutBtn" class="profile-edit-btn btn-danger">
+                            <i class="fas fa-sign-out-alt"></i> تسجيل خروج
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>انطلق نحو الاحترافية</h1>
+        <p>دورات تدريبية متخصصة تناسب مسارك المهني بألوان التميز.</p>
+        
+        <div class="academy-intro">
+            <p>أكاديمية مهارات هي الوجهة المثالية لتطوير المهارات المهنية والوصول إلى القمة في مسيرتك الوظيفية. 
+            نقدم دورات متخصصة مصممة بعناية لتلبية احتياجات الموظفين.</p>
+            <p>مع منهجية حديثة، مدربين معتمدين، وشهادات معترف بها، نحول طموحاتك إلى إنجازات ملموسة.</p>
+        </div>
+        
+        <a href="employee_2.html" class="btn-primary" style="display: block; max-width: 300px; margin: 0 auto 4rem;">
+            <i class="fas fa-rocket"></i> <span>الدورات التدريبية</span>
+        </a>
+    </header>
+
+    <section class="about">
+        <div class="card">
+            <i class="fas fa-certificate" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <h3>شهادات معتمدة</h3>
+            <p>شهادات مهنية معترف بها دولياً تضمن تميزك في سوق العمل التنافسي.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-chalkboard-teacher" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <h3>مدربون خبراء</h3>
+            <p>مدربون معتمدون بخبرة تزيد عن 10 سنوات في مجالاتهم المتخصصة.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-users" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <h3>آلاف المتدربين</h3>
+            <p>انضم إلى مجتمع أكثر من 5000 متدرب ناجح.</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-clock" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <h3>مرونة في التعلم</h3>
+            <p>دورات متاحة مع جدول زمني مرن يناسب حياتك اليومية.</p>
+        </div>
+    </section>
+
+    <section class="partners-section">
+        <h2 class="partners-title">شركاء النجاح</h2>
+        <div class="partners-slider">
+            <div class="partners-track">
+                <img src="img-z/z1.png" class="partner-logo" alt="شريك 1" loading="lazy">
+                <img src="img-z/z2.png" class="partner-logo" alt="شريك 2" loading="lazy">
+                <img src="img-z/z3.png" class="partner-logo" alt="شريك 3" loading="lazy">
+                <img src="img-z/z4.png" class="partner-logo" alt="شريك 4" loading="lazy">
+                <img src="img-z/z5.png" class="partner-logo" alt="شريك 5" loading="lazy">
+                <img src="img-z/z6.png" class="partner-logo" alt="شريك 6" loading="lazy">
+                <img src="img-z/z7.png" class="partner-logo" alt="شريك 7" loading="lazy">
+                <img src="img-z/z8.png" class="partner-logo" alt="شريك 8" loading="lazy">
+                <img src="img-z/z9.png" class="partner-logo" alt="شريك 9" loading="lazy">
+                <img src="img-maher/10.png" class="partner-logo" alt="شريك 10" loading="lazy">
+                <img src="img-maher/11.png" class="partner-logo" alt="شريك 11" loading="lazy">
+                <img src="img-maher/12.png" class="partner-logo" alt="شريك 12" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-graduation-cap"></i> مهارات</h3>
+                <p>منصتك لتطوير المهارات المهنية وتحقيق التميز في العمل.</p>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-link"></i> روابط مهمة</h3>
+                <a href="home_2.html">الرئيسية</a><br>
+                <a href="employee_2.html">الدورات التدريبية</a><br>
+                <a href="academy_2.html">عن الأكاديمية</a>
+            </div>
+            <div class="footer-section">
+                <h3><i class="fas fa-phone"></i> تواصل معنا</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                        <div>هاتف: 0539600080</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div><strong>إيميل:</strong> skillsproject23@gmail.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 مهارات. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        function initProfile() {
+            const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+            const editableName = document.getElementById('editableName');
+            const profileEmail = document.getElementById('profileEmail');
+            const profilePhone = document.getElementById('profilePhone');
+            const profilePic = document.getElementById('profilePic');
+            const profileIcon = document.getElementById('profileIcon');
+
+            if(editableName) editableName.textContent = profileData.name || 'أحمد محمد';
+            if(profileEmail) profileEmail.textContent = profileData.email || 'ahmed@example.com';
+            if(profilePhone) profilePhone.textContent = profileData.phone || '0539600080';
+            
+            if (profileData.pic || profileData.photo) {
+                profilePic.src = profileData.pic || profileData.photo;
+                profilePic.style.display = 'block';
+                if(profileIcon) profileIcon.style.display = 'none';
+            } else {
+                profilePic.style.display = 'none';
+                if(profileIcon) profileIcon.style.display = 'block';
+            }
+        }
+
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            if(dropdown) dropdown.classList.toggle('active');
+        }
+
+        function setupNameEditing() {
+            const editableName = document.getElementById('editableName');
+            const editBtn = document.getElementById('editNameBtn');
+            if(!editableName || !editBtn) return;
+
+            const saveChanges = () => {
+                if (!editableName.isContentEditable) return; 
+                const newName = editableName.textContent.trim();
+                if (newName.length >= 2) {
+                    const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+                    profileData.name = newName;
+                    localStorage.setItem('profileData', JSON.stringify(profileData));
+                } else {
+                    alert('الاسم يجب أن يكون حرفين على الأقل');
+                    editableName.textContent = JSON.parse(localStorage.getItem('profileData') || '{}').name || 'أحمد محمد';
+                }
+                editableName.contentEditable = false;
+                editableName.classList.remove('editing');
+                editBtn.style.display = 'flex';
+            };
+
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                editableName.contentEditable = true;
+                editableName.classList.add('editing');
+                editableName.focus();
+                const range = document.createRange();
+                range.selectNodeContents(editableName);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+                editBtn.style.display = 'none';
+            });
+                
+            editableName.addEventListener('blur', saveChanges);
+            editableName.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveChanges(); } });
+        }
+
+        function handleProfileUpload(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+                    profileData.pic = event.target.result;
+                    try {
+                        localStorage.setItem('profileData', JSON.stringify(profileData));
+                        const profilePic = document.getElementById('profilePic');
+                        if(profilePic) { profilePic.src = event.target.result; profilePic.style.display = 'block'; }
+                        const profileIcon = document.getElementById('profileIcon');
+                        if(profileIcon) profileIcon.style.display = 'none';
+                    } catch (err) {
+                        alert('حجم الصورة كبير جداً، يرجى اختيار صورة ذات مساحة أقل (أقل من 2 ميجابايت).');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+            e.target.value = '';
+        }
+
+        function logout() {
+            localStorage.removeItem('profileData');
+            window.location.href = 'index.html'; 
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initProfile();
+            setupNameEditing();
+
+            const profileHeader = document.getElementById('profileHeader');
+            if(profileHeader) profileHeader.addEventListener('click', toggleProfileDropdown);
+            
+            const profileUpload = document.getElementById('profileUpload');
+            if(profileUpload) profileUpload.addEventListener('change', handleProfileUpload);
+            
+            const logoutBtn = document.getElementById('logoutBtn');
+            if(logoutBtn) logoutBtn.addEventListener('click', logout);
+
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                if(nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+            });
+
+            document.addEventListener('click', (e) => {
+                const profileContainer = document.getElementById('profileContainer');
+                const dropdown = document.getElementById('profileDropdown');
+                if (profileContainer && dropdown && !profileContainer.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
