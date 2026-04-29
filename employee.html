@@ -7,6 +7,8 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
     
     <style>
         * {
@@ -109,40 +111,45 @@
         }
 
         .login-btn, .register-btn {
-            padding: 0.75rem 1.5rem;
+            padding: 0.55rem 1.25rem;
             color: white;
             text-decoration: none;
             border-radius: 25px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(37,99,235,0.3);
             display: flex;
             align-items: center;
             gap: 0.5rem;
             font-family: 'Cairo', sans-serif;
+            flex-direction: column;
+            line-height: 1.2;
+            text-align: center;
         }
-
+        .btn-label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.92rem;
+            font-weight: 700;
+        }
+        .btn-sub {
+            font-size: 0.68rem;
+            font-weight: 400;
+            opacity: 0.85;
+            white-space: nowrap;
+        }
         .login-btn {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         }
-
         .register-btn {
             background: linear-gradient(135deg, #10b981, #059669);
             box-shadow: 0 4px 15px rgba(16,185,129,0.3);
         }
-
-        .login-btn:hover, .register-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .login-btn:hover {
-            box-shadow: 0 8px 25px rgba(37,99,235,0.4);
-        }
-
-        .register-btn:hover {
-            box-shadow: 0 8px 25px rgba(16,185,129,0.4);
-        }
+        .login-btn:hover, .register-btn:hover { transform: translateY(-2px); }
+        .login-btn:hover { box-shadow: 0 8px 25px rgba(37,99,235,0.4); }
+        .register-btn:hover { box-shadow: 0 8px 25px rgba(16,185,129,0.4); }
 
         @media (max-width: 768px) {
             .login-buttons {
@@ -150,6 +157,86 @@
                 gap: 0.5rem;
                 width: 100%;
             }
+        }
+
+        /* Profile nav (logged-in) */
+        .profile-nav-wrap {
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .profile-nav-wrap.visible { display: flex; }
+        .profile-nav-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+        .profile-nav-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+        .badge-employee { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .badge-seeker   { background: linear-gradient(135deg, #10b981, #059669); }
+        .badge-admin    { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+        .logout-btn {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid #ef4444;
+            background: transparent;
+            color: #ef4444;
+            border-radius: 20px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .logout-btn:hover { background: #ef4444; color: white; }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+            min-width: 320px;
+        }
+        .toast {
+            background: white;
+            border-radius: 14px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            pointer-events: all;
+            border-right: 5px solid #3b82f6;
+            animation: toastIn 0.4s cubic-bezier(0.4,0,0.2,1);
+            transition: opacity 0.3s ease;
+        }
+        .toast.success { border-right-color: #10b981; }
+        .toast.error   { border-right-color: #ef4444; }
+        .toast.info    { border-right-color: #3b82f6; }
+        .toast i { font-size: 1.3rem; flex-shrink: 0; }
+        .toast.success i { color: #10b981; }
+        .toast.error i   { color: #ef4444; }
+        .toast.info i    { color: #3b82f6; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         /* Blue Slider */
@@ -212,8 +299,8 @@
         /* Courses Section */
         .courses {
             max-width: 1400px;
-            margin: 4rem auto;
-            padding: 0 5%;
+            margin: 3rem auto;
+            padding: 0 5% 2rem;
         }
 
         .courses h2 {
@@ -229,31 +316,32 @@
         .courses-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+            gap: 1.75rem;
             margin-bottom: 2rem;
         }
 
         .load-more-container {
             text-align: center;
-            margin: 3rem 0;
+            margin: 2rem 0 3rem;
         }
 
         .btn-load-more {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
-            padding: 1rem 3rem;
+            padding: 0.95rem 3rem;
             border-radius: 50px;
-            font-weight: 600;
-            font-size: 1.1rem;
+            font-weight: 700;
+            font-size: 1rem;
             cursor: pointer;
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 20px rgba(37,99,235,0.3);
             transition: all 0.3s ease;
+            font-family: 'Cairo', sans-serif;
         }
 
         .btn-load-more:hover {
             transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 8px 30px rgba(37,99,235,0.45);
         }
 
         .course-card {
@@ -442,9 +530,15 @@
             color: white;
             padding: 1rem 2.5rem;
             border-radius: 50px;
-            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
             font-weight: 600;
+            font-size: 1rem;
             transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .btn-register:hover {
@@ -595,10 +689,235 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ===== SEARCH & FILTER ===== */
+        .courses-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .courses-header h2 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .courses-count {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+        .search-wrap {
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 1rem 3.5rem 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(37,99,235,0.15);
+        }
+        .search-icon {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.1rem;
+            pointer-events: none;
+        }
+        .search-clear {
+            position: absolute;
+            right: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+            display: none;
+        }
+        .no-results {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-light);
+            display: none;
+        }
+        .no-results i { font-size: 3rem; margin-bottom: 1rem; color: #cbd5e1; display: block; }
+        .no-results p { font-size: 1.1rem; }
+
+        .page-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+            padding: 6rem 5% 3.5rem;
+            color: white;
+            text-align: center;
+            margin-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 75% 50%, rgba(96,165,250,0.15) 0%, transparent 60%);
+        }
+        .page-hero-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+        .page-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: rgba(255,255,255,0.9);
+        }
+        .page-hero h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            color: white;
+        }
+        .page-hero p {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+        }
+        .page-hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+            flex-wrap: wrap;
+        }
+        .hero-stat {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 0.85rem 1.6rem;
+            min-width: 105px;
+        }
+        .hero-stat-num {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.1;
+        }
+        .hero-stat-label {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.7);
+            margin-top: 0.2rem;
+        }
+        /* ===== IMPROVED COURSE CARDS ===== */
+        .course-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 1px solid rgba(0,0,0,0.05);
+            padding: 0;
+        }
+        .course-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 30px rgba(0,0,0,0.12);
+        }
+        .course-card::before { display: none; }
+        .course-img-wrap {
+            position: relative;
+            overflow: hidden;
+            height: 175px;
+            background: #f1f5f9;
+        }
+        .course-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            display: block;
+        }
+        .course-card:hover .course-img { transform: scale(1.07); }
+        .course-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(37,99,235,0.75), rgba(29,78,216,0.85));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: white;
+            font-size: 2rem;
+        }
+        .course-card:hover .course-overlay { opacity: 1; }
+        .course-card-body { padding: 1.15rem 1.25rem; }
+        .course-card h3 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.65rem;
+            line-height: 1.6;
+        }
+        .course-meta {
+            display: flex;
+            gap: 1rem;
+            color: #64748b;
+            font-size: 0.78rem;
+        }
+        .course-meta span { display: flex; align-items: center; gap: 0.3rem; }
+        .course-meta i { color: #2563eb; }
     </style>
 </head>
 
 <body>
+    <div class="toast-container" id="toastContainer"></div>
+    <script>
+    // Instant profile pre-render from localStorage (runs sync before any async call)
+    (function(){
+        try {
+            var p = JSON.parse(localStorage.getItem('profileData')||'{}');
+            if (p && p.name) {
+                var isAdmin = p.isAdmin === true;
+                var t = isAdmin ? 'مدير' : p.userType==='seeker' ? 'باحث عن عمل' : 'موظف';
+                var bc= isAdmin ? 'badge-admin' : p.userType==='seeker' ? 'badge-seeker' : 'badge-employee';
+                document.addEventListener('DOMContentLoaded', function(){
+                    var pn = document.getElementById('profileNav');
+                    if (pn) pn.classList.add('visible');
+                    var nn = document.getElementById('navUserName');
+                    if (nn) nn.textContent = p.name;
+                    var nb = document.getElementById('navUserBadge');
+                    if (nb) { nb.textContent = t; nb.className = 'profile-nav-badge '+bc; }
+                    if (isAdmin) { var ab=document.getElementById('adminDashBtn'); if(ab) ab.style.display='inline-flex'; }
+                });
+            }
+        }catch(e){}
+    })();
+    </script>
     <nav class="navbar" id="navbar">
         <div class="right-side">
              <ul class="nav-links">
@@ -608,25 +927,58 @@
                 <li><a href="academy.html">عن الأكاديمية</a></li>
             </ul>
         </div>
-
         <div class="left-side">
-            <div class="login-buttons">
-                <a href="rede.html" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>تسجيل دخول</span>
+            <!-- Logged in -->
+            <div class="profile-nav-wrap" id="profileNav">
+                <a href="admin/index.html" id="adminDashBtn" style="display:none;text-decoration:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;padding:0.45rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:600;font-family:'Cairo',sans-serif;gap:0.4rem;align-items:center;">
+                    <i class="fas fa-shield-alt"></i> لوحة التحكم
                 </a>
-                <a href="rgstr.html" class="register-btn">
-                    <i class="fas fa-user-plus"></i>
-                    <span>تسجيل</span>
-                </a>
+                <span class="profile-nav-name" id="navUserName"></span>
+                <span class="profile-nav-badge" id="navUserBadge"></span>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> خروج
+                </button>
             </div>
         </div>
     </nav>
-    
-    <br><br>
+
+    <div class="page-hero">
+        <div class="page-hero-inner">
+            <div class="page-hero-badge"><i class="fas fa-briefcase"></i> دورات الموظفين</div>
+            <h1>طوّر مهاراتك المهنية</h1>
+            <p>دورات متخصصة لموظفي القطاع الخاص للتطوير والارتقاء في المسيرة الوظيفية</p>
+            <div class="page-hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-num">49+</div>
+                    <div class="hero-stat-label">دورة تدريبية</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-num">معتمدة</div>
+                    <div class="hero-stat-label">شهادات</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-num">40س</div>
+                    <div class="hero-stat-label">ساعة تدريبية</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <section class="courses">
-        <h2>جميع الدورات المتاحة</h2>
+        <div class="courses-header">
+            <h2>جميع الدورات المتاحة</h2>
+            <p class="courses-count" id="coursesCount"></p>
+            <div class="search-wrap">
+                <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن دورة...">
+                <i class="fas fa-search search-icon"></i>
+                <button class="search-clear" id="searchClear" title="مسح البحث"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <div class="no-results" id="noResults">
+            <i class="fas fa-search"></i>
+            <p>لا توجد دورات تطابق بحثك</p>
+        </div>
         
         <div id="coursesGrid" class="courses-grid"></div>
 
@@ -646,9 +998,9 @@
                     <div id="modalObjective" class="objective"></div>
                     <ul id="modalAxes" class="axes"></ul>
                     <div class="modal-buttons">
-                        <a id="modalRegister" class="btn-register" href="rgstr.html" target="_blank">
+                        <button id="modalRegister" class="btn-register">
                             <i class="fas fa-user-plus"></i> تسجيل في الدورة
-                        </a>
+                        </button>
                         <button class="btn-close">
                             <i class="fas fa-times"></i> إغلاق
                         </button>
@@ -1549,61 +1901,64 @@
              }
         ];
 
-        let coursesData = [...staticCoursesData];
+        // -----------------------------------------------
+        // تحميل الدورات
+        // -----------------------------------------------
+        let coursesData = [...staticCoursesData]; // عرض فوري للبيانات الثابتة
+        let currentLimit = 9;
 
-        // Pagination for courses
-        let currentLimit = 9; 
+        async function initCourses() {
+            try {
+                const { data, error } = await supabase
+                    .from('courses')
+                    .select('*')
+                    .in('target_audience', ['employee', 'both'])
+                    .eq('is_active', true)
+                    .order('display_order')
+                    .order('created_at');
 
-        // Modal Functions
-        const modal = document.getElementById('courseModal');
-        let coursesGrid; 
-        const loadMoreBtn = document.getElementById('loadMore');
-        const modalImg = document.getElementById('modalImg');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalTerms = document.getElementById('modalTerms');
-        const closeBtn = document.querySelector('.close');
-        const btnClose = document.querySelector('.btn-close');
-
-        function createCourseCards() {
-            coursesGrid = document.getElementById('coursesGrid');
-            if(!coursesGrid) return;
-
-            coursesGrid.innerHTML = ''; 
-            for(let i = 0; i < coursesData.length; i++) {
-                if(i >= currentLimit) break;
-                
-                const course = coursesData[i];
-                const card = document.createElement('div');
-                card.className = 'course-card';
-                card.dataset.course = i;
-                card.innerHTML = `
-                    <img class="course-img" src="${course.img}" alt="${course.title}">
-                    <h3>${course.title}</h3>
-                `;
-                card.onclick = () => openModal(i);
-                coursesGrid.appendChild(card);
+                if (!error && data && data.length > 0) {
+                    // تحويل حقول قاعدة البيانات إلى التنسيق المستخدم في الصفحة
+                    coursesData = data.map(c => ({
+                        id: c.id,
+                        title: c.title,
+                        img: c.image_url,
+                        terms: c.terms || 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                        objective: c.description || '',
+                        axes: Array.isArray(c.axes) ? c.axes : [],
+                        registrationUrl: c.registration_url || ''
+                    }));
+                } else {
+                    // Fallback للبيانات الثابتة
+                    coursesData = [...staticCoursesData];
+                }
+            } catch (e) {
+                coursesData = [...staticCoursesData];
             }
-            if(loadMoreBtn) {
-                loadMoreBtn.style.display = currentLimit >= coursesData.length ? 'none' : 'block';
-            }
+            createCourseCards();
         }
 
         function openModal(index) {
             const course = coursesData[index];
-            modalImg.src = course.img;
-            modalImg.alt = course.title;
-            modalTitle.textContent = course.title;
-            modalTerms.textContent = course.terms;
+            const modal = document.getElementById('courseModal');
+            const modalImg = document.getElementById('modalImg');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalTerms = document.getElementById('modalTerms');
+
+            if(modalImg) { modalImg.src = course.img; modalImg.alt = course.title; }
+            if(modalTitle) modalTitle.textContent = course.title;
+            if(modalTerms) modalTerms.textContent = course.terms;
             
             const registerBtn = document.getElementById('modalRegister');
             if(registerBtn) {
-                registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> تسجيل في ' + course.title;
+                registerBtn.disabled = false;
+                registerBtn.style.background = '';
+                registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> تسجيل في الدورة';
+                registerBtn.onclick = () => handleEnroll(course);
             }
 
             const objectiveEl = document.getElementById('modalObjective');
-            if(objectiveEl) {
-                objectiveEl.innerHTML = `<h3>الهدف العام للدورة</h3><p>${course.objective}</p>`;
-            }
+            if(objectiveEl) objectiveEl.innerHTML = `<h3>الهدف العام للدورة</h3><p>${course.objective}</p>`;
 
             const axesEl = document.getElementById('modalAxes');
             if(axesEl) {
@@ -1621,29 +1976,239 @@
             }
         }
 
+        async function handleEnroll(course) {
+            const registerBtn = document.getElementById('modalRegister');
+            if (!registerBtn || registerBtn.disabled) return;
+
+            // أولاً: تحقق من تسجيل الدخول
+            let session = null;
+            try {
+                const { data } = await supabase.auth.getSession();
+                session = data.session;
+            } catch(e) {}
+
+            if (!session) {
+                showToast('يجب تسجيل الدخول أولاً للتسجيل في الدورة', 'error');
+                setTimeout(() => window.location.href = 'rede.html', 1800);
+                return;
+            }
+
+            // المستخدم مسجل دخول
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إرسال الطلب...';
+
+            if (!course.id) {
+                // دورة من البيانات الثابتة
+                setTimeout(() => {
+                    registerBtn.innerHTML = '<i class="fas fa-check-circle"></i> تم استلام طلبك ✓';
+                    registerBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    registerBtn.style.boxShadow = '0 8px 25px rgba(16,185,129,0.4)';
+                    showToast('تم استلام طلب التسجيل! سيتم التواصل معك خلال 48 ساعة 📩', 'success');
+                }, 1000);
+                return;
+            }
+
+            // دورة من Supabase
+            try {
+                const { error } = await supabase.from('enrollments').insert({
+                    user_id: session.user.id,
+                    course_id: course.id
+                });
+                if (error && error.code === '23505') {
+                    showToast('أنت مسجل في هذه الدورة مسبقاً!', 'info');
+                    registerBtn.innerHTML = '<i class="fas fa-check-circle"></i> مسجل مسبقاً';
+                } else if (error) {
+                    showToast('خطأ أثناء التسجيل: ' + error.message, 'error');
+                    registerBtn.disabled = false;
+                    registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> تسجيل في الدورة';
+                } else {
+                    registerBtn.innerHTML = '<i class="fas fa-check-circle"></i> تم التسجيل ✓';
+                    registerBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    showToast('تم تسجيلك في الدورة بنجاح! سيتم التواصل معك قريباً 🎉', 'success');
+                }
+            } catch(e) {
+                setTimeout(() => {
+                    registerBtn.innerHTML = '<i class="fas fa-check-circle"></i> تم استلام طلبك ✓';
+                    registerBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    showToast('تم استلام طلب التسجيل! سيتم التواصل معك قريباً 📩', 'success');
+                }, 1000);
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+            toast.innerHTML = `<i class="fas ${icons[type] || 'fa-info-circle'}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3500);
+        }
+
         function closeModal() {
+            const modal = document.getElementById('courseModal');
             if(modal) modal.style.display = 'none';
             document.body.style.overflow = 'auto';
         }
-
-        if(closeBtn) closeBtn.onclick = closeModal;
-        if(btnClose) btnClose.onclick = closeModal;
-        window.onclick = (e) => { if (e.target === modal) closeModal(); };
 
         window.addEventListener('scroll', () => {
             const navbar = document.getElementById('navbar');
             if(navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
         });
 
-        if(loadMoreBtn) {
-            loadMoreBtn.onclick = () => {
-                currentLimit += 9;
-                createCourseCards();
-            };
+        window.onclick = (e) => {
+            const modal = document.getElementById('courseModal');
+            if (e.target === modal) closeModal();
+        };
+
+        // *** Search logic ***
+        let searchQuery = '';
+
+        function updateCoursesCount(total, filtered) {
+            const el = document.getElementById('coursesCount');
+            if (!el) return;
+            if (searchQuery) {
+                el.textContent = `وُجد ${filtered} دورة من أصل ${total}`;
+            } else {
+                el.textContent = `${total} دورة تدريبية متاحة`;
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // Override createCourseCards to support search
+        function createCourseCards() {
+            const coursesGrid = document.getElementById('coursesGrid');
+            const loadMoreBtn = document.getElementById('loadMore');
+            const noResults   = document.getElementById('noResults');
+            if (!coursesGrid) return;
+
+            const filtered = searchQuery
+                ? coursesData.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase()))
+                : coursesData;
+
+            updateCoursesCount(coursesData.length, filtered.length);
+
+            coursesGrid.innerHTML = '';
+            const visible = filtered.slice(0, currentLimit);
+
+            if (filtered.length === 0) {
+                if (noResults) noResults.style.display = 'block';
+                if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+                return;
+            }
+            if (noResults) noResults.style.display = 'none';
+
+            visible.forEach((course, i) => {
+                const originalIndex = coursesData.indexOf(course);
+                const card = document.createElement('div');
+                card.className = 'course-card';
+                card.innerHTML = `
+                    <div class="course-img-wrap">
+                        <img class="course-img" src="${course.img}" alt="${course.title}" loading="lazy">
+                        <div class="course-overlay"><i class="fas fa-eye"></i></div>
+                    </div>
+                    <div class="course-card-body">
+                        <h3>${course.title}</h3>
+                        <div class="course-meta">
+                            <span><i class="fas fa-certificate"></i> معتمدة</span>
+                            <span><i class="fas fa-clock"></i> 5 أيام</span>
+                        </div>
+                    </div>
+                `;
+                card.onclick = () => openModal(originalIndex);
+                coursesGrid.appendChild(card);
+            });
+
+            if (loadMoreBtn) {
+                loadMoreBtn.style.display = currentLimit >= filtered.length ? 'none' : 'block';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // ربط أزرار الإغلاق
+            const closeBtn = document.querySelector('.close');
+            const btnClose = document.querySelector('.btn-close');
+            const loadMoreBtn = document.getElementById('loadMore');
+            if(closeBtn) closeBtn.onclick = closeModal;
+            if(btnClose) btnClose.onclick = closeModal;
+            if(loadMoreBtn) {
+                loadMoreBtn.onclick = () => { currentLimit += 9; createCourseCards(); };
+            }
+
+            // Search
+            const searchInput = document.getElementById('searchInput');
+            const searchClear = document.getElementById('searchClear');
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    searchQuery = searchInput.value.trim();
+                    currentLimit = 9;
+                    if (searchClear) searchClear.style.display = searchQuery ? 'block' : 'none';
+                    createCourseCards();
+                });
+            }
+            if (searchClear) {
+                searchClear.addEventListener('click', () => {
+                    searchInput.value = '';
+                    searchQuery = '';
+                    searchClear.style.display = 'none';
+                    currentLimit = 9;
+                    createCourseCards();
+                    searchInput.focus();
+                });
+            }
+
+            // عرض الدورات فوراً من البيانات الثابتة
             createCourseCards();
+
+            // Auth state in navbar
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const authButtons = document.getElementById('authButtons');
+                const profileNav  = document.getElementById('profileNav');
+                if (session) {
+                    let profile = JSON.parse(localStorage.getItem('profileData') || '{}');
+                    // *** إعادة جلب is_admin من DB مباشرة ***
+                    try {
+                        const { data: dbUser } = await supabase
+                            .from('users')
+                            .select('full_name, user_type, is_admin')
+                            .eq('id', session.user.id)
+                            .single();
+                        if (dbUser) {
+                            profile = {
+                                ...profile,
+                                name: dbUser.full_name || profile.name || '',
+                                userType: dbUser.user_type || profile.userType || 'employee',
+                                isAdmin: dbUser.is_admin === true
+                            };
+                            localStorage.setItem('profileData', JSON.stringify(profile));
+                        }
+                    } catch(e) {}
+
+                    const userType  = profile.userType || 'employee';
+                    const isAdmin   = profile.isAdmin === true;
+                    const typeLabel = isAdmin ? 'مدير' : userType === 'seeker' ? 'باحث عن عمل' : 'موظف';
+                    const badgeClass= isAdmin ? 'badge-admin' : userType === 'seeker' ? 'badge-seeker' : 'badge-employee';
+                    if (authButtons) authButtons.style.display = 'none';
+                    profileNav.classList.add('visible');
+                    document.getElementById('navUserName').textContent = profile.name || 'مستخدم';
+                    const badge = document.getElementById('navUserBadge');
+                    badge.textContent = typeLabel;
+                    badge.className = 'profile-nav-badge ' + badgeClass;
+                    if (profile.isAdmin) {
+                        const adminBtn = document.getElementById('adminDashBtn');
+                        if (adminBtn) adminBtn.style.display = 'inline-flex';
+                    }
+                    document.getElementById('logoutBtn').addEventListener('click', async () => {
+                        await supabase.auth.signOut();
+                        localStorage.removeItem('profileData');
+                        window.location.href = 'index.html';
+                    });
+                }
+                // حاول تحميل الدورات من Supabase (تحديث اختياري)
+                await initCourses();
+            } catch(e) {
+                console.warn('Supabase init failed, using static data:', e);
+            }
         });
 
     </script>

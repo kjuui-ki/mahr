@@ -7,6 +7,8 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
     
     <style>
         * {
@@ -471,10 +473,52 @@
             .hero { padding-top: 9rem; }
             .forms-container { max-width: 95%; }
         }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+            min-width: 320px;
+        }
+        .toast {
+            background: white;
+            border-radius: 14px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            pointer-events: all;
+            border-right: 5px solid #3b82f6;
+            animation: toastIn 0.4s cubic-bezier(0.4,0,0.2,1);
+            transition: opacity 0.3s ease;
+        }
+        .toast.success { border-right-color: #10b981; }
+        .toast.error { border-right-color: #ef4444; }
+        .toast.info { border-right-color: #3b82f6; }
+        .toast i { font-size: 1.3rem; flex-shrink: 0; }
+        .toast.success i { color: #10b981; }
+        .toast.error i { color: #ef4444; }
+        .toast.info i { color: #3b82f6; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
     </style>
 </head>
 
 <body>
+    <div class="toast-container" id="toastContainer"></div>
     <nav class="navbar" id="navbar">
         <div class="right-side">
             <img src="logo_maher.png" class="logo" alt="مهارات Logo">
@@ -579,11 +623,11 @@
             <div class="auth-switch">
                 <p id="switchToLoginText">
                     لديك حساب بالفعل؟ 
-                    <a href="#" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a>
+                    <a href="#" id="showLoginBtn" onclick="switchToLogin(); return false;"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</a>
                 </p>
                 <p id="switchToSignupText" style="display: none;">
                     ليس لديك حساب؟ 
-                    <a href="#" id="showSignupBtn"><i class="fas fa-user-plus"></i> إنشاء حساب جديد</a>
+                    <a href="#" id="showSignupBtn" onclick="switchToSignup(); return false;"><i class="fas fa-user-plus"></i> إنشاء حساب جديد</a>
                 </p>
             </div>
             
@@ -622,10 +666,68 @@
     </footer>
 
     <script>
-        // دالة التحقق الأساسية
-        function validateName(name) {
-            return name.trim().length >= 2;
+        // ============================================
+        // Switch between Login / Signup views (global - no DOMContentLoaded needed)
+        // ============================================
+        function switchToLogin() {
+            document.getElementById('mainTitle').textContent = 'تسجيل الدخول';
+            document.getElementById('mainSubtitle').textContent = 'أهلاً بك مجدداً في منصة مهارات، أدخل بياناتك للمتابعة';
+            document.getElementById('signupTabs').style.display = 'none';
+            const seekerNote = document.getElementById('seekerNote');
+            if (seekerNote) seekerNote.style.display = 'none';
+            ['employeeForm','seekerForm'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.classList.remove('active'); el.style.display = 'none'; }
+            });
+            const loginOnlyForm = document.getElementById('loginOnlyForm');
+            loginOnlyForm.style.display = 'block';
+            setTimeout(() => loginOnlyForm.classList.add('active'), 10);
+            document.getElementById('switchToLoginText').style.display  = 'none';
+            document.getElementById('switchToSignupText').style.display = 'flex';
         }
+
+        function switchToSignup() {
+            document.getElementById('mainTitle').textContent = 'إنشاء حساب جديد';
+            document.getElementById('mainSubtitle').textContent = 'اختر نوع حسابك وأدخل بياناتك للبدء في رحلة تطوير مهاراتك';
+            document.getElementById('signupTabs').style.display = 'flex';
+            const loginOnlyForm = document.getElementById('loginOnlyForm');
+            loginOnlyForm.classList.remove('active'); loginOnlyForm.style.display = 'none';
+            const employeeBtn = document.querySelector('.user-type-employee');
+            if (employeeBtn && employeeBtn.classList.contains('active')) {
+                const ef = document.getElementById('employeeForm');
+                ef.style.display = 'block';
+                setTimeout(() => ef.classList.add('active'), 10);
+            } else {
+                const sf = document.getElementById('seekerForm');
+                const sn = document.getElementById('seekerNote');
+                sf.style.display = 'block';
+                if (sn) sn.style.display = 'flex';
+                setTimeout(() => sf.classList.add('active'), 10);
+            }
+            document.getElementById('switchToLoginText').style.display  = 'flex';
+            document.getElementById('switchToSignupText').style.display = 'none';
+        }
+
+        // ============================================
+        // Toast Notification System
+        // ============================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+            toast.innerHTML = `<i class="fas ${icons[type] || 'fa-info-circle'}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ============================================
+        // Validation Functions
+        // ============================================
+        function validateName(name) { return name.trim().length >= 2; }
 
         function validateEmail(email) {
             const englishOnly = /^[a-zA-Z0-9@._-]+$/.test(email);
@@ -634,256 +736,260 @@
             return englishOnly && hasAt && validEnding;
         }
 
-        function validatePhone(phone) {
-            return /^05\d{8}$/.test(phone);
-        }
+        function validatePhone(phone) { return /^05\d{8}$/.test(phone); }
 
-        // التحقق لنموذج الموظف 
         function validateEmployeeForm() {
             const name = document.getElementById('empFullName').value;
             const email = document.getElementById('empEmail').value;
             const phone = document.getElementById('empPhone').value;
             const password = document.getElementById('empPassword').value;
-
             document.getElementById('empNameError').style.display = (name && !validateName(name)) ? 'block' : 'none';
             document.getElementById('empEmailError').style.display = (email && !validateEmail(email)) ? 'block' : 'none';
             document.getElementById('empPhoneError').style.display = (phone && !validatePhone(phone)) ? 'block' : 'none';
-
-            const isValid = validateName(name) && validateEmail(email) && validatePhone(phone) && password.length > 0;
+            const isValid = validateName(name) && validateEmail(email) && validatePhone(phone) && password.length >= 6;
             document.getElementById('empSubmit').disabled = !isValid;
         }
 
-        // التحقق لنموذج الباحث عن عمل 
         function validateSeekerForm() {
             const name = document.getElementById('seekFullName').value;
             const email = document.getElementById('seekEmail').value;
             const phone = document.getElementById('seekPhone').value;
             const password = document.getElementById('seekPassword').value;
-
             document.getElementById('seekNameError').style.display = (name && !validateName(name)) ? 'block' : 'none';
             document.getElementById('seekEmailError').style.display = (email && !validateEmail(email)) ? 'block' : 'none';
             document.getElementById('seekPhoneError').style.display = (phone && !validatePhone(phone)) ? 'block' : 'none';
-
-            const isValid = validateName(name) && validateEmail(email) && validatePhone(phone) && password.length > 0;
+            const isValid = validateName(name) && validateEmail(email) && validatePhone(phone) && password.length >= 6;
             document.getElementById('seekSubmit').disabled = !isValid;
         }
 
-        // التحقق لنموذج تسجيل الدخول فقط
         function validateLoginForm() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-
             document.getElementById('loginEmailError').style.display = (email && !validateEmail(email)) ? 'block' : 'none';
-
             const isValid = validateEmail(email) && password.length > 0;
             document.getElementById('loginSubmit').disabled = !isValid;
         }
 
-        // تأثير نزول الصفحة 
+        // ============================================
+        // Supabase Auth: Sign Up
+        // ============================================
+        async function handleSubmission(btnId, nameId, emailId, phoneId, passwordId, userType) {
+            const name     = document.getElementById(nameId).value.trim();
+            const email    = document.getElementById(emailId).value.trim();
+            const phone    = document.getElementById(phoneId).value.trim();
+            const password = document.getElementById(passwordId).value;
+            const submitBtn = document.getElementById(btnId);
+            const originalText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري إنشاء الحساب...</span>';
+
+            // 1. Create auth account
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+
+            if (signUpError) {
+                const msg = signUpError.message.toLowerCase();
+                if (msg.includes('already registered') || msg.includes('already been registered')) {
+                    showToast('هذا البريد مسجل مسبقاً. سجّل الدخول بدلاً من ذلك.', 'error');
+                    // Switch to login view
+                    document.getElementById('showLoginBtn').click();
+                    switchToLogin();
+                } else {
+                    showToast('خطأ: ' + signUpError.message, 'error');
+                }
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+
+            // 2. Sign in immediately to get session
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (signInError || !signInData?.user) {
+                showToast('تم إنشاء الحساب. قد تحتاج لتأكيد البريد الإلكتروني أولاً.', 'info');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+
+            // 3. Update profile row (trigger already created it)
+            const userId = signInData.user.id;
+            await supabase.from('users').upsert({
+                id: userId,
+                full_name: name,
+                email: email,
+                phone: phone,
+                user_type: userType
+            });
+
+            // 4. Save minimal profile locally
+            localStorage.setItem('profileData', JSON.stringify({ name, email, phone, userType }));
+
+            showToast(`أهلاً ${name}! تم إنشاء حسابك بنجاح 🎉`, 'success');
+            setTimeout(() => {
+                window.location.href = userType === 'seeker' ? 'Researcher.html' : 'employee.html';
+            }, 1600);
+        }
+
+        // ============================================
+        // Supabase Auth: Sign In
+        // ============================================
+        async function handleLogin(email, password) {
+            const submitBtn = document.getElementById('loginSubmit');
+            const authError = document.getElementById('loginAuthError');
+            const originalText = submitBtn.innerHTML;
+
+            authError.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري التحقق...</span>';
+
+            let signInData, signInError;
+            try {
+                const timeout = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('timeout')), 10000)
+                );
+                const result = supabase.auth.signInWithPassword({ email, password });
+                const response = await Promise.race([result, timeout]);
+                signInData = response.data;
+                signInError = response.error;
+            } catch (e) {
+                authError.style.display = 'block';
+                authError.textContent = e.message === 'timeout'
+                    ? 'انتهت مهلة الاتصال. تحقق من الإنترنت وحاول مجدداً.'
+                    : 'حدث خطأ: ' + e.message;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+
+            if (signInError || !signInData?.user) {
+                authError.style.display = 'block';
+                authError.textContent = signInError?.message?.includes('Email not confirmed')
+                    ? 'يجب تأكيد بريدك الإلكتروني أولاً. تحقق من صندوق الوارد.'
+                    : 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                return;
+            }
+
+            // Fetch profile (including is_admin)
+            const { data: profile } = await supabase
+                .from('users')
+                .select('full_name, phone, user_type, is_admin')
+                .eq('id', signInData.user.id)
+                .single();
+
+            const userType = profile?.user_type || 'employee';
+            localStorage.setItem('profileData', JSON.stringify({
+                name: profile?.full_name || '',
+                email: email,
+                phone: profile?.phone || '',
+                userType: userType,
+                isAdmin: profile?.is_admin || false
+            }));
+
+            showToast(`مرحباً ${profile?.full_name || 'بك'}! تم تسجيل الدخول ✅`, 'success');
+            setTimeout(() => {
+                if (profile?.is_admin) {
+                    window.location.href = 'admin/index.html';
+                } else {
+                    window.location.href = userType === 'seeker' ? 'Researcher.html' : 'employee.html';
+                }
+            }, 1400);
+        }
+
+        // ============================================
+        // Scroll Effect
+        // ============================================
         window.addEventListener('scroll', () => {
             document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
         });
 
+        // ============================================
+        // Hash detection + validation listeners — runs immediately (no async wait)
+        // ============================================
         document.addEventListener('DOMContentLoaded', () => {
-            
-            // التبديل بين إنشاء حساب (موظف / باحث عن عمل)
-            const employeeBtn = document.querySelector('.user-type-employee');
-            const seekerBtn = document.querySelector('.user-type-seeker');
+            // Hash detection
+            if (window.location.hash === '#login') {
+                switchToLogin();
+            }
+
+            // Input validation listeners
+            ['empFullName','empEmail','empPhone','empPassword'].forEach(id =>
+                document.getElementById(id).addEventListener('input', validateEmployeeForm));
+            ['seekFullName','seekEmail','seekPhone','seekPassword'].forEach(id =>
+                document.getElementById(id).addEventListener('input', validateSeekerForm));
+            ['loginEmail','loginPassword'].forEach(id =>
+                document.getElementById(id).addEventListener('input', validateLoginForm));
+
+            // Tab switching: موظف / باحث
+            const employeeBtn  = document.querySelector('.user-type-employee');
             const employeeForm = document.getElementById('employeeForm');
-            const seekerForm = document.getElementById('seekerForm');
-            const seekerNote = document.getElementById('seekerNote');
-            
+            const seekerForm   = document.getElementById('seekerForm');
+            const seekerNote   = document.getElementById('seekerNote');
+
             document.querySelectorAll('.user-type-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.user-type-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    
                     if (btn.dataset.type === 'employee') {
-                        employeeForm.classList.add('active');
-                        seekerForm.classList.remove('active');
-                        seekerNote.style.display = 'none';
-                        setTimeout(() => seekerForm.style.display = 'none', 200);
                         employeeForm.style.display = 'block';
+                        setTimeout(() => employeeForm.classList.add('active'), 10);
+                        seekerForm.classList.remove('active');
+                        setTimeout(() => seekerForm.style.display = 'none', 200);
+                        seekerNote.style.display = 'none';
                     } else {
-                        employeeForm.classList.remove('active');
-                        seekerForm.classList.add('active');
-                        seekerNote.style.display = 'flex';
-                        setTimeout(() => employeeForm.style.display = 'none', 200);
                         seekerForm.style.display = 'block';
+                        setTimeout(() => seekerForm.classList.add('active'), 10);
+                        employeeForm.classList.remove('active');
+                        setTimeout(() => employeeForm.style.display = 'none', 200);
+                        seekerNote.style.display = 'flex';
                     }
                 });
             });
 
-            // التبديل بين إنشاء حساب وتسجيل الدخول
-            const showLoginBtn = document.getElementById('showLoginBtn');
-            const showSignupBtn = document.getElementById('showSignupBtn');
-            const loginOnlyForm = document.getElementById('loginOnlyForm');
-            const signupTabs = document.getElementById('signupTabs');
-            
-            const switchToLoginText = document.getElementById('switchToLoginText');
-            const switchToSignupText = document.getElementById('switchToSignupText');
-            
-            const mainTitle = document.getElementById('mainTitle');
-            const mainSubtitle = document.getElementById('mainSubtitle');
+            // Switch between signup and login
+            document.getElementById('showLoginBtn').addEventListener('click', (e) => { e.preventDefault(); switchToLogin(); });
+            document.getElementById('showSignupBtn').addEventListener('click', (e) => { e.preventDefault(); switchToSignup(); });
 
-            showLoginBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                mainTitle.textContent = "تسجيل الدخول";
-                mainSubtitle.textContent = "أهلاً بك مجدداً في منصة مهارات، أدخل بياناتك للمتابعة";
-                
-                signupTabs.style.display = 'none';
-                seekerNote.style.display = 'none';
-                employeeForm.classList.remove('active');
-                employeeForm.style.display = 'none';
-                seekerForm.classList.remove('active');
-                seekerForm.style.display = 'none';
-                
-                loginOnlyForm.style.display = 'block';
-                setTimeout(() => loginOnlyForm.classList.add('active'), 10);
-                
-                switchToLoginText.style.display = 'none';
-                switchToSignupText.style.display = 'flex';
-            });
-
-            showSignupBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                mainTitle.textContent = "إنشاء حساب جديد";
-                mainSubtitle.textContent = "اختر نوع حسابك وأدخل بياناتك للبدء في رحلة تطوير مهاراتك";
-                
-                signupTabs.style.display = 'flex';
-                
-                loginOnlyForm.classList.remove('active');
-                loginOnlyForm.style.display = 'none';
-                
-                if (employeeBtn.classList.contains('active')) {
-                    employeeForm.style.display = 'block';
-                    setTimeout(() => employeeForm.classList.add('active'), 10);
-                } else {
-                    seekerForm.style.display = 'block';
-                    seekerNote.style.display = 'flex';
-                    setTimeout(() => seekerForm.classList.add('active'), 10);
-                }
-                
-                switchToLoginText.style.display = 'flex';
-                switchToSignupText.style.display = 'none';
-            });
-
-            // إضافة مستمعي الأحداث
-            ['empFullName', 'empEmail', 'empPhone', 'empPassword'].forEach(id => {
-                document.getElementById(id).addEventListener('input', validateEmployeeForm);
-            });
-
-            ['seekFullName', 'seekEmail', 'seekPhone', 'seekPassword'].forEach(id => {
-                document.getElementById(id).addEventListener('input', validateSeekerForm);
-            });
-
-            ['loginEmail', 'loginPassword'].forEach(id => {
-                document.getElementById(id).addEventListener('input', validateLoginForm);
-            });
-
-            // دالة معالجة إنشاء الحساب المحدثة لتدعم التوجيه حسب نوع المستخدم
-            function handleSubmission(btnId, nameId, emailId, phoneId, passwordId, userType) {
-                const name = document.getElementById(nameId).value;
-                const email = document.getElementById(emailId).value;
-                const phone = document.getElementById(phoneId).value;
-                const password = document.getElementById(passwordId).value;
-                
-                const submitBtn = document.getElementById(btnId);
-                const originalText = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري معالجة الطلب...</span>';
-                
-                setTimeout(() => {
-                    // جلب المستخدمين الحاليين أو إنشاء مصفوفة جديدة
-                    let users = JSON.parse(localStorage.getItem('maharat_users')) || [];
-                    
-                    // التحقق مما إذا كان البريد الإلكتروني مسجل مسبقاً
-                    if(users.some(u => u.email === email)) {
-                        alert("هذا البريد الإلكتروني مسجل لدينا بالفعل!");
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalText;
-                        return;
-                    }
-
-                    // إنشاء كائن المستخدم الجديد مع حفظ نوع الحساب
-                    const newUser = { name: name, email: email, phone: phone, password: password, type: userType };
-                    users.push(newUser);
-                    localStorage.setItem('maharat_users', JSON.stringify(users));
-                    
-                    // تسجيل الدخول التلقائي بعد التخزين
-                    localStorage.setItem('profileData', JSON.stringify({
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        type: userType
-                    }));
-
-                    // التوجيه بناءً على نوع الحساب المختار
-                    if (userType === 'seeker') {
-                        window.location.href = 'home_1.html';
-                    } else {
-                        window.location.href = 'home_2.html';
-                    }
-                }, 1500);
-            }
-
-            // التعامل مع أزرار الإرسال (إنشاء حساب) - إرسال نوع المستخدم للدالة
+            // Form submissions
             document.getElementById('employeeForm').addEventListener('submit', (e) => {
                 e.preventDefault();
-                handleSubmission('empSubmit', 'empFullName', 'empEmail', 'empPhone', 'empPassword', 'employee');
+                handleSubmission('empSubmit','empFullName','empEmail','empPhone','empPassword','employee');
             });
-
             document.getElementById('seekerForm').addEventListener('submit', (e) => {
                 e.preventDefault();
-                handleSubmission('seekSubmit', 'seekFullName', 'seekEmail', 'seekPhone', 'seekPassword', 'seeker');
+                handleSubmission('seekSubmit','seekFullName','seekEmail','seekPhone','seekPassword','seeker');
             });
-
-            // التعامل مع زر الإرسال (تسجيل الدخول فقط)
             document.getElementById('loginOnlyForm').addEventListener('submit', (e) => {
                 e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
+                const email    = document.getElementById('loginEmail').value.trim();
                 const password = document.getElementById('loginPassword').value;
-                const submitBtn = document.getElementById('loginSubmit');
-                const authError = document.getElementById('loginAuthError');
-                
-                // إخفاء رسالة الخطأ إن كانت ظاهرة
-                authError.style.display = 'none';
-                
-                const originalText = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>جاري التحقق...</span>';
-                
-                setTimeout(() => {
-                    // جلب قاعدة بيانات المستخدمين الوهمية من LocalStorage
-                    let users = JSON.parse(localStorage.getItem('maharat_users')) || [];
-                    
-                    // البحث عن مستخدم يتطابق بريده وكلمة مروره مع المدخلات
-                    const validUser = users.find(u => u.email === email && u.password === password);
-                    
-                    if (validUser) {
-                        // تسجيل دخول ناجح وحفظ بيانات الجلسة مع نوع المستخدم
-                        localStorage.setItem('profileData', JSON.stringify({
-                            name: validUser.name,
-                            email: validUser.email,
-                            phone: validUser.phone,
-                            type: validUser.type || 'employee' // في حال كان الحساب قديماً ولم يحفظ نوعه
-                        }));
-
-                        // توجيه المستخدم لصفحته الصحيحة عند تسجيل الدخول أيضاً
-                        if (validUser.type === 'seeker') {
-                            window.location.href = 'home_1.html';
-                        } else {
-                            window.location.href = 'home_2.html';
-                        }
-                    } else {
-                        // فشل تسجيل الدخول
-                        authError.style.display = 'block';
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalText;
-                    }
-                }, 1200);
+                handleLogin(email, password);
             });
         });
+
+        // ============================================
+        // Check session (async - redirect if already logged in)
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                // Re-fetch profile from DB to get latest is_admin
+                const { data: profile } = await supabase
+                    .from('users')
+                    .select('user_type, is_admin')
+                    .eq('id', session.user.id)
+                    .single();
+                if (profile?.is_admin) {
+                    window.location.href = 'admin/index.html';
+                } else {
+                    const userType = profile?.user_type || 'employee';
+                    window.location.href = userType === 'seeker' ? 'Researcher.html' : 'employee.html';
+                }
+            }
+        });
+
     </script>
 </body>
 </html>

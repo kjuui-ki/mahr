@@ -7,6 +7,8 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
     
     <style>
         * {
@@ -101,188 +103,44 @@
             color: var(--primary);
         }
 
-        /* Unified Profile Styles */
-        .profile-container {
-            position: relative;
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50px;
-            background: var(--secondary);
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
-        }
-
-        .profile-header:hover {
-            background: rgba(37, 99, 235, 0.1);
-            transform: scale(1.02);
-        }
-
-        .profile-avatar-container {
-            position: relative;
-            width: 45px;
-            height: 45px;
-        }
-
-        .profile-avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--primary);
-            display: none;
-        }
-
-        .profile-icon {
-            font-size: 2.2rem;
-            color: var(--text-light);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: block;
-        }
-
-        .job-seeker-badge {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-        }
-
-        .profile-dropdown {
-            position: absolute;
-            top: calc(100% + 15px); 
-            left: 0; 
-            right: auto;
-            background: var(--white);
-            border-radius: 16px;
-            box-shadow: var(--shadow-lg);
-            min-width: 280px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1001;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .profile-container:hover .profile-dropdown,
-        .profile-dropdown.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .profile-info {
-            padding: 1.5rem;
-            text-align: center;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .editable-section {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .editable-section label {
-            font-weight: 600;
-            color: var(--text-dark);
-            min-width: 60px;
-            font-size: 0.95rem;
-        }
-
-        .editable-name {
-            flex: 1;
-            padding: 0.5rem 1rem;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            background: var(--secondary);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 24px;
-        }
-
-        .editable-name.editing {
-            border-color: var(--primary);
-            background: white;
-            outline: none;
-            cursor: text;
-        }
-
-        .edit-name-btn {
-            background: var(--primary);
-            color: white;
+        /* Auth Buttons */
+        .login-buttons { display: flex; gap: 0.75rem; align-items: center; }
+        .login-btn, .register-btn {
             border: none;
-            padding: 0.5rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            transition: all 0.3s ease;
-        }
-
-        .static-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
-            padding: 0.75rem;
-            background: var(--secondary);
-            border-radius: 8px;
-        }
-
-        .static-info label {
-            font-weight: 600;
-            color: var(--text-dark);
-            min-width: 60px;
-            font-size: 0.9rem;
-        }
-
-        .static-info span {
-            flex: 1;
-            color: var(--text-light);
-            font-size: 0.95rem;
-        }
-
-        .profile-actions {
-            margin-top: 1rem;
-            border-top: 1px solid rgba(0,0,0,0.1);
-            padding-top: 1rem;
-            padding: 0 1.5rem 1.5rem;
-        }
-
-        .profile-edit-btn {
-            display: block;
-            width: 100%;
-            padding: 1rem 1.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 0.55rem 1.25rem;
             color: white;
-            text-align: center;
-            border-radius: 12px;
-            cursor: pointer;
+            text-decoration: none;
+            border-radius: 25px;
             font-weight: 600;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
-            border: none;
-            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 15px rgba(37,99,235,0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            flex-direction: column;
+            line-height: 1.2;
+            text-align: center;
         }
+        .btn-label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.92rem; font-weight: 700; }
+        .btn-sub { font-size: 0.68rem; font-weight: 400; opacity: 0.85; white-space: nowrap; }
+        .login-btn { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+        .register-btn { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16,185,129,0.3); }
+        .login-btn:hover, .register-btn:hover { transform: translateY(-2px); }
+        .login-btn:hover { box-shadow: 0 8px 25px rgba(37,99,235,0.4); }
+        .register-btn:hover { box-shadow: 0 8px 25px rgba(16,185,129,0.4); }
+        /* Profile nav (logged-in) */
+        .profile-nav-wrap { display: none; align-items: center; gap: 0.75rem; }
+        .profile-nav-wrap.visible { display: flex; }
+        .profile-nav-name { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
+        .profile-nav-badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: white; }
+        .badge-employee { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .badge-seeker   { background: linear-gradient(135deg, #10b981, #059669); }
+        .badge-admin    { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+        .logout-btn { padding: 0.6rem 1.2rem; border: 2px solid #ef4444; background: transparent; color: #ef4444; border-radius: 20px; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.4rem; }
+        .logout-btn:hover { background: #ef4444; color: white; }
 
         /* Courses Section */
         .courses {
@@ -643,10 +501,179 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+            min-width: 320px;
+        }
+        .toast {
+            background: white;
+            border-radius: 14px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            pointer-events: all;
+            border-right: 5px solid #3b82f6;
+            animation: toastIn 0.4s cubic-bezier(0.4,0,0.2,1);
+            transition: opacity 0.3s ease;
+        }
+        .toast.success { border-right-color: #10b981; }
+        .toast.error   { border-right-color: #ef4444; }
+        .toast.info    { border-right-color: #3b82f6; }
+        .toast i { font-size: 1.3rem; flex-shrink: 0; }
+        .toast.success i { color: #10b981; }
+        .toast.error i   { color: #ef4444; }
+        .toast.info i    { color: #3b82f6; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ===== PAGE HERO ===== */
+        .page-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+            padding: 6rem 5% 3.5rem;
+            color: white;
+            text-align: center;
+            margin-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 25% 50%, rgba(52,211,153,0.15) 0%, transparent 60%);
+        }
+        .page-hero-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+        .page-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: rgba(255,255,255,0.9);
+        }
+        .page-hero h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            color: white;
+        }
+        .page-hero p {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+        }
+        /* ===== IMPROVED COURSE CARDS ===== */
+        .course-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 1px solid rgba(0,0,0,0.05);
+            padding: 0;
+        }
+        .course-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 30px rgba(0,0,0,0.12);
+        }
+        .course-card::before { display: none; }
+        .course-img-wrap {
+            position: relative;
+            overflow: hidden;
+            height: 175px;
+            background: #f1f5f9;
+        }
+        .course-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            display: block;
+        }
+        .course-card:hover .course-img { transform: scale(1.07); }
+        .course-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(37,99,235,0.75), rgba(29,78,216,0.85));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: white;
+            font-size: 2rem;
+        }
+        .course-card:hover .course-overlay { opacity: 1; }
+        .course-card-body { padding: 1.15rem 1.25rem; }
+        .course-card h3 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.65rem;
+            line-height: 1.6;
+        }
+        .course-meta {
+            display: flex;
+            gap: 1rem;
+            color: #64748b;
+            font-size: 0.78rem;
+        }
+        .course-meta span { display: flex; align-items: center; gap: 0.3rem; }
+        .course-meta i { color: #2563eb; }
     </style>
 </head>
 
 <body>
+    <div class="toast-container" id="toastContainer"></div>
+    <script>
+    (function(){
+        try {
+            var p = JSON.parse(localStorage.getItem('profileData')||'{}');
+            if (p && p.name) {
+                var isAdmin = p.isAdmin === true;
+                var t = isAdmin ? 'مدير' : p.userType==='seeker' ? 'باحث عن عمل' : 'موظف';
+                var bc= isAdmin ? 'badge-admin' : p.userType==='seeker' ? 'badge-seeker' : 'badge-employee';
+                document.addEventListener('DOMContentLoaded', function(){
+                    var pn = document.getElementById('profileNav');
+                    if (pn) pn.classList.add('visible');
+                    var nn = document.getElementById('navUserName');
+                    if (nn) nn.textContent = p.name;
+                    var nb = document.getElementById('navUserBadge');
+                    if (nb) { nb.textContent = t; nb.className = 'profile-nav-badge '+bc; }
+                    if (isAdmin) { var ab=document.getElementById('adminDashBtn'); if(ab) ab.style.display='inline-flex'; }
+                });
+            }
+        }catch(e){}
+    })();
+    </script>
     <nav class="navbar" id="navbar">
         <div class="right-side">
             <ul class="nav-links">
@@ -658,46 +685,28 @@
         </div>
 
         <div class="left-side">
-            <div class="profile-container" id="profileContainer">
-                <div class="profile-header" id="profileHeader">
-                    <div class="profile-avatar-container">
-                        <img id="profilePic" src="" class="profile-avatar" alt="ملف التعريف">
-                        <i id="profileIcon" class="fas fa-user-circle profile-icon"></i>
-                    </div>
-                    <span class="job-seeker-badge">باحث عن عمل</span>
-                </div>
-                <div class="profile-dropdown" id="profileDropdown">
-                    <div class="profile-info">
-                        <div class="editable-section">
-                            <label>الاسم:</label>
-                            <div id="editableName" class="editable-name" contenteditable="false">أحمد محمد</div>
-                            <button id="editNameBtn" class="edit-name-btn"><i class="fas fa-edit"></i></button>
-                        </div>
-                        <div class="static-info">
-                            <label>الإيميل:</label>
-                            <span id="profileEmail">ahmed@example.com</span>
-                        </div>
-                        <div class="static-info">
-                            <label>الهاتف:</label>
-                            <span id="profilePhone">0539600080</span>
-                        </div>
-                    </div>
-                    <div class="profile-actions">
-                        <label for="profileUpload" class="profile-edit-btn">
-                            <i class="fas fa-camera"></i> <span>تعديل الصورة</span>
-                        </label>
-                        <input type="file" id="profileUpload" accept="image/*" hidden>
-                    </div>
-                    <div class="profile-actions" style="margin-top: 0; padding-top: 0; border-top: none;">
-                        <button id="logoutBtn" class="profile-edit-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;">
-                            <i class="fas fa-sign-out-alt"></i> تسجيل خروج
-                        </button>
-                    </div>
-                </div>
+            <!-- Logged in -->
+            <div class="profile-nav-wrap" id="profileNav">
+                <a href="admin/index.html" id="adminDashBtn" style="display:none;text-decoration:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;padding:0.45rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:600;font-family:'Cairo',sans-serif;gap:0.4rem;align-items:center;">
+                    <i class="fas fa-shield-alt"></i> لوحة التحكم
+                </a>
+                <span class="profile-nav-name" id="navUserName"></span>
+                <span class="profile-nav-badge" id="navUserBadge"></span>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> خروج
+                </button>
             </div>
         </div>
     </nav>
-    
+
+    <div class="page-hero">
+        <div class="page-hero-inner">
+            <div class="page-hero-badge"><i class="fas fa-search"></i> دورات الباحثين عن عمل</div>
+            <h1>طوّر مهاراتك وانطلق نحو وظيفتك</h1>
+            <p>دورات متخصصة تفتح أمامك أبواب الفرص الوظيفية وتبني مسيرتك المهنية</p>
+        </div>
+    </div>
+
     <section class="courses">
         <h2>جميع الدورات المتاحة</h2>
         <div id="coursesGrid" class="courses-grid"></div>
@@ -1620,11 +1629,40 @@
              }
         ];
 
+        // -----------------------------------------------
+        // تحميل الدورات
+        // -----------------------------------------------
+        let coursesData = [...staticCoursesData]; // عرض فوري للبيانات الثابتة
         let currentLimit = 9;
-        
-        // مصفوفة لحفظ فهارس الدورات التي تم التسجيل فيها خلال التصفح
-        let registeredCourses = new Set();
-        let registrationTimeout; // متغير لحفظ العداد
+
+        async function initCourses() {
+            try {
+                const { data, error } = await supabase
+                    .from('courses')
+                    .select('*')
+                    .in('target_audience', ['seeker', 'both'])
+                    .eq('is_active', true)
+                    .order('display_order')
+                    .order('created_at');
+
+                if (!error && data && data.length > 0) {
+                    coursesData = data.map(c => ({
+                        id: c.id,
+                        title: c.title,
+                        img: c.image_url,
+                        terms: c.terms || 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+                        objective: c.description || '',
+                        axes: Array.isArray(c.axes) ? c.axes : [],
+                        registrationUrl: c.registration_url || ''
+                    }));
+                } else {
+                    coursesData = [...staticCoursesData];
+                }
+            } catch (e) {
+                coursesData = [...staticCoursesData];
+            }
+            createCourseCards();
+        }
 
         function createCourseCards() {
             const grid = document.getElementById('coursesGrid');
@@ -1638,8 +1676,17 @@
                 const card = document.createElement('div');
                 card.className = 'course-card';
                 card.innerHTML = `
-                    <img class="course-img" src="${course.img}" alt="${course.title}">
-                    <h3>${course.title}</h3>
+                    <div class="course-img-wrap">
+                        <img class="course-img" src="${course.img}" alt="${course.title}" loading="lazy">
+                        <div class="course-overlay"><i class="fas fa-eye"></i></div>
+                    </div>
+                    <div class="course-card-body">
+                        <h3>${course.title}</h3>
+                        <div class="course-meta">
+                            <span><i class="fas fa-certificate"></i> معتمدة</span>
+                            <span><i class="fas fa-clock"></i> 5 أيام</span>
+                        </div>
+                    </div>
                 `;
                 card.onclick = () => openModal(i);
                 grid.appendChild(card);
@@ -1693,27 +1740,66 @@
                 registerText.textContent = 'تسجيل في الدورة';
             }
 
-            btnRegister.onclick = function() {
-                if (!registeredCourses.has(index) && !btnRegister.classList.contains('loading')) {
-                    
-                    btnRegister.classList.add('loading');
-                    registerIcon.className = 'fas fa-spinner fa-spin';
-                    registerText.textContent = 'جاري التسجيل...';
-                    btnRegister.disabled = true;
-                    
-                    setTimeout(() => {
-                        registerProgress.style.transition = 'width 3s linear';
-                        registerProgress.style.width = '100%';
-                    }, 30);
+            // زر التسجيل الفعلي عبر Supabase
+            btnRegister.onclick = async function() {
+                if (btnRegister.classList.contains('loading') || btnRegister.classList.contains('registered')) return;
 
-                    registrationTimeout = setTimeout(() => {
-                        registeredCourses.add(index);
+                btnRegister.classList.add('loading');
+                registerIcon.className = 'fas fa-spinner fa-spin';
+                registerText.textContent = 'جاري التسجيل...';
+                btnRegister.disabled = true;
+
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    btnRegister.classList.remove('loading');
+                    btnRegister.disabled = false;
+                    registerIcon.className = 'fas fa-user-plus';
+                    registerText.textContent = 'تسجيل في الدورة';
+                    showToast('يجب تسجيل الدخول أولاً للتسجيل في الدورة', 'error');
+                    setTimeout(() => window.location.href = 'rede.html', 1500);
+                    return;
+                }
+
+                if (!course.id) {
+                    // دورة من البيانات الثابتة - أظهر تأكيد مباشر
+                    registerProgress.style.width = '100%';
+                    setTimeout(() => {
                         btnRegister.classList.remove('loading');
                         btnRegister.classList.add('registered');
                         registerIcon.className = 'fas fa-check-circle';
-                        registerText.textContent = 'تم التسجيل في الدورة';
-                        registerProgress.style.transition = 'none';
-                    }, 3000); 
+                        registerText.textContent = 'تم تسجيل طلبك';
+                        btnRegister.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    }, 1200);
+                    showToast('تم استلام طلب التسجيل! سيتم التواصل معك قريباً ✅', 'success');
+                    return;
+                }
+
+                const { error } = await supabase.from('enrollments').insert({
+                    user_id: session.user.id,
+                    course_id: course.id
+                });
+
+                registerProgress.style.transition = 'none';
+                registerProgress.style.width = '100%';
+
+                if (error && error.code === '23505') {
+                    btnRegister.classList.remove('loading');
+                    btnRegister.classList.add('registered');
+                    registerIcon.className = 'fas fa-check-circle';
+                    registerText.textContent = 'مسجل مسبقاً';
+                } else if (error) {
+                    btnRegister.classList.remove('loading');
+                    btnRegister.disabled = false;
+                    registerIcon.className = 'fas fa-user-plus';
+                    registerText.textContent = 'تسجيل في الدورة';
+                    registerProgress.style.width = '0';
+                    showToast('خطأ أثناء التسجيل: ' + error.message, 'error');
+                } else {
+                    btnRegister.classList.remove('loading');
+                    btnRegister.classList.add('registered');
+                    registerIcon.className = 'fas fa-check-circle';
+                    registerText.textContent = 'تم التسجيل في الدورة';
+                    showToast('تم تسجيلك في الدورة بنجاح! سيتم التواصل معك قريباً 🎉', 'success');
                 }
             };
 
@@ -1730,9 +1816,27 @@
         }
 
         // Profile Functions
-        function initProfile() {
-            const profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
-            
+        async function initProfile() {
+            // Load from Supabase session first, fallback to localStorage
+            let profileData = JSON.parse(localStorage.getItem('profileData') || '{}');
+
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                const { data: profile } = await supabase
+                    .from('users')
+                    .select('full_name, email, phone')
+                    .eq('id', session.user.id)
+                    .single();
+                if (profile) {
+                    profileData = { ...profileData, name: profile.full_name, email: profile.email, phone: profile.phone };
+                    localStorage.setItem('profileData', JSON.stringify({ ...profileData, userType: 'seeker' }));
+                }
+            } else {
+                // Not logged in → redirect to login
+                window.location.href = 'rede.html';
+                return;
+            }
+
             const editableName = document.getElementById('editableName');
             const profileEmail = document.getElementById('profileEmail');
             const profilePhone = document.getElementById('profilePhone');
@@ -1819,24 +1923,28 @@
             e.target.value = '';
         }
 
-         function logout() {
-            localStorage.removeItem('profileData');
-            window.location.href = 'index.html'; 
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-times-circle', info: 'fa-info-circle' };
+            toast.innerHTML = `<i class="fas ${icons[type] || 'fa-info-circle'}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3500);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initProfile();
-            setupNameEditing();
-            createCourseCards();
+         function logout() {
+            supabase.auth.signOut().then(() => {
+                localStorage.removeItem('profileData');
+                window.location.href = 'index.html';
+            });
+        }
 
-            const profileHeader = document.getElementById('profileHeader');
-            if(profileHeader) profileHeader.addEventListener('click', toggleProfileDropdown);
-            
-            const profileUpload = document.getElementById('profileUpload');
-            if(profileUpload) profileUpload.addEventListener('change', handleProfileUpload);
-            
-            const logoutBtn = document.getElementById('logoutBtn');
-            if(logoutBtn) logoutBtn.addEventListener('click', logout);
+        document.addEventListener('DOMContentLoaded', async () => {
+            // عرض الدورات فوراً
+            createCourseCards();
+            // تحديث Supabase في الخلفية (اختياري)
+            initCourses().catch(() => {});
 
             const btnClose = document.querySelector('.btn-close');
             if(btnClose) btnClose.onclick = closeModal;
@@ -1859,13 +1967,52 @@
                 if(nav) nav.classList.toggle('scrolled', window.scrollY > 50);
             });
 
-            document.addEventListener('click', (e) => {
-                const profileContainer = document.getElementById('profileContainer');
-                const dropdown = document.getElementById('profileDropdown');
-                if (profileContainer && dropdown && !profileContainer.contains(e.target)) {
-                    dropdown.classList.remove('active');
+            // Auth state in navbar
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const authButtons = document.getElementById('authButtons');
+                const profileNav  = document.getElementById('profileNav');
+                if (session) {
+                    let profile = JSON.parse(localStorage.getItem('profileData') || '{}');
+                    // *** إعادة جلب is_admin من DB مباشرة ***
+                    try {
+                        const { data: dbUser } = await supabase
+                            .from('users')
+                            .select('full_name, user_type, is_admin')
+                            .eq('id', session.user.id)
+                            .single();
+                        if (dbUser) {
+                            profile = {
+                                ...profile,
+                                name: dbUser.full_name || profile.name || '',
+                                userType: dbUser.user_type || profile.userType || 'seeker',
+                                isAdmin: dbUser.is_admin === true
+                            };
+                            localStorage.setItem('profileData', JSON.stringify(profile));
+                        }
+                    } catch(e) {}
+
+                    const userType  = profile.userType || 'seeker';
+                    const isAdmin   = profile.isAdmin === true;
+                    const typeLabel = isAdmin ? 'مدير' : userType === 'seeker' ? 'باحث عن عمل' : 'موظف';
+                    const badgeClass= isAdmin ? 'badge-admin' : userType === 'seeker' ? 'badge-seeker' : 'badge-employee';
+                    if (authButtons) authButtons.style.display = 'none';
+                    if (profileNav) profileNav.classList.add('visible');
+                    document.getElementById('navUserName').textContent = profile.name || 'مستخدم';
+                    const badge = document.getElementById('navUserBadge');
+                    badge.textContent = typeLabel;
+                    badge.className = 'profile-nav-badge ' + badgeClass;
+                    if (profile.isAdmin) {
+                        const adminBtn = document.getElementById('adminDashBtn');
+                        if (adminBtn) adminBtn.style.display = 'inline-flex';
+                    }
+                    document.getElementById('logoutBtn').addEventListener('click', async () => {
+                        await supabase.auth.signOut();
+                        localStorage.removeItem('profileData');
+                        window.location.href = 'index.html';
+                    });
                 }
-            });
+            } catch(e) { console.warn('Auth check failed:', e); }
         });
     </script>
 </body>

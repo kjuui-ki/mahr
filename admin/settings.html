@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإعدادات | مهارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabaseClient.js"></script>
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        .settings-card{background:#fff;border-radius:16px;padding:2rem;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid var(--border)}
+        .settings-card h3{font-size:1rem;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:.6rem;color:var(--text-primary)}
+        .settings-card h3 i{color:var(--primary)}
+        .settings-section{display:flex;flex-direction:column;gap:1.25rem;margin-bottom:1.75rem}
+        .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;background:var(--bg-light);border-radius:10px}
+        .toggle-row .toggle-info strong{display:block;font-size:.9rem;font-weight:600}
+        .toggle-row .toggle-info small{color:var(--text-muted);font-size:.8rem}
+        .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
+        .toggle-switch input{opacity:0;width:0;height:0}
+        .toggle-slider{position:absolute;inset:0;background:#cbd5e1;border-radius:999px;cursor:pointer;transition:.3s}
+        .toggle-slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s}
+        .toggle-switch input:checked+.toggle-slider{background:var(--primary)}
+        .toggle-switch input:checked+.toggle-slider:before{transform:translateX(20px)}
+        .profile-avatar{width:80px;height:80px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--primary);margin:0 auto 1rem}
+    </style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="brand-text"><span class="brand-name">مهارات</span><span class="brand-sub">لوحة التحكم</span></div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    </div>
+    <div class="sidebar-admin">
+        <div class="admin-avatar-wrap"><div class="admin-avatar"><i class="fas fa-user-shield"></i></div><div class="admin-status-dot"></div></div>
+        <div class="admin-details"><span class="admin-name" id="adminName">المدير</span><span class="admin-role">مشرف النظام</span></div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">الرئيسية</div>
+        <a href="index.html" class="nav-link" data-page="overview"><i class="fas fa-chart-pie"></i><span>نظرة عامة</span></a>
+        <div class="nav-section-label">إدارة المحتوى</div>
+        <a href="courses.html" class="nav-link" data-page="courses"><i class="fas fa-book-open"></i><span>الدورات</span></a>
+        <a href="users.html" class="nav-link" data-page="users"><i class="fas fa-users"></i><span>المستخدمون</span></a>
+        <a href="enrollments.html" class="nav-link" data-page="enrollments"><i class="fas fa-user-check"></i><span>التسجيلات</span></a>
+        <div class="nav-section-label">الشهادات والتقارير</div>
+        <a href="certificates.html" class="nav-link" data-page="certificates"><i class="fas fa-certificate"></i><span>الشهادات</span></a>
+        <a href="reports.html" class="nav-link" data-page="reports"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+        <div class="nav-section-label">التواصل</div>
+        <a href="contacts.html" class="nav-link" data-page="contacts"><i class="fas fa-envelope"></i><span>طلبات التواصل</span></a>
+        <a href="partners.html" class="nav-link" data-page="partners"><i class="fas fa-handshake"></i><span>الشركاء</span></a>
+        <div class="nav-section-label">النظام</div>
+        <a href="settings.html" class="nav-link active" data-page="settings"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+        <a href="../index.html" class="nav-link"><i class="fas fa-home"></i><span>الموقع الرئيسي</span></a>
+    </nav>
+    <div class="sidebar-footer"><button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i><span>تسجيل الخروج</span></button></div>
+</aside>
+
+<div class="main-wrap">
+    <header class="topbar">
+        <div class="topbar-right">
+            <button class="topbar-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="topbar-title"><h1>إعدادات <span>النظام</span></h1><p id="currentDate"></p></div>
+        </div>
+        <div class="topbar-left">
+            <div class="topbar-admin"><div class="topbar-avatar"><i class="fas fa-user-shield"></i></div><span id="topbarName">المدير</span></div>
+        </div>
+    </header>
+
+    <main class="content">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+            <!-- Admin Profile -->
+            <div class="settings-card">
+                <h3><i class="fas fa-user-cog"></i> الملف الشخصي</h3>
+                <div class="profile-avatar"><i class="fas fa-user-shield"></i></div>
+                <div class="form-group"><label>الاسم الكامل</label><input type="text" id="profileName" placeholder="اسمك الكامل"></div>
+                <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="profileEmail" placeholder="email@example.com" readonly style="background:#f8fafc;cursor:not-allowed"></div>
+                <button class="btn btn-primary" onclick="saveProfile()"><i class="fas fa-save"></i> حفظ التغييرات</button>
+            </div>
+
+            <!-- Change Password -->
+            <div class="settings-card">
+                <h3><i class="fas fa-lock"></i> تغيير كلمة المرور</h3>
+                <div class="form-group"><label>كلمة المرور الجديدة</label><input type="password" id="newPass" placeholder="••••••••" minlength="6"></div>
+                <div class="form-group"><label>تأكيد كلمة المرور</label><input type="password" id="confirmPass" placeholder="••••••••" minlength="6"></div>
+                <button class="btn btn-primary" onclick="changePassword()"><i class="fas fa-key"></i> تحديث كلمة المرور</button>
+            </div>
+
+            <!-- Platform settings -->
+            <div class="settings-card">
+                <h3><i class="fas fa-sliders-h"></i> إعدادات المنصة</h3>
+                <div class="settings-section">
+                    <div class="toggle-row">
+                        <div class="toggle-info"><strong>السماح بالتسجيل الجديد</strong><small>يسمح للزوار بإنشاء حسابات</small></div>
+                        <label class="toggle-switch"><input type="checkbox" id="tRegistration" checked><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-info"><strong>الموافقة التلقائية على التسجيلات</strong><small>قبول الطلبات دون مراجعة</small></div>
+                        <label class="toggle-switch"><input type="checkbox" id="tAutoApprove"><span class="toggle-slider"></span></label>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-info"><strong>إشعارات البريد الإلكتروني</strong><small>إرسال إشعارات للمستخدمين</small></div>
+                        <label class="toggle-switch"><input type="checkbox" id="tEmailNotif" checked><span class="toggle-slider"></span></label>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button>
+            </div>
+
+            <!-- System info -->
+            <div class="settings-card">
+                <h3><i class="fas fa-info-circle"></i> معلومات النظام</h3>
+                <div class="settings-section">
+                    <div class="toggle-row">
+                        <div class="toggle-info"><strong>إصدار المنصة</strong></div>
+                        <span style="font-weight:600;color:var(--primary)">v2.0.0</span>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-info"><strong>قاعدة البيانات</strong></div>
+                        <span class="badge badge-active">Supabase</span>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-info"><strong>اسم المنصة</strong></div>
+                        <span style="font-weight:600">أكاديمية ماهر العالي</span>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-info"><strong>آخر تحديث</strong></div>
+                        <span id="sysDate" style="color:var(--text-muted);font-size:.85rem"></span>
+                    </div>
+                </div>
+                <div style="margin-top:1rem;padding:1rem;background:#fef3c7;border-radius:10px;border-right:4px solid #f59e0b">
+                    <p style="font-size:.85rem;color:#92400e;margin:0"><i class="fas fa-exclamation-triangle" style="margin-left:.4rem"></i>تأكد من تشغيل setup_database.sql في Supabase للحصول على جميع الميزات.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="admin-shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    await adminInit('settings');
+    loadProfile();
+    document.getElementById('sysDate').textContent = new Date().toLocaleDateString('ar-SA');
+});
+
+async function loadProfile() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    document.getElementById('profileEmail').value = session.user.email || '';
+    const { data } = await supabase.from('users').select('full_name').eq('id', session.user.id).single();
+    if (data) document.getElementById('profileName').value = data.full_name || '';
+}
+
+async function saveProfile() {
+    const name = document.getElementById('profileName').value.trim();
+    if (!name) { showToast('الاسم مطلوب','warning'); return; }
+    const { data: { session } } = await supabase.auth.getSession();
+    const { error } = await supabase.from('users').update({ full_name: name }).eq('id', session.user.id);
+    if (error) { showToast('خطأ: '+error.message,'danger'); return; }
+    showToast('تم حفظ الملف الشخصي');
+    document.getElementById('adminName').textContent = name;
+    document.getElementById('topbarName').textContent = name;
+}
+
+async function changePassword() {
+    const p1 = document.getElementById('newPass').value;
+    const p2 = document.getElementById('confirmPass').value;
+    if (!p1||p1.length<6) { showToast('كلمة المرور يجب أن تكون 6 أحرف على الأقل','warning'); return; }
+    if (p1!==p2) { showToast('كلمتا المرور غير متطابقتين','danger'); return; }
+    const { error } = await supabase.auth.updateUser({ password: p1 });
+    if (error) { showToast('خطأ: '+error.message,'danger'); return; }
+    showToast('تم تحديث كلمة المرور');
+    document.getElementById('newPass').value=''; document.getElementById('confirmPass').value='';
+}
+
+function saveSettings() { showToast('تم حفظ الإعدادات'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التقارير | مهارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabaseClient.js"></script>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="brand-text"><span class="brand-name">مهارات</span><span class="brand-sub">لوحة التحكم</span></div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    </div>
+    <div class="sidebar-admin">
+        <div class="admin-avatar-wrap"><div class="admin-avatar"><i class="fas fa-user-shield"></i></div><div class="admin-status-dot"></div></div>
+        <div class="admin-details"><span class="admin-name" id="adminName">المدير</span><span class="admin-role">مشرف النظام</span></div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">الرئيسية</div>
+        <a href="index.html" class="nav-link" data-page="overview"><i class="fas fa-chart-pie"></i><span>نظرة عامة</span></a>
+        <div class="nav-section-label">إدارة المحتوى</div>
+        <a href="courses.html" class="nav-link" data-page="courses"><i class="fas fa-book-open"></i><span>الدورات</span></a>
+        <a href="users.html" class="nav-link" data-page="users"><i class="fas fa-users"></i><span>المستخدمون</span></a>
+        <a href="enrollments.html" class="nav-link" data-page="enrollments"><i class="fas fa-user-check"></i><span>التسجيلات</span></a>
+        <div class="nav-section-label">الشهادات والتقارير</div>
+        <a href="certificates.html" class="nav-link" data-page="certificates"><i class="fas fa-certificate"></i><span>الشهادات</span></a>
+        <a href="reports.html" class="nav-link active" data-page="reports"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+        <div class="nav-section-label">التواصل</div>
+        <a href="contacts.html" class="nav-link" data-page="contacts"><i class="fas fa-envelope"></i><span>طلبات التواصل</span></a>
+        <a href="partners.html" class="nav-link" data-page="partners"><i class="fas fa-handshake"></i><span>الشركاء</span></a>
+        <div class="nav-section-label">النظام</div>
+        <a href="settings.html" class="nav-link" data-page="settings"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+        <a href="../index.html" class="nav-link"><i class="fas fa-home"></i><span>الموقع الرئيسي</span></a>
+    </nav>
+    <div class="sidebar-footer"><button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i><span>تسجيل الخروج</span></button></div>
+</aside>
+
+<div class="main-wrap">
+    <header class="topbar">
+        <div class="topbar-right">
+            <button class="topbar-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="topbar-title"><h1>لوحة <span>التقارير</span></h1><p id="currentDate"></p></div>
+        </div>
+        <div class="topbar-left">
+            <div class="topbar-admin"><div class="topbar-avatar"><i class="fas fa-user-shield"></i></div><span id="topbarName">المدير</span></div>
+        </div>
+    </header>
+
+    <main class="content">
+        <!-- Summary stats -->
+        <div class="stats-grid" style="margin-bottom:1.75rem">
+            <div class="stat-card" style="--accent:#2563eb"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-body"><div class="stat-num" id="rUsers">—</div><div class="stat-lbl">إجمالي المستخدمين</div></div></div>
+            <div class="stat-card" style="--accent:#10b981"><div class="stat-icon"><i class="fas fa-book-open"></i></div><div class="stat-body"><div class="stat-num" id="rCourses">—</div><div class="stat-lbl">الدورات</div></div></div>
+            <div class="stat-card" style="--accent:#7c3aed"><div class="stat-icon"><i class="fas fa-user-check"></i></div><div class="stat-body"><div class="stat-num" id="rEnrollments">—</div><div class="stat-lbl">إجمالي التسجيلات</div></div></div>
+            <div class="stat-card" style="--accent:#f59e0b"><div class="stat-icon"><i class="fas fa-certificate"></i></div><div class="stat-body"><div class="stat-num" id="rCerts">—</div><div class="stat-lbl">الشهادات</div></div></div>
+        </div>
+
+        <div class="report-grid">
+            <!-- Enrollments by status -->
+            <div class="report-card">
+                <h4><i class="fas fa-user-check"></i> التسجيلات حسب الحالة</h4>
+                <div id="rEnrStatus"><div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i></div></div>
+            </div>
+
+            <!-- Users by type -->
+            <div class="report-card">
+                <h4><i class="fas fa-users"></i> المستخدمون حسب النوع</h4>
+                <div id="rUserType"><div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i></div></div>
+            </div>
+
+            <!-- Courses by audience -->
+            <div class="report-card">
+                <h4><i class="fas fa-book-open"></i> الدورات حسب الفئة</h4>
+                <div id="rCourseAudience"><div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i></div></div>
+            </div>
+
+            <!-- Contacts by status -->
+            <div class="report-card">
+                <h4><i class="fas fa-envelope"></i> الرسائل حسب الحالة</h4>
+                <div id="rContactStatus"><div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i></div></div>
+            </div>
+
+            <!-- Top enrolled courses -->
+            <div class="report-card" style="grid-column:span 2">
+                <h4><i class="fas fa-star"></i> أكثر الدورات تسجيلاً</h4>
+                <div id="rTopCourses"><div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i></div></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="admin-shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    await adminInit('reports');
+    loadReports();
+});
+
+function renderReportRows(data) {
+    return data.map(([label, value, color]) => `
+        <div class="report-row">
+            <span>${label}</span>
+            <strong style="color:${color||'var(--primary)'}">${value}</strong>
+        </div>`).join('');
+}
+
+async function loadReports() {
+    const [users, courses, enrollments, certs, contacts] = await Promise.all([
+        supabase.from('users').select('id, user_type, is_admin', { count: 'exact' }),
+        supabase.from('courses').select('id, target_audience, is_active, is_free', { count: 'exact' }),
+        supabase.from('enrollments').select('id, status, course_id, courses(title)', { count: 'exact' }),
+        supabase.from('certificates').select('id', { count: 'exact' }),
+        supabase.from('contact_requests').select('id, status', { count: 'exact' })
+    ]);
+
+    const u = users.data || [];
+    const c = courses.data || [];
+    const e = enrollments.data || [];
+    const ct = contacts.data || [];
+
+    document.getElementById('rUsers').textContent = u.length;
+    document.getElementById('rCourses').textContent = c.length;
+    document.getElementById('rEnrollments').textContent = e.length;
+    document.getElementById('rCerts').textContent = certs.count || 0;
+
+    // Enrollments by status
+    document.getElementById('rEnrStatus').innerHTML = renderReportRows([
+        ['معلق',   e.filter(x=>x.status==='pending').length,   '#f59e0b'],
+        ['مقبول',  e.filter(x=>x.status==='approved').length,  '#10b981'],
+        ['مكتمل',  e.filter(x=>x.status==='completed').length, '#2563eb'],
+        ['مرفوض',  e.filter(x=>x.status==='rejected').length,  '#ef4444'],
+        ['الإجمالي',e.length, '#1e293b']
+    ]);
+
+    // Users by type
+    document.getElementById('rUserType').innerHTML = renderReportRows([
+        ['موظفون',          u.filter(x=>x.user_type==='employee').length, '#2563eb'],
+        ['باحثون عن عمل',   u.filter(x=>x.user_type==='seeker').length,   '#10b981'],
+        ['مدراء',           u.filter(x=>x.is_admin).length,               '#7c3aed'],
+        ['الإجمالي',        u.length, '#1e293b']
+    ]);
+
+    // Courses by audience
+    document.getElementById('rCourseAudience').innerHTML = renderReportRows([
+        ['للموظفين',        c.filter(x=>x.target_audience==='employee').length, '#2563eb'],
+        ['للباحثين',        c.filter(x=>x.target_audience==='seeker').length,   '#10b981'],
+        ['للجميع',          c.filter(x=>x.target_audience==='both').length,     '#7c3aed'],
+        ['نشطة',            c.filter(x=>x.is_active).length,                   '#10b981'],
+        ['مجانية',          c.filter(x=>x.is_free).length,                     '#f59e0b'],
+        ['الإجمالي',        c.length, '#1e293b']
+    ]);
+
+    // Contacts by status
+    document.getElementById('rContactStatus').innerHTML = renderReportRows([
+        ['جديدة',    ct.filter(x=>x.status==='new').length,     '#ef4444'],
+        ['مقروءة',   ct.filter(x=>x.status==='read').length,    '#f59e0b'],
+        ['تم الرد',  ct.filter(x=>x.status==='replied').length, '#10b981'],
+        ['الإجمالي', ct.length, '#1e293b']
+    ]);
+
+    // Top enrolled courses
+    const courseCount = {};
+    e.forEach(x => {
+        const title = x.courses?.title;
+        if (title) courseCount[title] = (courseCount[title]||0)+1;
+    });
+    const sorted = Object.entries(courseCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    if (!sorted.length) {
+        document.getElementById('rTopCourses').innerHTML = emptyState('لا توجد تسجيلات بعد','fa-chart-bar');
+    } else {
+        const max = sorted[0][1];
+        document.getElementById('rTopCourses').innerHTML = sorted.map(([title, count], i) => `
+            <div class="report-row" style="padding:.65rem 0">
+                <span style="display:flex;align-items:center;gap:.5rem;max-width:60%">
+                    <span style="background:var(--primary-light);color:var(--primary);border-radius:4px;padding:.1rem .4rem;font-size:.72rem;font-weight:700">${i+1}</span>
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(title)}</span>
+                </span>
+                <div style="display:flex;align-items:center;gap:.75rem;flex-shrink:0">
+                    <div style="width:80px;height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden">
+                        <div style="width:${Math.round(count/max*100)}%;height:100%;background:var(--primary);border-radius:3px"></div>
+                    </div>
+                    <strong style="color:var(--primary);min-width:20px;text-align:left">${count}</strong>
+                </div>
+            </div>`).join('');
+    }
+}
+</script>
+</body>
+</html>

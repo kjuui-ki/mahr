@@ -44,7 +44,7 @@
             line-height: 1.7;
             color: var(--text-dark);
             overflow-x: hidden;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: #f8fafc;
         }
 
         /* LTR English Support */
@@ -548,18 +548,34 @@ transform: scale(1.05);
   align-items: center;
 }
 .login-btn, .register-btn {
-  padding: 0.75rem 1.5rem;
+  padding: 0.55rem 1.25rem;
   color: white;
   text-decoration: none;
   border-radius: 25px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(37,99,235,0.3);
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-family: 'Cairo', sans-serif;
+  flex-direction: column;
+  line-height: 1.2;
+  text-align: center;
+}
+.btn-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+.btn-sub {
+  font-size: 0.68rem;
+  font-weight: 400;
+  opacity: 0.85;
+  white-space: nowrap;
 }
 .login-btn {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -578,6 +594,49 @@ transform: scale(1.05);
   box-shadow: 0 8px 25px rgba(16,185,129,0.4);
 }
 
+/* Profile (logged-in state) */
+.profile-nav-wrap {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+}
+.profile-nav-wrap.visible { display: flex; }
+.profile-nav-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+.profile-nav-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+}
+.badge-employee { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+.badge-seeker   { background: linear-gradient(135deg, #10b981, #059669); }
+.badge-admin    { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+.logout-btn {
+  padding: 0.6rem 1.2rem;
+  border: 2px solid #ef4444;
+  background: transparent;
+  color: #ef4444;
+  border-radius: 20px;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.logout-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+.courses-smart-link { cursor: pointer; }
+
 @media (max-width: 768px) {
   .login-buttons {
     flex-direction: column;
@@ -585,7 +644,264 @@ transform: scale(1.05);
   }
 }
 
-/* شركاء النجاح - Partners Ticker */
+        /* ===== PROFESSIONAL HERO ===== */
+        .hero-section {
+            min-height: 100vh;
+            background: linear-gradient(160deg, #0f172a 0%, #1e3a8a 45%, #2563eb 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 5% 5rem;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+            color: white;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            width: 700px; height: 700px;
+            top: -250px; right: -200px;
+            background: radial-gradient(circle, rgba(96,165,250,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            bottom: -150px; left: -100px;
+            background: radial-gradient(circle, rgba(52,211,153,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.55rem 1.4rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-badge i { color: #fbbf24; }
+        .hero-title {
+            font-size: clamp(2.8rem, 6vw, 5rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            color: white;
+            animation: fadeInUp 0.8s ease 0.1s both;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 30%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: rgba(255,255,255,0.75);
+            max-width: 560px;
+            margin: 0 auto 3rem;
+            line-height: 1.9;
+            animation: fadeInUp 0.8s ease 0.2s both;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+            animation: fadeInUp 0.8s ease 0.3s both;
+            position: relative;
+            z-index: 1;
+        }
+        .btn-hero-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 10px 30px rgba(37,99,235,0.5);
+            transition: all 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+        }
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(37,99,235,0.6);
+        }
+        .btn-hero-secondary {
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.25);
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+        }
+        .btn-hero-secondary:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-3px);
+        }
+        .hero-stats-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            animation: fadeInUp 0.8s ease 0.4s both;
+            max-width: 700px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-stat {
+            text-align: center;
+            padding: 0.5rem 1.5rem;
+            flex: 1;
+            min-width: 120px;
+        }
+        .hero-stat:not(:last-child) { border-left: 1px solid rgba(255,255,255,0.15); }
+        .hero-stat-num {
+            display: block;
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.2;
+        }
+        .hero-stat-label {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.65);
+            font-weight: 500;
+            display: block;
+        }
+        /* ===== FEATURES SECTION ===== */
+        .features-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 7rem 5%;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        .section-tag {
+            display: inline-block;
+            background: rgba(37,99,235,0.08);
+            color: #2563eb;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(37,99,235,0.15);
+        }
+        .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+        .section-subtitle {
+            font-size: 1.05rem;
+            color: #64748b;
+            max-width: 480px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 6px rgba(0,0,0,0.04);
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+            border: 1px solid rgba(0,0,0,0.04);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb, #0ea5e9);
+            transform: scaleX(0);
+            transition: transform 0.35s ease;
+            transform-origin: right;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.08), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+        .feature-card:hover::after { transform: scaleX(1); transform-origin: left; }
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: #2563eb;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover .feature-icon {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            transform: scale(1.1) rotate(-5deg);
+        }
+        .feature-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+        }
+        .feature-card p {
+            color: #64748b;
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* ===== IMPROVED PARTNERS ===== */
+        /* شركاء النجاح - Partners Ticker */
 .partners-section {
     background: var(--white);
     padding: 4rem 5%;
@@ -642,7 +958,29 @@ transform: scale(1.05);
 </head>
 
 <body>
-
+    <script>
+    (function(){
+        try {
+            var p = JSON.parse(localStorage.getItem('profileData')||'{}');
+            if (p && p.name) {
+                var isAdmin = p.isAdmin === true;
+                var t = isAdmin ? 'مدير' : p.userType==='seeker' ? 'باحث عن عمل' : 'موظف';
+                var bc= isAdmin ? 'badge-admin' : p.userType==='seeker' ? 'badge-seeker' : 'badge-employee';
+                document.addEventListener('DOMContentLoaded', function(){
+                    var ab2 = document.getElementById('authButtons');
+                    if (ab2) ab2.style.display = 'none';
+                    var pn = document.getElementById('profileNav');
+                    if (pn) pn.classList.add('visible');
+                    var nn = document.getElementById('navUserName');
+                    if (nn) nn.textContent = p.name;
+                    var nb = document.getElementById('navUserBadge');
+                    if (nb) { nb.textContent = t; nb.className = 'profile-nav-badge '+bc; }
+                    if (isAdmin) { var ab=document.getElementById('adminDashBtn'); if(ab) ab.style.display='inline-flex'; }
+                });
+            }
+        }catch(e){}
+    })();
+    </script>
 
     <nav class="navbar" id="navbar">
 
@@ -650,69 +988,110 @@ transform: scale(1.05);
              <ul class="nav-links">
                 <img src="logo_maher.png" class="logo" alt="مهارات Logo">
                 <li><a href="index.html" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
-                <li><a href="employee.html" data-ar="الدورات التدريبية" data-en="Employee Login">الدورات التدريبية</a></li>
+                <li><a href="employee.html" id="coursesNavLink" class="courses-smart-link" data-ar="الدورات التدريبية" data-en="Training Courses">الدورات التدريبية</a></li>
                 <li><a href="academy.html" data-ar="عن الأكاديمية" data-en="About Academy">عن الأكاديمية</a></li>
             </ul>
         </div>
 
-
-            <div class="left-side">
-            <div class="login-buttons">
-                <a href="rede.html" class="login-btn" data-ar="تسجيل دخول" data-en="Login">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span data-ar="تسجيل دخول" data-en="Login">تسجيل دخول</span>
+        <div class="left-side">
+            <!-- Not logged in -->
+            <div class="login-buttons" id="authButtons">
+                <a href="rede.html#login" class="login-btn">
+                    <span class="btn-label"><i class="fas fa-sign-in-alt"></i> تسجيل دخول</span>
+                    <span class="btn-sub">لديك حساب بالفعل؟</span>
                 </a>
-                <a href="rede.html" class="register-btn" data-ar="تسجيل" data-en="Register">
-                    <i class="fas fa-user-plus"></i>
-                    <span data-ar="تسجيل" data-en="Register">تسجيل</span>
+                <a href="rede.html#register" class="register-btn">
+                    <span class="btn-label"><i class="fas fa-user-plus"></i> تسجيل</span>
+                    <span class="btn-sub">إنشاء حساب جديد</span>
                 </a>
+            </div>
+            <!-- Logged in -->
+            <div class="profile-nav-wrap" id="profileNav">
+                <a href="admin/index.html" id="adminDashBtn" style="display:none;text-decoration:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;padding:0.45rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:600;font-family:'Cairo',sans-serif;gap:0.4rem;align-items:center;">
+                    <i class="fas fa-shield-alt"></i> لوحة التحكم
+                </a>
+                <a href="#" id="goCoursesBtn" style="text-decoration:none;">
+                    <span class="profile-nav-name" id="navUserName"></span>
+                    <span class="profile-nav-badge" id="navUserBadge"></span>
+                </a>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> خروج
+                </button>
             </div>
         </div>
     </nav>
     
 
-    <header class="hero">
-        <h1 data-ar="انطلق نحو الاحترافية" data-en="Launch Towards Professionalism">انطلق نحو الاحترافية</h1>
-        <p data-ar="دورات تدريبية متخصصة تناسب مسارك المهني بألوان التميز." data-en="Specialized training courses tailored to your professional path with excellence.">دورات تدريبية متخصصة تناسب مسارك المهني بألوان التميز.</p>
-        
-        <div class="academy-intro">
-            <p data-ar="أكاديمية ماهر هي الوجهة المثالية لتطوير المهارات المهنية والوصول إلى القمة في مسيرتك الوظيفية. نقدم دورات متخصصة مصممة بعناية لتلبية احتياجات الموظفين والباحثين عن عمل على حد سواء." data-en="Maher Academy is the ideal destination for professional skills development and reaching the top of your career. We offer carefully designed specialized courses to meet the needs of employees and job seekers alike.">
-                أكاديمية ماهر هي الوجهة المثالية لتطوير المهارات المهنية والوصول إلى القمة في مسيرتك الوظيفية. 
-                نقدم دورات متخصصة مصممة بعناية لتلبية احتياجات الموظفين والباحثين عن عمل على حد سواء.
-            </p>
-            <p data-ar="مع منهجية حديثة، مدربين معتمدين، وشهادات معترف بها، نحول طموحاتك إلى إنجازات ملموسة." data-en="With modern methodology, certified trainers, and recognized certificates, we transform your ambitions into tangible achievements.">
-                مع منهجية حديثة، مدربين معتمدين، وشهادات معترف بها، نحول طموحاتك إلى إنجازات ملموسة.
-            </p>
+    <section class="hero-section">
+        <div class="hero-badge">
+            <i class="fas fa-award"></i>
+            منصة التدريب المهني الأولى
         </div>
-        
-<a href="rede.html" class="btn-primary" data-ar="الدورات" data-en="Start Now" style="display: block; max-width: 300px; margin: 0 auto 4rem;">
-            <i class="fas fa-rocket"></i> <span data-ar="الدورات" data-en="Start Now">الدورات</span>
-        </a>
-    </header>
+        <h1 class="hero-title">
+            انطلق نحو<br>
+            <span class="gradient-text">الاحترافية</span>
+        </h1>
+        <p class="hero-subtitle">
+            دورات تدريبية متخصصة مصممة بعناية لموظفي القطاع الخاص والباحثين عن عمل
+        </p>
+        <div class="hero-actions">
+            <a href="employee.html" id="heroCTA" class="btn-hero-primary">
+                <i class="fas fa-rocket"></i>
+                ابدأ رحلتك الآن
+            </a>
+            <a href="academy.html" class="btn-hero-secondary">
+                <i class="fas fa-info-circle"></i>
+                اعرف أكثر
+            </a>
+        </div>
+        <div class="hero-stats-row">
+            <div class="hero-stat">
+                <span class="hero-stat-num">49</span>
+                <span class="hero-stat-label">دورة تدريبية</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-num">+5K</span>
+                <span class="hero-stat-label">متدرب ناجح</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-num">100%</span>
+                <span class="hero-stat-label">شهادات معتمدة</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-num">+10</span>
+                <span class="hero-stat-label">سنوات خبرة</span>
+            </div>
+        </div>
+    </section>
 
-    <section class="about">
-        <div class="card">
-            <i class="fas fa-certificate" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
-            <h3 data-ar="شهادات معتمدة" data-en="Certified Certificates">شهادات معتمدة</h3>
-            <p data-ar="شهادات مهنية معترف بها دولياً تضمن تميزك في سوق العمل التنافسي." data-en="Professionally recognized international certificates ensure your excellence in the competitive job market.">شهادات مهنية معترف بها دولياً تضمن تميزك في سوق العمل التنافسي.</p>
+    <section class="features-section">
+        <div class="section-header">
+            <div class="section-tag">لماذا مهارات؟</div>
+            <h2 class="section-title">كل ما تحتاجه للنجاح</h2>
+            <p class="section-subtitle">برامج تدريبية شاملة تجمع بين العلم والتطبيق العملي</p>
         </div>
-        <div class="card">
-            <i class="fas fa-chalkboard-teacher" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
-            <h3 data-ar="مدربون خبراء" data-en="Expert Trainers">مدربون خبراء</h3>
-            <p data-ar="مدربون معتمدون بخبرة تزيد عن 10 سنوات في مجالاتهم المتخصصة." data-en="Certified trainers with over 10 years of experience in their specialized fields.">مدربون معتمدون بخبرة تزيد عن 10 سنوات في مجالاتهم المتخصصة.</p>
+        <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-certificate"></i></div>
+            <h3>شهادات معتمدة</h3>
+            <p>شهادات مهنية معترف بها تضمن تميزك في سوق العمل التنافسي.</p>
         </div>
-        <div class="card">
-            <i class="fas fa-users" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
-            <h3 data-ar="آلاف المتدربين" data-en="Thousands of Trainees">آلاف المتدربين</h3>
-            <p data-ar="انضم إلى مجتمع أكثر من 5000 متدرب ناجح ." data-en="Join a community of over 5000 successful trainees worldwide.">انضم إلى مجتمع أكثر من 5000 متدرب ناجح .</p>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+            <h3>مدربون خبراء</h3>
+            <p>مدربون معتمدون بخبرة تزيد عن 10 سنوات في مجالاتهم المتخصصة.</p>
         </div>
-        <div class="card">
-            <i class="fas fa-clock" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
-            <h3 data-ar="مرونة في التعلم" data-en="Learning Flexibility">مرونة في التعلم</h3>
-            <p data-ar="دورات متاحة مع جدول زمني مرن يناسب حياتك اليومية." data-en="Courses available 24/7 with flexible schedules that suit your daily life.">دورات متاحة مع جدول زمني مرن يناسب حياتك اليومية.</p>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-users"></i></div>
+            <h3>آلاف المتدربين</h3>
+            <p>انضم إلى مجتمع أكثر من 5000 متدرب ناجح في جميع أنحاء المملكة.</p>
         </div>
-
-
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-clock"></i></div>
+            <h3>مرونة في التعلم</h3>
+            <p>دورات متاحة بجدول زمني مرن يناسب مسيرتك المهنية.</p>
+        </div>
+        </div>
     </section>
 
     <!-- شركاء النجاح Ticker -->
@@ -782,94 +1161,98 @@ transform: scale(1.05);
         </div>
     </footer>
 
-    <script src="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzeHh1dWN6eWp6emNqb2phaXl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NTExNTUsImV4cCI6MjA5MjMyNzE1NX0.U1q5u-oWcBSuyvLFmf1ytbYKO4kTSFJA6TJ0ne02Ag0"></script>
 
-<script>
-const supabaseUrl = "PUT_YOUR_URL_HERE";
-const supabaseKey = "PUT_YOUR_KEY_HERE";
-
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-// تجربة اتصال
-async function test() {
-  const { data, error } = await supabase.from('profiles').select('*');
-  console.log(data, error);
-}
-
-test();
-</script>
 
 
     <script>
-        // Enhanced Language System
-        function initLanguage() {
-            const savedLang = localStorage.getItem('lang') || 'ar';
-            updateLanguage(savedLang);
-            // Set active button
-            document.querySelector(`[data-lang='${savedLang}']`).classList.add('active');
-            document.querySelector(`[data-lang='${savedLang === 'ar' ? 'en' : 'ar'}']`).classList.remove('active');
-        }
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+        });
 
-        function updateLanguage(lang) {
-            localStorage.setItem('lang', lang);
-            document.documentElement.lang = lang;
-            document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            document.body.classList.toggle('en', lang === 'en');
-            
-            // Update ALL translatable content
-            document.querySelectorAll('[data-ar]').forEach(el => {
-                el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en || el.dataset.ar;
-            });
-            
-            // Update placeholders for inputs (forms)
-            document.querySelectorAll('input[placeholder]').forEach(input => {
-                if (input.dataset.arPlaceholder && input.dataset.enPlaceholder) {
-                    input.placeholder = lang === 'ar' ? input.dataset.arPlaceholder : input.dataset.enPlaceholder;
+        // Auth State: Show profile or login buttons
+        document.addEventListener('DOMContentLoaded', async () => {
+            const authButtons = document.getElementById('authButtons');
+            const profileNav  = document.getElementById('profileNav');
+            const navUserName = document.getElementById('navUserName');
+            const navUserBadge= document.getElementById('navUserBadge');
+            const logoutBtn   = document.getElementById('logoutBtn');
+            const heroCTA     = document.getElementById('heroCTA');
+            const coursesLink = document.getElementById('coursesNavLink');
+
+            // Check session
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session) {
+                let profile = JSON.parse(localStorage.getItem('profileData') || '{}');
+                // *** إعادة جلب is_admin من DB مباشرة ***
+                try {
+                    const { data: dbUser } = await supabase
+                        .from('users')
+                        .select('full_name, user_type, is_admin')
+                        .eq('id', session.user.id)
+                        .single();
+                    if (dbUser) {
+                        profile = {
+                            ...profile,
+                            name: dbUser.full_name || profile.name || '',
+                            userType: dbUser.user_type || profile.userType || 'employee',
+                            isAdmin: dbUser.is_admin === true,
+                            email: session.user.email
+                        };
+                        localStorage.setItem('profileData', JSON.stringify(profile));
+                    }
+                } catch(e) {}
+
+                const userType = profile.userType || 'employee';
+                const coursesPage = userType === 'seeker' ? 'Researcher.html' : 'employee.html';
+                const isAdmin    = profile.isAdmin === true;
+                const typeLabel  = isAdmin ? 'مدير' : userType === 'seeker' ? 'باحث عن عمل' : 'موظف';
+                const badgeClass = isAdmin ? 'badge-admin' : userType === 'seeker' ? 'badge-seeker' : 'badge-employee';
+
+                // Show profile nav
+                authButtons.style.display = 'none';
+                profileNav.classList.add('visible');
+                navUserName.textContent = profile.name || 'مستخدم';
+                navUserBadge.textContent = typeLabel;
+                navUserBadge.className = 'profile-nav-badge ' + badgeClass;
+
+                // Show dashboard button for admins
+                if (profile.isAdmin) {
+                    const adminBtn = document.getElementById('adminDashBtn');
+                    if (adminBtn) adminBtn.style.display = 'inline-flex';
                 }
-            });
-        }
 
-        // Language Switch Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
+                // Update links
+                if (heroCTA) heroCTA.href = coursesPage;
+                if (coursesLink) coursesLink.href = coursesPage;
 
-            
-            // Navbar Scroll Effect
-            window.addEventListener('scroll', () => {
-                document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
-            });
+                // Go to courses when clicking name
+                const goBtn = document.getElementById('goCoursesBtn');
+                if (goBtn) goBtn.href = coursesPage;
 
-            // Theme toggle (if element exists)
-            const themeToggle = document.querySelector('.theme-toggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', () => {
-                    document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+                // Logout
+                logoutBtn.addEventListener('click', async () => {
+                    await supabase.auth.signOut();
+                    localStorage.removeItem('profileData');
+                    window.location.reload();
                 });
+            } else {
+                // Not logged in: allow browsing courses
+                if (coursesLink) coursesLink.href = 'employee.html';
             }
-        });
 
-        // Smooth Scroll (existing)
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
+            // Animate cards on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.style.animationPlayState = 'running';
                 });
             });
-        });
-
-        // Animate on Scroll (existing)
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animationPlayState = 'running';
-                }
-            });
-        });
-
-        document.querySelectorAll('.card').forEach(card => {
-            observer.observe(card);
+            document.querySelectorAll('.card').forEach(card => observer.observe(card));
         });
     </script>
 
 </body>
 </html>
+

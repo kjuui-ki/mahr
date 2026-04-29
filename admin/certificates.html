@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الشهادات | مهارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabaseClient.js"></script>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="brand-text"><span class="brand-name">مهارات</span><span class="brand-sub">لوحة التحكم</span></div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    </div>
+    <div class="sidebar-admin">
+        <div class="admin-avatar-wrap"><div class="admin-avatar"><i class="fas fa-user-shield"></i></div><div class="admin-status-dot"></div></div>
+        <div class="admin-details"><span class="admin-name" id="adminName">المدير</span><span class="admin-role">مشرف النظام</span></div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">الرئيسية</div>
+        <a href="index.html" class="nav-link" data-page="overview"><i class="fas fa-chart-pie"></i><span>نظرة عامة</span></a>
+        <div class="nav-section-label">إدارة المحتوى</div>
+        <a href="courses.html" class="nav-link" data-page="courses"><i class="fas fa-book-open"></i><span>الدورات</span></a>
+        <a href="users.html" class="nav-link" data-page="users"><i class="fas fa-users"></i><span>المستخدمون</span></a>
+        <a href="enrollments.html" class="nav-link" data-page="enrollments"><i class="fas fa-user-check"></i><span>التسجيلات</span></a>
+        <div class="nav-section-label">الشهادات والتقارير</div>
+        <a href="certificates.html" class="nav-link active" data-page="certificates"><i class="fas fa-certificate"></i><span>الشهادات</span></a>
+        <a href="reports.html" class="nav-link" data-page="reports"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+        <div class="nav-section-label">التواصل</div>
+        <a href="contacts.html" class="nav-link" data-page="contacts"><i class="fas fa-envelope"></i><span>طلبات التواصل</span></a>
+        <a href="partners.html" class="nav-link" data-page="partners"><i class="fas fa-handshake"></i><span>الشركاء</span></a>
+        <div class="nav-section-label">النظام</div>
+        <a href="settings.html" class="nav-link" data-page="settings"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+        <a href="../index.html" class="nav-link"><i class="fas fa-home"></i><span>الموقع الرئيسي</span></a>
+    </nav>
+    <div class="sidebar-footer"><button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i><span>تسجيل الخروج</span></button></div>
+</aside>
+
+<div class="main-wrap">
+    <header class="topbar">
+        <div class="topbar-right">
+            <button class="topbar-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="topbar-title"><h1>إدارة <span>الشهادات</span></h1><p id="currentDate"></p></div>
+        </div>
+        <div class="topbar-left">
+            <button class="btn btn-success btn-sm" onclick="openIssueModal()"><i class="fas fa-plus"></i> إصدار شهادة</button>
+            <div class="topbar-admin"><div class="topbar-avatar"><i class="fas fa-user-shield"></i></div><span id="topbarName">المدير</span></div>
+        </div>
+    </header>
+
+    <main class="content">
+        <div class="stats-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:1.5rem">
+            <div class="stat-card" style="--accent:#f59e0b"><div class="stat-icon"><i class="fas fa-certificate"></i></div><div class="stat-body"><div class="stat-num" id="cStat1">—</div><div class="stat-lbl">إجمالي الشهادات</div></div></div>
+            <div class="stat-card" style="--accent:#10b981"><div class="stat-icon"><i class="fas fa-calendar-alt"></i></div><div class="stat-body"><div class="stat-num" id="cStat2">—</div><div class="stat-lbl">شهادات هذا الشهر</div></div></div>
+        </div>
+
+        <div class="table-container">
+            <div class="tbl-head">
+                <div class="tbl-title">الشهادات المُصدرة</div>
+                <input type="search" class="tbl-search" placeholder="🔍 بحث بالاسم أو رقم الشهادة..." oninput="filterCerts(this.value)">
+            </div>
+            <div class="tbl-body" id="certsTbody">
+                <div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal: Issue Certificate -->
+<div class="modal-overlay" id="issueModal">
+    <div class="modal-box">
+        <div class="modal-hdr">
+            <h3><i class="fas fa-certificate" style="color:var(--warning)"></i> إصدار شهادة إتمام</h3>
+            <button class="modal-close" onclick="closeIssueModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="issueForm" onsubmit="issueCert(event)">
+            <div class="form-group">
+                <label>البريد الإلكتروني للمتدرب *</label>
+                <input type="email" id="certEmail" required placeholder="user@example.com">
+                <div class="form-hint">يجب أن يكون المستخدم مسجلاً في المنصة</div>
+            </div>
+            <div class="form-group">
+                <label>الدورة *</label>
+                <select id="certCourse" required>
+                    <option value="">اختر دورة...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>رقم الشهادة (اختياري - يُولَّد تلقائياً)</label>
+                <input type="text" id="certNum" placeholder="CERT-2026-XXXXXX">
+                <div class="form-hint">اتركه فارغاً لتوليد رقم تلقائي</div>
+            </div>
+            <!-- Preview -->
+            <div style="background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:12px;padding:1.5rem;text-align:center;color:#fff;margin-top:1rem">
+                <i class="fas fa-certificate" style="font-size:2rem;opacity:.8;margin-bottom:.5rem;display:block"></i>
+                <div style="font-size:1rem;font-weight:700">شهادة إتمام دورة تدريبية</div>
+                <div style="font-size:.8rem;opacity:.7;margin-top:.25rem">أكاديمية ماهر العالي للتدريب</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="closeIssueModal()">إلغاء</button>
+                <button type="submit" class="btn btn-success" id="issueBtn">
+                    <i class="fas fa-certificate"></i> إصدار الشهادة
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="admin-shared.js"></script>
+<script>
+let allCerts = [], allCoursesList = [], fSearch = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await adminInit('certificates');
+    loadCerts();
+    loadCoursesForSelect();
+});
+
+async function loadCerts() {
+    const { data, error } = await supabase.from('certificates')
+        .select('*, users(full_name, email), courses(title)')
+        .order('issued_at', { ascending: false });
+    if (error) { renderError('certsTbody', error.message); return; }
+    allCerts = data || [];
+
+    document.getElementById('cStat1').textContent = allCerts.length;
+    const thisMonth = new Date(); thisMonth.setDate(1); thisMonth.setHours(0,0,0,0);
+    document.getElementById('cStat2').textContent = allCerts.filter(c=>new Date(c.issued_at)>=thisMonth).length;
+
+    renderCerts();
+}
+
+function renderCerts() {
+    let list = allCerts;
+    if (fSearch) list = list.filter(c =>
+        c.users?.full_name?.toLowerCase().includes(fSearch.toLowerCase()) ||
+        c.certificate_number?.toLowerCase().includes(fSearch.toLowerCase())
+    );
+
+    if (!list.length) { document.getElementById('certsTbody').innerHTML = emptyState('لا توجد شهادات مُصدرة','fa-certificate'); return; }
+
+    document.getElementById('certsTbody').innerHTML = `
+    <table>
+        <thead><tr>
+            <th>#</th><th>المتدرب</th><th>الدورة</th><th>رقم الشهادة</th><th>تاريخ الإصدار</th><th>إجراءات</th>
+        </tr></thead>
+        <tbody>${list.map((c,i)=>`
+            <tr>
+                <td style="color:var(--text-muted)">${i+1}</td>
+                <td>
+                    <strong style="display:block">${esc(c.users?.full_name)||'—'}</strong>
+                    <small style="color:var(--text-muted)">${esc(c.users?.email)||'—'}</small>
+                </td>
+                <td style="max-width:200px;white-space:normal">${esc(c.courses?.title)||'—'}</td>
+                <td><code style="background:#f1f5f9;padding:.2rem .5rem;border-radius:4px;font-size:.82rem">${esc(c.certificate_number)}</code></td>
+                <td style="color:var(--text-muted)">${fmtDateTime(c.issued_at)}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger btn-icon" onclick="deleteCert('${c.id}')" title="حذف"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`).join('')}
+        </tbody>
+    </table>`;
+}
+
+function filterCerts(v) { fSearch = v; renderCerts(); }
+
+async function loadCoursesForSelect() {
+    const { data } = await supabase.from('courses').select('id, title').eq('is_active', true).order('display_order');
+    allCoursesList = data || [];
+    const sel = document.getElementById('certCourse');
+    sel.innerHTML = '<option value="">اختر دورة...</option>' +
+        allCoursesList.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('');
+}
+
+function openIssueModal() { document.getElementById('issueModal').classList.add('active'); }
+function closeIssueModal() { document.getElementById('issueModal').classList.remove('active'); document.getElementById('issueForm').reset(); }
+
+async function issueCert(e) {
+    e.preventDefault();
+    const btn = document.getElementById('issueBtn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+
+    const email = document.getElementById('certEmail').value.trim();
+    const courseId = document.getElementById('certCourse').value;
+    let certNum = document.getElementById('certNum').value.trim();
+    if (!certNum) certNum = 'CERT-' + new Date().getFullYear() + '-' + Math.floor(Math.random()*900000+100000);
+
+    const { data: user } = await supabase.from('users').select('id, full_name').eq('email', email).single();
+    if (!user) {
+        showToast('لم يُعثر على مستخدم بهذا البريد الإلكتروني', 'danger');
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-certificate"></i> إصدار الشهادة';
+        return;
+    }
+
+    const { error } = await supabase.from('certificates').insert({
+        user_id: user.id, course_id: courseId, certificate_number: certNum
+    });
+
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-certificate"></i> إصدار الشهادة';
+
+    if (error) { showToast('خطأ: ' + error.message, 'danger'); return; }
+    showToast(`تم إصدار الشهادة ${certNum} بنجاح`);
+    closeIssueModal();
+    loadCerts();
+}
+
+async function deleteCert(id) {
+    if (!confirm('حذف هذه الشهادة نهائياً؟')) return;
+    const { error } = await supabase.from('certificates').delete().eq('id', id);
+    if (error) { showToast('خطأ: ' + error.message, 'danger'); return; }
+    showToast('تم حذف الشهادة', 'danger');
+    loadCerts();
+}
+</script>
+</body>
+</html>

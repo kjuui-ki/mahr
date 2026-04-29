@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | مهارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabaseClient.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f1f5f9;
+            --white: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed; top: 0; right: 0;
+            width: 260px; height: 100vh;
+            background: linear-gradient(180deg, var(--primary-dark), var(--primary));
+            color: white; z-index: 100;
+            display: flex; flex-direction: column;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+        }
+        .sidebar-logo {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; gap: 0.75rem;
+        }
+        .sidebar-logo img { height: 45px; }
+        .sidebar-logo span { font-size: 1.1rem; font-weight: 700; }
+        .sidebar-nav { flex: 1; padding: 1rem 0; overflow-y: auto; }
+        .nav-item {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.85rem 1.5rem; cursor: pointer;
+            transition: all 0.2s ease; color: rgba(255,255,255,0.85);
+            font-weight: 500; border-right: 3px solid transparent;
+            font-size: 0.95rem;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-right-color: white;
+        }
+        .nav-item i { width: 20px; text-align: center; }
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .admin-info { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+        .admin-avatar {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
+        .admin-name { font-size: 0.9rem; font-weight: 600; }
+        .admin-badge { font-size: 0.75rem; opacity: 0.8; }
+        .btn-logout {
+            width: 100%; padding: 0.6rem;
+            background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4);
+            color: white; border-radius: 8px; cursor: pointer;
+            font-family: 'Cairo', sans-serif; font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.4); }
+
+        /* Main Content */
+        .main-content {
+            margin-right: 260px;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .page-header {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .page-title { font-size: 1.5rem; font-weight: 700; color: var(--text); }
+        .page-title span { color: var(--primary); }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex; align-items: center; gap: 1rem;
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-icon {
+            width: 55px; height: 55px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+        }
+        .stat-icon.blue { background: #dbeafe; color: var(--primary); }
+        .stat-icon.green { background: #d1fae5; color: var(--success); }
+        .stat-icon.purple { background: #ede9fe; color: #7c3aed; }
+        .stat-icon.orange { background: #fef3c7; color: var(--warning); }
+        .stat-icon.red { background: #fee2e2; color: var(--danger); }
+        .stat-number { font-size: 1.8rem; font-weight: 800; color: var(--text); }
+        .stat-label { font-size: 0.85rem; color: var(--text-light); }
+
+        /* Tabs */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Table */
+        .table-container {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .table-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem;
+        }
+        .table-title { font-size: 1.1rem; font-weight: 700; }
+        .table-search {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem; min-width: 220px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: #f8fafc;
+            padding: 0.85rem 1rem;
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f8fafc; }
+
+        /* Badges */
+        .badge {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem; font-weight: 600;
+        }
+        .badge-employee { background: #dbeafe; color: var(--primary); }
+        .badge-seeker { background: #d1fae5; color: var(--success); }
+        .badge-both { background: #ede9fe; color: #7c3aed; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-approved { background: #d1fae5; color: #065f46; }
+        .badge-completed { background: #dbeafe; color: #1e40af; }
+        .badge-cancelled { background: #fee2e2; color: #991b1b; }
+        .badge-new { background: #fee2e2; color: #991b1b; }
+        .badge-read { background: #fef3c7; color: #92400e; }
+        .badge-replied { background: #d1fae5; color: #065f46; }
+        .badge-admin { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem; border-radius: 8px;
+            font-family: 'Cairo', sans-serif; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; border: none; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-outline {
+            background: transparent; color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed;
+            inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 90%; max-width: 580px;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+        .modal-box h3 { font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--text); }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label {
+            display: block; margin-bottom: 0.5rem;
+            font-size: 0.9rem; font-weight: 600; color: var(--text);
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.75rem 1rem;
+            border: 1px solid var(--border); border-radius: 10px;
+            font-family: 'Cairo', sans-serif; font-size: 0.95rem;
+            color: var(--text); background: var(--white);
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary);
+        }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .modal-actions {
+            display: flex; gap: 0.75rem; justify-content: flex-end;
+            margin-top: 1.5rem; padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        .btn-close-modal {
+            background: transparent; border: none; cursor: pointer;
+            font-size: 1.2rem; color: var(--text-light);
+            float: left; transition: color 0.2s;
+        }
+        .btn-close-modal:hover { color: var(--danger); }
+        .modal-box .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center; padding: 3rem;
+            color: var(--text-light);
+        }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; display: block; }
+
+        /* Loading */
+        .loading-spinner {
+            display: flex; align-items: center; justify-content: center;
+            padding: 3rem; color: var(--text-light); gap: 0.75rem;
+        }
+        .loading-spinner i { font-size: 1.5rem; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Alert */
+        .alert {
+            padding: 0.85rem 1.25rem; border-radius: 10px;
+            margin-bottom: 1rem; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-danger { background: #fee2e2; color: #991b1b; }
+        .alert-info { background: #dbeafe; color: #1e40af; }
+
+        /* Seed button */
+        .seed-banner {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1rem;
+        }
+        .seed-banner p { font-size: 0.9rem; color: #92400e; font-weight: 500; }
+
+        /* Certificate preview */
+        .cert-preview {
+            background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+            color: white; border-radius: 16px;
+            padding: 2rem; text-align: center;
+            margin-top: 1rem;
+        }
+        .cert-preview h2 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+        .cert-number { font-size: 0.85rem; opacity: 0.8; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 0; overflow: hidden; }
+            .main-content { margin-right: 0; padding: 1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="logo_maher.png" alt="مهارات" onerror="this.style.display='none'">
+            <span>لوحة التحكم</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-item active" onclick="switchTab('overview')">
+                <i class="fas fa-chart-pie"></i> نظرة عامة
+            </div>
+            <div class="nav-item" onclick="switchTab('users')">
+                <i class="fas fa-users"></i> المستخدمون
+            </div>
+            <div class="nav-item" onclick="switchTab('courses')">
+                <i class="fas fa-book-open"></i> الدورات التدريبية
+            </div>
+            <div class="nav-item" onclick="switchTab('enrollments')">
+                <i class="fas fa-user-check"></i> التسجيلات
+            </div>
+            <div class="nav-item" onclick="switchTab('certificates')">
+                <i class="fas fa-certificate"></i> الشهادات
+            </div>
+            <div class="nav-item" onclick="switchTab('contacts')">
+                <i class="fas fa-envelope"></i> طلبات التواصل
+            </div>
+            <div class="nav-item" onclick="switchTab('partners')">
+                <i class="fas fa-handshake"></i> الشركاء
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="admin-info">
+                <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
+                <div>
+                    <div class="admin-name" id="adminName">المدير</div>
+                    <div class="admin-badge">مشرف النظام</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- TAB: Overview -->
+        <div class="tab-content active" id="tab-overview">
+            <div class="page-header">
+                <div class="page-title">نظرة <span>عامة</span></div>
+                <span style="color: var(--text-light); font-size: 0.9rem;" id="currentDate"></span>
+            </div>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                    <div><div class="stat-number" id="statUsers">-</div><div class="stat-label">إجمالي المستخدمين</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-book-open"></i></div>
+                    <div><div class="stat-number" id="statCourses">-</div><div class="stat-label">الدورات النشطة</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple"><i class="fas fa-user-check"></i></div>
+                    <div><div class="stat-number" id="statEnrollments">-</div><div class="stat-label">التسجيلات</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange"><i class="fas fa-certificate"></i></div>
+                    <div><div class="stat-number" id="statCerts">-</div><div class="stat-label">الشهادات المُصدرة</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red"><i class="fas fa-envelope"></i></div>
+                    <div><div class="stat-number" id="statContacts">-</div><div class="stat-label">طلبات التواصل الجديدة</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Users -->
+        <div class="tab-content" id="tab-users">
+            <div class="page-header">
+                <div class="page-title">إدارة <span>المستخدمين</span></div>
+            </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">قائمة المستخدمين</div>
+                    <input type="text" class="table-search" placeholder="بحث باسم أو بريد..." oninput="filterUsers(this.value)">
+                </div>
+                <div id="usersTableBody">
+                    <div class="loading-spinner"><i class="fas fa-circle-notch"></i> جاري التحميل...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Courses -->
+        <div class="tab-content" id="tab-courses">
+            <div class="page-header">
+                <div class="page-title">إدارة <span>الدورات</span></div>
+                <button class="btn btn-primary" onclick="openCourseModal()">
+                    <i class="fas fa-plus"></i> إضافة دورة
+                </button>
+            </div>
+            <div id="seedBanner" class="seed-banner" style="display:none">
+                <p><i class="fas fa-info-circle"></i> قاعدة البيانات فارغة من الدورات. يمكنك نقل الدورات الموجودة في الموقع إلى قاعدة البيانات تلقائياً.</p>
+                <button class="btn btn-warning btn-sm" onclick="seedCourses()">
+                    <i class="fas fa-database"></i> نقل الدورات تلقائياً
+                </button>
+            </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">قائمة الدورات</div>
+                    <input type="text" class="table-search" placeholder="بحث باسم الدورة..." oninput="filterCourses(this.value)">
+                </div>
+                <div id="coursesTableBody">
+                    <div class="loading-spinner"><i class="fas fa-circle-notch"></i> جاري التحميل...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Enrollments -->
+        <div class="tab-content" id="tab-enrollments">
+            <div class="page-header">
+                <div class="page-title">إدارة <span>التسجيلات</span></div>
+            </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">قائمة التسجيلات</div>
+                    <select class="table-search" style="min-width:160px" onchange="filterEnrollments(this.value)">
+                        <option value="">كل الحالات</option>
+                        <option value="pending">معلق</option>
+                        <option value="approved">مقبول</option>
+                        <option value="completed">مكتمل</option>
+                        <option value="cancelled">ملغي</option>
+                    </select>
+                </div>
+                <div id="enrollmentsTableBody">
+                    <div class="loading-spinner"><i class="fas fa-circle-notch"></i> جاري التحميل...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Certificates -->
+        <div class="tab-content" id="tab-certificates">
+            <div class="page-header">
+                <div class="page-title">إدارة <span>الشهادات</span></div>
+                <button class="btn btn-success" onclick="openIssueCertModal()">
+                    <i class="fas fa-plus"></i> إصدار شهادة
+                </button>
+            </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">الشهادات المُصدرة</div>
+                </div>
+                <div id="certsTableBody">
+                    <div class="loading-spinner"><i class="fas fa-circle-notch"></i> جاري التحميل...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Contacts -->
+        <div class="tab-content" id="tab-contacts">
+            <div class="page-header">
+                <div class="page-title">طلبات <span>التواصل</span></div>
+            </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">الاستفسارات الواردة</div>
+                    <select class="table-search" style="min-width:140px" onchange="filterContacts(this.value)">
+                        <option value="">كل الطلبات</option>
+                        <option value="new">جديد</option>
+                        <option value="read">مقروء</option>
+                        <option value="replied">تم الرد</option>
+                    </select>
+                </div>
+                <div id="contactsTableBody">
+                    <div class="loading-spinner"><i class="fas fa-circle-notch"></i> جاري التحميل...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Partners -->
+        <div class="tab-content" id="tab-partners">
+            <div class="page-header">
+                <div class="page-title">إدارة <span>الشركاء</span></div>
+                <button class="btn btn-primary" onclick="openPartnerModal()">
+                    <i class="fas fa-plus"></i> إضافة شريك
+                </button>
+            </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">قائمة الشركاء</div>
+                </div>
+                <div id="partnersTableBody">
+                    <div class="loading-spinner"><i class="fas fa-circle-notch"></i> جاري التحميل...</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: Add/Edit Course -->
+    <div class="modal-overlay" id="courseModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="courseModalTitle">إضافة دورة جديدة</h3>
+                <button class="btn-close-modal" onclick="closeCourseModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="courseForm" onsubmit="saveCourse(event)">
+                <div class="form-group">
+                    <label>اسم الدورة *</label>
+                    <input type="text" id="courseTitle" required placeholder="مثال: مهارات التواصل">
+                </div>
+                <div class="form-group">
+                    <label>وصف الدورة (الهدف العام)</label>
+                    <textarea id="courseDesc" placeholder="إكساب المتدرب مهارات..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>نص الشروط</label>
+                    <input type="text" id="courseTerms" value="شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية">
+                </div>
+                <div class="form-group">
+                    <label>محاور الدورة (سطر واحد لكل محور)</label>
+                    <textarea id="courseAxes" rows="5" placeholder="المحور الأول...&#10;المحور الثاني..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>اسم المدرب</label>
+                        <input type="text" id="courseInstructor" placeholder="اسم المدرب">
+                    </div>
+                    <div class="form-group">
+                        <label>مدة الدورة (أيام)</label>
+                        <input type="number" id="courseDuration" value="5" min="1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>الفئة المستهدفة</label>
+                        <select id="courseAudience">
+                            <option value="both">الجميع (موظف + باحث)</option>
+                            <option value="employee">موظف فقط</option>
+                            <option value="seeker">باحث عن عمل فقط</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ البداية</label>
+                        <input type="date" id="courseStartDate">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>رابط الصورة</label>
+                        <input type="text" id="courseImage" placeholder="img-maher/1.jpeg">
+                    </div>
+                    <div class="form-group">
+                        <label>عدد المقاعد</label>
+                        <input type="number" id="courseCapacity" placeholder="لا حد" min="1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>السعر (0 = مجاني)</label>
+                        <input type="number" id="coursePrice" value="0" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>رابط التسجيل الخارجي</label>
+                        <input type="url" id="courseRegUrl" placeholder="https://...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>الترتيب في العرض</label>
+                    <input type="number" id="courseOrder" value="0" min="0">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeCourseModal()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary" id="saveCourseBtn">
+                        <i class="fas fa-save"></i> حفظ الدورة
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Issue Certificate -->
+    <div class="modal-overlay" id="certModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>إصدار شهادة إتمام</h3>
+                <button class="btn-close-modal" onclick="document.getElementById('certModal').classList.remove('active')"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="certForm" onsubmit="issueCertificate(event)">
+                <div class="form-group">
+                    <label>المستخدم (البريد الإلكتروني)</label>
+                    <input type="email" id="certUserEmail" required placeholder="user@example.com">
+                </div>
+                <div class="form-group">
+                    <label>الدورة</label>
+                    <select id="certCourseId" required>
+                        <option value="">اختر دورة...</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('certModal').classList.remove('active')">إلغاء</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-certificate"></i> إصدار الشهادة
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Add/Edit Partner -->
+    <div class="modal-overlay" id="partnerModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="partnerModalTitle">إضافة شريك جديد</h3>
+                <button class="btn-close-modal" onclick="closePartnerModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="partnerForm" onsubmit="savePartner(event)">
+                <div class="form-group">
+                    <label>اسم الشريك *</label>
+                    <input type="text" id="partnerName" required placeholder="اسم الشركة أو الجهة">
+                </div>
+                <div class="form-group">
+                    <label>رابط الشعار (Logo URL)</label>
+                    <input type="text" id="partnerLogo" placeholder="img-z/partner.png">
+                </div>
+                <div class="form-group">
+                    <label>الموقع الإلكتروني</label>
+                    <input type="url" id="partnerWebsite" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>ترتيب العرض</label>
+                    <input type="number" id="partnerOrder" value="0" min="0">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closePartnerModal()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> حفظ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

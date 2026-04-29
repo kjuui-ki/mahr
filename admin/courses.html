@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الدورات | مهارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabaseClient.js"></script>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="brand-text">
+            <span class="brand-name">مهارات</span>
+            <span class="brand-sub">لوحة التحكم</span>
+        </div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    </div>
+    <div class="sidebar-admin">
+        <div class="admin-avatar-wrap">
+            <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
+            <div class="admin-status-dot"></div>
+        </div>
+        <div class="admin-details">
+            <span class="admin-name" id="adminName">المدير</span>
+            <span class="admin-role">مشرف النظام</span>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">الرئيسية</div>
+        <a href="index.html" class="nav-link" data-page="overview"><i class="fas fa-chart-pie"></i><span>نظرة عامة</span></a>
+        <div class="nav-section-label">إدارة المحتوى</div>
+        <a href="courses.html" class="nav-link active" data-page="courses"><i class="fas fa-book-open"></i><span>الدورات</span></a>
+        <a href="users.html" class="nav-link" data-page="users"><i class="fas fa-users"></i><span>المستخدمون</span></a>
+        <a href="enrollments.html" class="nav-link" data-page="enrollments"><i class="fas fa-user-check"></i><span>التسجيلات</span></a>
+        <div class="nav-section-label">الشهادات والتقارير</div>
+        <a href="certificates.html" class="nav-link" data-page="certificates"><i class="fas fa-certificate"></i><span>الشهادات</span></a>
+        <a href="reports.html" class="nav-link" data-page="reports"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+        <div class="nav-section-label">التواصل</div>
+        <a href="contacts.html" class="nav-link" data-page="contacts"><i class="fas fa-envelope"></i><span>طلبات التواصل</span></a>
+        <a href="partners.html" class="nav-link" data-page="partners"><i class="fas fa-handshake"></i><span>الشركاء</span></a>
+        <div class="nav-section-label">النظام</div>
+        <a href="settings.html" class="nav-link" data-page="settings"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+        <a href="../index.html" class="nav-link"><i class="fas fa-home"></i><span>الموقع الرئيسي</span></a>
+    </nav>
+    <div class="sidebar-footer">
+        <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i><span>تسجيل الخروج</span></button>
+    </div>
+</aside>
+
+<div class="main-wrap">
+    <header class="topbar">
+        <div class="topbar-right">
+            <button class="topbar-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="topbar-title">
+                <h1>إدارة <span>الدورات</span></h1>
+                <p id="currentDate"></p>
+            </div>
+        </div>
+        <div class="topbar-left">
+            <button class="btn btn-primary btn-sm" onclick="openCourseModal()">
+                <i class="fas fa-plus"></i> دورة جديدة
+            </button>
+            <div class="topbar-admin">
+                <div class="topbar-avatar"><i class="fas fa-user-shield"></i></div>
+                <span id="topbarName">المدير</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="content">
+
+        <!-- Stats Row -->
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem">
+            <div class="stat-card" style="--accent:#2563eb">
+                <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+                <div class="stat-body"><div class="stat-num" id="cStat1">—</div><div class="stat-lbl">إجمالي الدورات</div></div>
+            </div>
+            <div class="stat-card" style="--accent:#10b981">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-body"><div class="stat-num" id="cStat2">—</div><div class="stat-lbl">دورات نشطة</div></div>
+            </div>
+            <div class="stat-card" style="--accent:#7c3aed">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-body"><div class="stat-num" id="cStat3">—</div><div class="stat-lbl">للجميع</div></div>
+            </div>
+            <div class="stat-card" style="--accent:#f59e0b">
+                <div class="stat-icon"><i class="fas fa-tag"></i></div>
+                <div class="stat-body"><div class="stat-num" id="cStat4">—</div><div class="stat-lbl">مجانية</div></div>
+            </div>
+        </div>
+
+        <!-- Seed Banner -->
+        <div id="seedBanner" class="seed-banner" style="display:none">
+            <p><i class="fas fa-info-circle"></i> قاعدة البيانات فارغة. يمكنك نقل الدورات الـ49 الموجودة في الموقع تلقائياً.</p>
+            <button class="btn btn-warning btn-sm" onclick="seedCourses()">
+                <i class="fas fa-database"></i> نقل الدورات تلقائياً
+            </button>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <div class="tbl-head">
+                <div class="tbl-title">قائمة الدورات</div>
+                <div class="tbl-controls">
+                    <select class="tbl-search" onchange="filterCoursesAudience(this.value)" style="min-width:160px">
+                        <option value="">كل الفئات</option>
+                        <option value="employee">موظف</option>
+                        <option value="seeker">باحث عن عمل</option>
+                        <option value="both">الجميع</option>
+                    </select>
+                    <input type="search" class="tbl-search" placeholder="🔍 بحث بالعنوان..." oninput="filterCoursesSearch(this.value)">
+                </div>
+            </div>
+            <div class="tbl-body" id="coursesTbody">
+                <div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal: Add/Edit Course -->
+<div class="modal-overlay" id="courseModal">
+    <div class="modal-box" style="max-width:680px">
+        <div class="modal-hdr">
+            <h3 id="modalTitle">إضافة دورة جديدة</h3>
+            <button class="modal-close" onclick="closeCourseModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="courseForm" onsubmit="saveCourse(event)">
+            <div class="form-group">
+                <label>اسم الدورة *</label>
+                <input type="text" id="fTitle" required placeholder="مثال: الذكاء الاصطناعي">
+            </div>
+            <div class="form-group">
+                <label>الهدف العام للدورة</label>
+                <textarea id="fDesc" placeholder="إكساب المتدرب مهارات..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>نص الشروط (يظهر في بطاقة الدورة)</label>
+                <input type="text" id="fTerms" value="شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية">
+            </div>
+            <div class="form-group">
+                <label>محاور الدورة <span class="form-hint" style="display:inline">(سطر لكل محور)</span></label>
+                <textarea id="fAxes" rows="6" placeholder="المحور الأول...&#10;المحور الثاني...&#10;المحور الثالث..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>اسم المدرب</label>
+                    <input type="text" id="fInstructor" placeholder="اسم المدرب">
+                </div>
+                <div class="form-group">
+                    <label>المدة (أيام)</label>
+                    <input type="number" id="fDuration" value="5" min="1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>الفئة المستهدفة</label>
+                    <select id="fAudience">
+                        <option value="both">الجميع (موظف + باحث)</option>
+                        <option value="employee">موظف فقط</option>
+                        <option value="seeker">باحث عن عمل فقط</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ البداية</label>
+                    <input type="date" id="fStart">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>رابط الصورة</label>
+                    <input type="text" id="fImage" placeholder="../img-maher/1.jpeg">
+                </div>
+                <div class="form-group">
+                    <label>عدد المقاعد</label>
+                    <input type="number" id="fCapacity" placeholder="بلا حد" min="1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>السعر (0 = مجاني)</label>
+                    <input type="number" id="fPrice" value="0" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>رابط التسجيل الخارجي</label>
+                    <input type="url" id="fRegUrl" placeholder="https://...">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>ترتيب العرض</label>
+                <input type="number" id="fOrder" value="0" min="0">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="closeCourseModal()">إلغاء</button>
+                <button type="submit" class="btn btn-primary" id="saveCourseBtn">
+                    <i class="fas fa-save"></i> حفظ الدورة
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="admin-shared.js"></script>
+<script>
+let allCourses = [], editingId = null;
+let filterSearch = '', filterAudience = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await adminInit('courses');
+    loadCourses();
+});
+
+async function loadCourses() {
+    document.getElementById('coursesTbody').innerHTML =
+        '<div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...</div>';
+
+    const { data, error } = await supabase.from('courses')
+        .select('*').order('display_order').order('created_at', { ascending: false });
+
+    if (error) { renderError('coursesTbody', error.message); return; }
+    allCourses = data || [];
+
+    // Stats
+    document.getElementById('cStat1').textContent = allCourses.length;
+    document.getElementById('cStat2').textContent = allCourses.filter(c=>c.is_active).length;
+    document.getElementById('cStat3').textContent = allCourses.filter(c=>c.target_audience==='both').length;
+    document.getElementById('cStat4').textContent = allCourses.filter(c=>c.is_free).length;
+
+    document.getElementById('seedBanner').style.display = allCourses.length === 0 ? 'flex' : 'none';
+    renderCourses();
+}
+
+function renderCourses() {
+    let list = allCourses;
+    if (filterSearch) list = list.filter(c => c.title.toLowerCase().includes(filterSearch.toLowerCase()));
+    if (filterAudience) list = list.filter(c => c.target_audience === filterAudience);
+
+    if (!list.length) {
+        document.getElementById('coursesTbody').innerHTML = emptyState('لا توجد دورات تطابق البحث');
+        return;
+    }
+
+    document.getElementById('coursesTbody').innerHTML = `
+    <table>
+        <thead><tr>
+            <th>#</th><th>الدورة</th><th>الفئة</th><th>المدرب</th>
+            <th>السعر</th><th>الحالة</th><th>الترتيب</th><th>الإجراءات</th>
+        </tr></thead>
+        <tbody>${list.map((c, i) => `
+            <tr>
+                <td style="color:var(--text-muted)">${i+1}</td>
+                <td>
+                    <div style="display:flex;align-items:center;gap:.75rem">
+                        <img src="${esc(c.image_url)}" class="img-thumb" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2242%22 height=%2242%22><rect width=%2242%22 height=%2242%22 fill=%22%23dbeafe%22 rx=%228%22/><text x=%2221%22 y=%2226%22 text-anchor=%22middle%22 fill=%22%232563eb%22 font-size=%2216%22>📚</text></svg>'">
+                        <div>
+                            <strong style="display:block;white-space:normal;max-width:240px">${esc(c.title)}</strong>
+                            <small style="color:var(--text-muted)">${(c.description||'').substring(0,50)}${(c.description||'').length>50?'...':''}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>${audienceBadge(c.target_audience)}</td>
+                <td>${esc(c.instructor_name)||'—'}</td>
+                <td>${c.is_free ? '<span class="badge badge-approved">مجاني</span>' : `<strong>${c.price} ر.س</strong>`}</td>
+                <td>
+                    ${c.is_active
+                        ? '<span class="badge badge-active"><i class="fas fa-circle" style="font-size:.45rem"></i> نشط</span>'
+                        : '<span class="badge badge-inactive"><i class="fas fa-circle" style="font-size:.45rem"></i> معطل</span>'}
+                </td>
+                <td style="color:var(--text-muted)">${c.display_order}</td>
+                <td>
+                    <div style="display:flex;gap:.35rem">
+                        <button class="btn btn-sm btn-outline btn-icon" onclick="editCourse('${c.id}')" title="تعديل"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-icon ${c.is_active ? 'btn-warning' : 'btn-success'}" onclick="toggleCourse('${c.id}',${c.is_active})" title="${c.is_active?'تعطيل':'تفعيل'}">
+                            <i class="fas ${c.is_active ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-icon" onclick="deleteCourse('${c.id}')" title="حذف"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>`).join('')}
+        </tbody>
+    </table>`;
+}
+
+function filterCoursesSearch(q) { filterSearch = q; renderCourses(); }
+function filterCoursesAudience(v) { filterAudience = v; renderCourses(); }
+
+function openCourseModal() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'إضافة دورة جديدة';
+    document.getElementById('courseForm').reset();
+    document.getElementById('fTerms').value = 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية';
+    document.getElementById('fDuration').value = 5;
+    document.getElementById('fAudience').value = 'both';
+    document.getElementById('fPrice').value = 0;
+    document.getElementById('fOrder').value = allCourses.length;
+    document.getElementById('courseModal').classList.add('active');
+}
+
+function closeCourseModal() {
+    document.getElementById('courseModal').classList.remove('active');
+    editingId = null;
+}
+
+function editCourse(id) {
+    const c = allCourses.find(x => x.id === id);
+    if (!c) return;
+    editingId = id;
+    document.getElementById('modalTitle').textContent = 'تعديل الدورة';
+    document.getElementById('fTitle').value = c.title || '';
+    document.getElementById('fDesc').value = c.description || '';
+    document.getElementById('fTerms').value = c.terms || '';
+    document.getElementById('fAxes').value = (c.axes || []).join('\n');
+    document.getElementById('fInstructor').value = c.instructor_name || '';
+    document.getElementById('fDuration').value = c.duration_days || 5;
+    document.getElementById('fAudience').value = c.target_audience || 'both';
+    document.getElementById('fStart').value = c.start_date || '';
+    document.getElementById('fImage').value = c.image_url || '';
+    document.getElementById('fCapacity').value = c.capacity || '';
+    document.getElementById('fPrice').value = c.price || 0;
+    document.getElementById('fRegUrl').value = c.registration_url || '';
+    document.getElementById('fOrder').value = c.display_order || 0;
+    document.getElementById('courseModal').classList.add('active');
+}
+
+async function saveCourse(e) {
+    e.preventDefault();
+    const btn = document.getElementById('saveCourseBtn');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> جاري الحفظ...';
+
+    const axes = document.getElementById('fAxes').value.split('\n').map(a=>a.trim()).filter(a=>a);
+    const price = parseFloat(document.getElementById('fPrice').value) || 0;
+
+    const payload = {
+        title: document.getElementById('fTitle').value.trim(),
+        description: document.getElementById('fDesc').value.trim(),
+        terms: document.getElementById('fTerms').value.trim(),
+        axes,
+        instructor_name: document.getElementById('fInstructor').value.trim(),
+        duration_days: parseInt(document.getElementById('fDuration').value) || 5,
+        target_audience: document.getElementById('fAudience').value,
+        start_date: document.getElementById('fStart').value || null,
+        image_url: document.getElementById('fImage').value.trim(),
+        capacity: parseInt(document.getElementById('fCapacity').value) || null,
+        price, is_free: price === 0,
+        registration_url: document.getElementById('fRegUrl').value.trim(),
+        display_order: parseInt(document.getElementById('fOrder').value) || 0
+    };
+
+    const { error } = editingId
+        ? await supabase.from('courses').update(payload).eq('id', editingId)
+        : await supabase.from('courses').insert(payload);
+
+    btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> حفظ الدورة';
+
+    if (error) { showToast('خطأ: ' + error.message, 'danger'); return; }
+    showToast(editingId ? 'تم تحديث الدورة بنجاح' : 'تمت إضافة الدورة بنجاح');
+    closeCourseModal();
+    loadCourses();
+}
+
+async function toggleCourse(id, current) {
+    const { error } = await supabase.from('courses').update({ is_active: !current }).eq('id', id);
+    if (error) { showToast('خطأ: ' + error.message, 'danger'); return; }
+    showToast(current ? 'تم تعطيل الدورة' : 'تم تفعيل الدورة', current ? 'warning' : 'success');
+    loadCourses();
+}
+
+async function deleteCourse(id) {
+    const c = allCourses.find(x=>x.id===id);
+    if (!confirm(`حذف دورة "${c?.title}" نهائياً؟\nسيتم حذف جميع التسجيلات المرتبطة.`)) return;
+    const { error } = await supabase.from('courses').delete().eq('id', id);
+    if (error) { showToast('خطأ: ' + error.message, 'danger'); return; }
+    showToast('تم حذف الدورة', 'danger');
+    loadCourses();
+}
+
+// ── Seed 49 courses ──────────────────────────
+async function seedCourses() {
+    if (!confirm('سيتم إضافة الدورات الـ49 إلى قاعدة البيانات. هل أنت متأكد؟')) return;
+    const btn = event.currentTarget;
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> جاري النقل...';
+
+    const seedData = [
+        {title:'الذكاء الاصطناعي',image_url:'../img-maher/1.jpeg',description:'إكساب المتدرب مهارات الذكاء الاصطناعي.',axes:['المفاهيم الأساسية للذكاء الاصطناعي.','التعلم الآلي (Machine Learning).','التعلم العميق (Deep Learning).','الشبكات العصبية (Neural Networks).','معالجة اللغة الطبيعية (Natural Language Processing).','الروبوتات والتحكم الآلي.','خوارزميات الذكاء الاصطناعي المتقدمة.','تطبيقات الذكاء الاصطناعي في الصناعة.','الأخلاقيات والتحديات القانونية.','مستقبل الذكاء الاصطناعي.']},
+        {title:'الأمن السيبراني',image_url:'../img-maher/2.png',description:'إكساب المتدرب مهارات الأمن السيبراني.',axes:['أساسيات أمن المعلومات والجرائم الإلكترونية.','أنواع الهجمات الإلكترونية.','تحديد نقاط الضعف في الشبكات.','تقنيات اختبار أمان الشبكة.','المخاطر المرتبطة بنقل المعلومات.','تقنيات الدفاع الإلكتروني.','مهارات صد الهجمات الإلكترونية.','التعامل مع القضايا الأخلاقية والقانونية.','تقييم الاختراقات المحتملة.','حماية شبكات الحاسب.','مهارات إدارة مشاريع أمن المعلومات.','فهم التحقيق الجنائي الرقمي.']},
+        {title:'تحليل البيانات',image_url:'../img-maher/3.jpg',description:'إكساب المتدربين مهارات تحليل البيانات.',axes:['أنواع تحليل البيانات وأدواتها.','مهارات التعامل مع البيانات الضخمة.','مهارات تحليل الشبكات.','تحليل البيانات باستخدام الذكاء الاصطناعي.']},
+        {title:'مهارات توظيف الأوفيس في العمل الإداري',image_url:'../img-maher/4.png',description:'إكساب المتدرب مهارات توظيف الأوفيس في العمل الإداري.',axes:['مقدمة عن استخدام برامج الأوفيس.','استخدام Word لإعداد الوثائق الإدارية.','استخدام Excel لإدارة البيانات.','استخدام PowerPoint لإنشاء عروض تقديمية.','إعداد البريد الإلكتروني باستخدام Outlook.','استخدام Access لإدارة قواعد البيانات.','اختصارات لوحة المفاتيح.','تنظيم الملفات والمجلدات.','حفظ المستندات وحمايتها.','التعامل مع المشكلات الشائعة.']},
+        {title:'إدخال البيانات',image_url:'../img-maher/5.png',description:'إكساب المتدربين مهارات إدخال البيانات.',axes:['مكونات جهاز الحاسب الآلي.','الجلسة الصحيحة للكتابة.','برنامج مدرب الطباعة.','إدخال البيانات بشكل سريع ودقيق.','فوائد توظيف تطبيقات الأوفيس.','الواجهات الرئيسة لتطبيق مايكروسوفت وورد.','مهارات استخدام مايكروسوفت وورد.']},
+        {title:'إدارة المكاتب الإلكترونية',image_url:'../img-maher/6.png',description:'إكساب المتدرب المهارات اللازمة للأعمال المكتبية الإلكترونية.',axes:['مفهوم السكرتارية الحديثة.','مبادئ نظم المعلومات الإدارية.','مهارات التعامل مع المرؤوسين.','مهارات التعامل مع الرؤساء.','مهارات التعامل مع المراجعين.','مفهوم العلاقات العامة.','مهارات تجنب الأخطاء الإدارية.','مهارات إدارة الوقت.','الأرشفة الإلكترونية.']},
+        {title:'إدارة المخاطر والأزمات',image_url:'../img-maher/7.png',description:'إكساب المتدرب مهارات إدارة المخاطر والأزمات.',axes:['ماهية المخاطر والأزمات.','خصائص المخاطر والأزمات.','حدوث المخاطر في بيئة العمل.','أنواع المخاطر والأزمات.','أسباب المخاطر وآثارها.','أسس مواجهة المخاطر والأزمات.','الإستراتيجيات المناسبة لإدارة المخاطر.','مسؤوليات فرق المخاطر.','آليات عمل فرق المخاطر.','خطط إدارة المخاطر.']},
+        {title:'بناء وإدارة فرق العمل',image_url:'../img-maher/8.png',description:'إكساب المتدرب مهارات بناء فرق العمل.',axes:['مفهوم فريق العمل والمفاهيم الإدارية.','دورة ديناميكيات المجموعات.','إستراتيجيات إدارة فرق العمل.','الأدوات الإدارية لنجاح فريق العمل.','نقاط مهمة لبناء فريق العمل.','طرق تحفيز الفريق.','ممارسة الأدوات الإدارية.']},
+        {title:'إدارة الموارد البشرية',image_url:'../img-maher/9.png',description:'إكساب المتدرب مهارات إدارة الموارد البشرية.',axes:['مقدمة في إدارة الموارد البشرية.','توظيف الموظفين واختيارهم.','تقييم الأداء وإدارته.','تطوير الموظفين وتدريبهم.','إدارة العلاقات العمالية.','تصميم الوظائف وتحليلها.','تخطيط الموارد البشرية.','إدارة التغيير والابتكار.','إدارة الأجور والمزايا.','إدارة الثقافة التنظيمية.']},
+        {title:'إدارة الأزمات المالية',image_url:'../img-maher/10.png',description:'إكساب المتدرب مهارات إدارة الأزمات المالية.',axes:['مفهوم الأزمات المالية وتحليل أسبابها.','تقييم المخاطر المالية.','تطوير خطط الطوارئ المالية.','إدارة السيولة خلال الأزمات.','تقييم الأصول والالتزامات.','إستراتيجيات التعامل مع الديون.','أدوات رصد الأداء المالي.','خطط استعادة الكيان المالي.','تقييم الدروس المستفادة من الأزمات.']},
+        {title:'إعداد التقارير المالية',image_url:'../img-maher/11.png',description:'تنمية قدرات المتدربين على إعداد التقارير المالية.',axes:['مفهوم التقارير المالية والتحليل المالي.','أهمية التحليل المالي.','أنواع التقارير المالية.','المفاهيم الأساسية في المحاسبة المالية.','تأثير الضرائب في التقارير المالية.','الشفافية في التقارير المالية.','دقة إعداد التقارير المالية.','فهم المخاطر المالية.','صناعة قرارات إستراتيجية.','إعداد التقارير وتطبيق التحليل المالي.']},
+        {title:'إدارة المشاريع الاحترافية',image_url:'../img-maher/12.png',description:'إكساب المتدرب مهارات إدارة المشاريع.',axes:['مفهوم المشروع.','نطاق المشروع.','أنشطة المشروع.','إدارة المعنيين بالمشروع.','إدارة فريق العمل وتطويره.','إدارة المخاطر وتحليلها.','وضع خطة الاستجابة للمخاطر.','إدارة جودة المشاريع.']},
+        {title:'القيادة التنظيمية في اتخاذ القرار',image_url:'../img-maher/13.png',description:'تنمية مهارات المتدرب في مجال القيادة التنظيمية.',axes:['اتجاهات فهم القيادة.','أنماط القيادة وخصائص القادة.','صناعة التأثير وتطبيق فنون القادة.','القيادة التحويلية.','القيادة الخادمة.','مشكلة ضعف القيادة وحلها.','تحليل دور القائد.','بناء منظومة العمل المؤسسي.','تأهيل قادة المستقبل.','اتخاذ القرارات الجريئة.']},
+        {title:'النجاح الوظيفي وتنظيم وتطوير أساليب العمل',image_url:'../img-maher/14.png',description:'إكساب المتدرب مهارات النجاح الوظيفي.',axes:['مفهوم النجاح الوظيفي.','مراحل الحياة الوظيفية.','الجانب التطويري والسلوكي للنجاح.','مهارات النجاح الوظيفي.','عوامل أساسية للنجاح الوظيفي.','الاستقرار في الوظيفة.','المفاهيم الحديثة في التنظيم والتطوير.','مهارات تبسيط الإجراءات.']},
+        {title:'التطوير الإداري',image_url:'../img-maher/15.png',description:'إكساب المتدرب مهارات التطوير الإداري.',axes:['مفهوم التطوير الإداري وأهميته.','دور المديرين في تحليل احتياجات التطوير.','تصميم برامج التطوير وتنفيذها.','مهارات القيادة والإدارة.','الثقافة التنظيمية والقيم الإدارية.','اتخاذ القرارات الإستراتيجية.','الابتكار والإبداع في الإدارة.','إدارة التغيير المؤسسي.','تقييم نتائج التطوير الإداري.']},
+        {title:'التخطيط الاستراتيجي',image_url:'../img-maher/16.png',description:'إكساب المتدرب أهم المفاهيم في التخطيط الاستراتيجي.',axes:['مفهوم التخطيط الإستراتيجي وأهدافه.','أساسيات التخطيط الإستراتيجي.','عناصر التخطيط الإستراتيجي.','أساليب التخطيط ومراحله.','تحليل البيئة الخارجية والداخلية.','تحديد رؤية المؤسسة ورسالتها.','وضع الأهداف الإستراتيجية.','مشكلات التخطيط الإستراتيجي.','خطوات التخطيط الإستراتيجي الفعال.']},
+        {title:'الكتابة الوظيفية للمؤسسات والشركات',image_url:'../img-maher/17.png',description:'إكساب المتدرب مهارات إعداد النماذج الإدارية.',axes:['الاتصال والتواصل في الكتابة الوظيفية.','الكتابة الوظيفية والكتابة الإبداعية.','النماذج الإدارية المختلفة.','الصياغة اللغوية الصحيحة.','كتابة المحتوى الوظيفي.','كتابة المحاضر والتقارير الإدارية.','نظام المراسلات الإلكترونية.','أساسيات التواصل عبر البريد الإلكتروني.','آلية صياغة الردود الرسمية.']},
+        {title:'خدمة العملاء',image_url:'../img-maher/18.png',description:'إكساب المتدرب مفاهيم خدمة العملاء.',axes:['أساليب الاتصال وعناصره.','أنواع الاتصال ومكوناته.','مهارات الإنصات الجيد.','مهارات الحديث والتعامل.','مهارات الحوار مع الآخرين.','لغة الجسد في الاتصال.','مفهوم خدمة العملاء.','إستراتيجيات التميز في خدمة العملاء.','طبيعة التسويق والعلاقات العامة.']},
+        {title:'استخدام نموذج الجودة الأوروبي EFQM',image_url:'../img-maher/19.png',description:'إكساب المتدربين مهارات تطبيق نموذج الجودة الأوروبي.',axes:['التميز في أداء المؤسسات.','أهمية نموذج الجودة الأوروبي EFQM.','مكونات نموذج الجودة الأوروبي.','المعايير الأساسية للنموذج.','الدول التي تتبنى النموذج.','آليات إدارة التميز.','نظام تقييم المؤسسات.','تقييم المؤسسات وتطويرها.','تحديات التميز والجودة.']},
+        {title:'أحكام نظام العمل السعودي',image_url:'../img-maher/20.png',description:'إكساب المتدرب أحكام نظام العمل السعودي.',axes:['الأحكام العامة لعقد العمل.','صياغة عقد العمل.','الجوانب القانونية لانتهاء العلاقة العمالية.','تطبيقات قضائية على حالات عملية.']},
+        {title:'المسؤولية القانونية للممارسات الصحية',image_url:'../img-maher/21.png',description:'إكساب المتدرب معارف خاصة بالمسؤولية القانونية في المهن الصحية.',axes:['اختصاصات الهيئة الصحية الشرعية.','نظام التأمين التعاوني ضد الأخطاء الطبية.','الضوابط الشرعية لإجراء التجارب الطبية.','الأخطاء المهنية الصحية وحق التعويض.','الأعمال الطبية دون مسؤولية قانونية.']},
+        {title:'الأمن الصناعي',image_url:'../img-maher/22.png',description:'إكساب المتدرب مهارات الأمن الصناعي.',axes:['مفهوم الأمان والسلامة.','أهداف السلامة وأهميتها.','إجراءات السلامة وواجباتها.','مهام حارس السلامة.','لوائح السلامة واشتراطاتها.','الوقاية ومكافحة الحرائق.','تصنيف المخاطر وتحليلها.','ضغوط العمل ومهارات التعامل معها.']},
+        {title:'الصحة والسلامة المهنية OSHA',image_url:'../img-maher/23.png',description:'إكساب المتدرب مهارات الصحة والسلامة المهنية.',axes:['أهداف برنامج السلامة والصحة المهنية.','طرق الوقاية من الحوادث.','أنواع الحوادث والإصابات.','دور مسؤول السلامة.','أنواع المخاطر وطرق تجنبها.','التخطيط لمنع الحوادث.','أنواع الحرائق والطفايات.','تحليل المخاطر في بيئة العمل.','خطة الإخلاء والطوارئ.']},
+        {title:'دمج التقنية في التعليم والتدريب',image_url:'../img-maher/24.png',description:'إكساب المتدرب مهارات دمج التكنولوجيا في التعليم.',axes:['البيئة التعليمية وأنواعها.','التحولات التي عجلت بدمج التكنولوجيا.','نماذج دمج التكنولوجيا في التعليم.','المستحدثات التكنولوجية والقاعات الذكية.','التعليم الإلكتروني وأشكاله.','الوسائط المتعددة في التعليم.','الفصول الافتراضية وأنواعها.','التعليم المتنقل.','الواقع المعزز في التعليم.']},
+        {title:'التعليم الإلكتروني في مواجهة الأزمات والمخاطر',image_url:'../img-maher/25.png',description:'إكساب المتدرب مهارات التعليم الإلكتروني في الأزمات.',axes:['مفهوم الأزمات والكوارث.','مواجهة الأزمات في المؤسسات التعليمية.','أساليب الاستجابة للأزمات.','أسس إدارة الأزمات التعليمية.','التعليم عن بعد في الأزمات.','مفهوم التعليم الإلكتروني ومميزاته.','أنواع أنظمة إدارة التعلم.','استخدام Moodle و Blackboard.']},
+        {title:'إدارة البيئة الصفية',image_url:'../img-maher/26.png',description:'إكساب المتدرب مهارات إدارة البيئة الصفية.',axes:['مفهوم الإدارة الصفية وتطبيقاتها.','مفهوم إدارة بيئة التعلم.','أهمية الإدارة الصفية الفعالة.','معايير الإدارة الصفية الناجحة.','العوامل المؤثرة في الإدارة الصفية.','المشكلات الصفية وأساليب التعامل معها.','إجراءات تنفيذ الدرس.']},
+        {title:'تصميم وإنتاج المحتوى الرقمي',image_url:'../img-maher/27.png',description:'إكساب المتدرب مهارات صناعة المحتوى الرقمي.',axes:['مفهوم الاتصال ومرتكزات التعلم.','أنواع المحتوى الرقمي.','الأدوات والحلول الرقمية.','التعامل مع مهارات صناعة المحتوى.','أدوات تحليل التفاعل الرقمي.','مهارات تحليل البيانات.','دور الذكاء الاصطناعي في المحتوى.','تحديد مصفوفة المحتوى الرقمي.']},
+        {title:'تصميم وإنتاج الكتاب الإلكتروني التفاعلي',image_url:'../img-maher/28.png',description:'إكساب المتدرب مهارات تصميم الكتاب الإلكتروني.',axes:['مفاهيم الكتاب الإلكتروني التفاعلي.','تاريخ تطور الكتاب الإلكتروني.','مميزات الكتاب الإلكتروني.','معايير تصميم الكتاب الإلكتروني.','أشهر تطبيقات الإنتاج.','التصميم باستخدام نموذج ADDIE.','الإنتاج باستخدام Flip PDF.']},
+        {title:'التعليم النشط',image_url:'../img-maher/29.png',description:'إكساب المتدرب مهارات التعلم النشط.',axes:['مفهوم التعلم النشط.','أسس التعلم النشط وعوائده.','عوائق التعلم النشط.','دور كل من المعلم والمتعلم.','إستراتيجيات التعلم النشط.','طريقة تطبيق الإستراتيجيات.','كيف تصبح متعلماً نشطاً.']},
+        {title:'استخدام أدوات جوجل في التعليم',image_url:'../img-maher/30.png',description:'إكساب المتدرب مهارات استخدام أدوات جوجل التعليمية.',axes:['مفهوم تطبيقات جوجل التعليمية.','استخدام أبرز تطبيقات جوجل.','Gmail, Google Drive, Google Classroom.','Google Forms, Google Sites.','Google Scholar, Google Meet.']},
+        {title:'التعليم عبر الجوال والأجهزة اللوحية',image_url:'../img-maher/31.png',description:'تمكين المتدرب من اكتساب مهارات التعليم عبر الجوال.',axes:['تعريف التعليم باستخدام الجوال.','التطور التاريخي للتعليم المتنقل.','مميزات التعليم عبر الجوال.','تحديات التعليم المتنقل.','تطبيقات التعليم عبر الجوال.','التصميم التعليمي للتعليم المتنقل.','نموذج تصميم التعليم ADDIE.']},
+        {title:'التقويم من أجل التعليم',image_url:'../img-maher/32.png',description:'إكساب المتدرب مهارات التقويم من أجل التعليم.',axes:['مفهوم التقويم وأساليبه.','مبادئ التقويم في التعليم.','الفرق بين التقويم التربوي والتعليمي.','طرق التقويم وأدواته.','مواصفات التقويم الجيد.']},
+        {title:'تصميم وإنتاج الواقع المعزز',image_url:'../img-maher/33.png',description:'إكساب المتدرب المهارات العملية في إنتاج الواقع المعزز.',axes:['الواقع المعزز وخصائصه.','النظريات التربوية للواقع المعزز.','أهمية تقنية الواقع المعزز.','أنواع الواقع المعزز.','الفرق بين الواقع المعزز والافتراضي.','استخدام الواقع المعزز في التعليم.','وسائل وتطبيقات الواقع المعزز.','مشروع تطبيقي.']},
+        {title:'مهارات التدريس الفعال',image_url:'../img-maher/34.png',description:'إكساب المتدرب مهارات التدريس الفعال.',axes:['مفهوم التدريس الفعال وأبعاده.','خصائص التدريس الفعال وشروطه.','صفات المعلم الفعال.','مهارات التدريس الفعال.','القدرة على تسيير الدرس.','مهارات التعزيز وإثارة الدافعية.','تقييم فعالية التدريس.','الإستراتيجيات الحديثة للتعلم.','خطوات التدريس الإبداعي.']},
+        {title:'إدارة عمليات التفتيش والرقابة',image_url:'../img-maher/35.png',description:'إكساب المتدربين المعارف اللازمة للمفتشين.',axes:['المفاهيم الأساسية في التفتيش والرقابة.','الحياد والنزاهة والاستقلال.','مفهوم عملية التفتيش.','أهداف عملية التفتيش.','السياسات التنظيمية للتفتيش.','معايير الجودة في التفتيش.','المهارات الواجبة في فريق التفتيش.','الأساليب الحديثة في التفتيش.','مهارات إعداد خطة التفتيش.','التحديات التي تواجه التفتيش.']},
+        {title:'مكافحة الاحتيال المصرفي',image_url:'../img-maher/36.png',description:'إكساب المتدربين مهارات مكافحة جرائم الاحتيال المصرفي.',axes:['الاحتيال المصرفي وأنواعه.','الأسباب المسهمة في الاحتيال.','الأطر القانونية المتعلقة بمكافحة الاحتيال.','أدوار موظفي المصرف.','إجراءات العناية الواجبة KYC.','مؤشرات الإنذار المبكر.','تحليل أساليب الاحتيال الشائعة.','آليات الرقابة الداخلية.','التعامل مع الحالات المشبوهة.','توثيق الحالات المشبوهة.']},
+        {title:'الجودة الشاملة',image_url:'../img-maher/37.png',description:'إكساب المتدربين مهارات تطبيق مبادئ الجودة الشاملة.',axes:['مفهوم الجودة الشاملة.','أسس الإدارة الإستراتيجية لتحسين الجودة.','أدوات تقييم الجودة الشاملة.','الاتجاهات العالمية في الجودة.','المهارات الأساسية لتطبيق الجودة.','إستراتيجيات تحسين الأداء المؤسسي.','دراسة الحالات وأفضل الممارسات.','صياغة إستراتيجيات قائمة على الجودة.']},
+        {title:'مكافحة الفساد الإداري والمالي',image_url:'../img-maher/38.png',description:'إكساب المتدربين مهارات مكافحة الفساد الإداري.',axes:['مفهوم الفساد المالي والإداري وأسبابه.','أثر الفساد على الجوانب الاقتصادية.','الحكم الصالح ومبادئه.','المساءلة المجتمعية وأدواتها.','الفساد وأخلاقيات العمل.','عوامل الوقاية من الفساد.','الرقابة في المؤسسات.','أنواع الرقابة الداخلية والخارجية.','إستراتيجيات مكافحة الفساد.']},
+        {title:'مؤشرات قياس الأداء KPIs',image_url:'../img-maher/39.png',description:'تزويد المشاركين بالمعرفة اللازمة لمؤشرات الأداء.',axes:['مفهوم مؤشرات الأداء وأهميتها.','أنواع مؤشرات الأداء.','الفرق بين KPIs والعوامل الحرجة.','العلاقة بين الأهداف والمخاطر والمؤشرات.','الخطوات المنهجية لتصميم المؤشرات.','إعداد الجداول العملية للمؤشرات.','آليات جمع بيانات المؤشرات.','تمثيل نتائج المؤشرات بيانياً.','دمج مؤشرات الأداء في العمليات.']},
+        {title:'إدارة المبيعات والمشتريات',image_url:'../img-maher/40.png',description:'إكساب المتدرب المهارات اللازمة لشغل وظائف المبيعات.',axes:['مقدمة إلى المبيعات والمشتريات.','مهارات التواصل والتفاوض.','التكنولوجيا في المبيعات.','التجارة الإلكترونية والمبيعات الرقمية.','إدارة العلاقات مع العملاء والموردين.','المهارات المالية في المبيعات.','إدارة الجودة وخدمة العملاء.','التطبيقات العملية والتحضير للتوظيف.']},
+        {title:'إدارة المطاعم',image_url:'../img-maher/41.png',description:'إكساب المتدرب المهارات اللازمة للإدارة في المطاعم.',axes:['تخطيط الأعمال وتنظيم المطعم.','إدارة العمليات اليومية.','التغذية وسلامة الأغذية.','التسويق والعلاقات العامة.','الخدمة وتجربة العملاء.','إدارة الموارد البشرية.','التمويل والمحاسبة.','القوانين والتشريعات.','التطوير والابتكار المستمر.']},
+        {title:'إدارة الفنادق',image_url:'../img-maher/42.png',description:'إكساب المتدرب المهارات اللازمة لإدارة الفنادق.',axes:['مقدمة في إدارة الفنادق.','التخطيط والتنظيم الفندقي.','إدارة الخدمات الفندقية.','التسويق والبيع في القطاع الفندقي.','إدارة الموارد البشرية في الفنادق.','إدارة الجودة والرضا الفندقي.','التكنولوجيا في إدارة الفنادق.','الأمن والسلامة في الفنادق.','الاستدامة والمسؤولية الاجتماعية.']},
+        {title:'منسق فعاليات',image_url:'../img-maher/43.png',description:'إكساب المتدرب المهارات اللازمة لشغل وظيفة منسق فعاليات.',axes:['التخطيط المبدئي وإعداد الجدول الزمني.','إدارة الميزانية والموارد.','اختيار المكان والتنسيق اللوجستي.','التسويق والترويج.','تقنيات التسجيل وإدارة الجمهور.','إدارة المتحدثين والمحتوى.','التكنولوجيا والأدوات الحديثة.','التقييم والمتابعة بعد الفعالية.']},
+        {title:'الباريستا',image_url:'../img-maher/44.png',description:'إكساب المتدرب المهارات اللازمة لشغل وظيفة الباريستا.',axes:['تاريخ القهوة ومصادرها.','معرفة القهوة المختصة.','التخزين الصحيح للقهوة.','تذوق النكهات.','إتقان طرق التحضير.','تحضير الإسبريسو.','اختيار الماء المناسب.','تبخير الحليب وتكوين اللاتيه آرت.','مهارات الباريستا المحترف.','إدارة المقهى.']},
+        {title:'مشغل ألعاب ترفيهية',image_url:'../img-maher/45.png',description:'إكساب المتدرب مهارات تشغيل الألعاب الترفيهية.',axes:['مفهوم السياحة.','شركات الألعاب الترفيهية.','قواعد نظام العمل في شركات الألعاب.','تطبيق عملي على تشغيل الألعاب.','أسس الأمن والسلامة.','أنواع الألعاب الترفيهية.','تكنولوجيا الألعاب الإلكترونية.','إدارة منصات الألعاب.']},
+        {title:'إدارة بيوت الثقافة',image_url:'../img-maher/46.png',description:'إكساب المتدرب المهارات اللازمة لإدارة بيوت الثقافة.',axes:['بيوت الثقافة وأهدافها.','تأثير بيوت الثقافة في التنمية.','دور المسرح والفنون في نشر الثقافة.','مفهوم الهوية الثقافية.','سمات الإدارة الناجحة.','التخطيط الإستراتيجي لبيوت الثقافة.','مفهوم الجودة الشاملة.','إستراتيجيات إدارة الكوادر البشرية.','الملكية الفكرية وحقوق المؤلف.','أسس التسويق الثقافي.']},
+        {title:'المبيعات الهاتفية',image_url:'../img-maher/47.png',description:'إكساب المتدرب مهارات المبيعات الهاتفية.',axes:['مفهوم المبيعات الهاتفية وأهميتها.','مهارات التواصل الفعال والاستماع النشط.','مهارات الإقناع والتأثير.','إدارة الوقت وتنظيم الجداول.','التخطيط المسبق ومعرفة الجمهور.','صياغة السيناريوهات البيعية.','مهارة بناء الثقة مع العملاء.','تحليل احتياجات العميل.','التعامل مع الاعتراضات البيعية.','بناء علاقات طويلة المدى.','استخدام برامج CRM.']},
+        {title:'مشرف السكن الجماعي',image_url:'../img-maher/48.png',description:'إكساب المتدرب مهارات الإشراف على السكن الجماعي.',axes:['مفاهيم السكن وأهميته.','الحق في السكن اللائق.','أنواع السكن واحتياجاته.','مفهوم السكن الجماعي.','تصنيف السكن الجماعي ومهام المشرف.','الشروط الصحية والفنية للسكن.','متطلبات ترخيص السكن الجماعي.','متطلبات الوقاية من الحرائق.','لائحة المخالفات والغرامات.','تطبيق المهارات الإدارية والقيادية.']},
+        {title:'مشرف مهارات البيع لمنتجات التغذية واللياقة',image_url:'../img-maher/49.png',description:'إكساب المتدربين مهارات بيع منتجات التغذية.',axes:['تصنيف المنتجات الصحية والمكملات الغذائية.','آليات عمل منتجات إنقاص الوزن.','أنواع مكملات البروتين والأحماض الأمينية.','مكونات الغذاء الأساسية.','مبادئ التغذية الصحية في إدارة الوزن.','مهارات التواصل الفعال مع العملاء.','إعداد حلول واستشارات مخصصة.']}
+    ];
+
+    const records = seedData.map((c, i) => ({
+        ...c,
+        terms: 'شهادة معتمدة | مدة الدورة 5 ايام | بمعدل 40 ساعة تدريبية',
+        target_audience: 'both',
+        is_free: true, price: 0,
+        duration_days: 5, is_active: true,
+        display_order: i
+    }));
+
+    const { error } = await supabase.from('courses').insert(records);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-database"></i> نقل الدورات تلقائياً';
+
+    if (error) { showToast('خطأ: ' + error.message, 'danger'); return; }
+    showToast(`تم نقل ${records.length} دورة بنجاح!`);
+    loadCourses();
+}
+</script>
+</body>
+</html>

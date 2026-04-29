@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التسجيلات | مهارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabaseClient.js"></script>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="brand-text"><span class="brand-name">مهارات</span><span class="brand-sub">لوحة التحكم</span></div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    </div>
+    <div class="sidebar-admin">
+        <div class="admin-avatar-wrap"><div class="admin-avatar"><i class="fas fa-user-shield"></i></div><div class="admin-status-dot"></div></div>
+        <div class="admin-details"><span class="admin-name" id="adminName">المدير</span><span class="admin-role">مشرف النظام</span></div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">الرئيسية</div>
+        <a href="index.html" class="nav-link" data-page="overview"><i class="fas fa-chart-pie"></i><span>نظرة عامة</span></a>
+        <div class="nav-section-label">إدارة المحتوى</div>
+        <a href="courses.html" class="nav-link" data-page="courses"><i class="fas fa-book-open"></i><span>الدورات</span></a>
+        <a href="users.html" class="nav-link" data-page="users"><i class="fas fa-users"></i><span>المستخدمون</span></a>
+        <a href="enrollments.html" class="nav-link active" data-page="enrollments"><i class="fas fa-user-check"></i><span>التسجيلات</span></a>
+        <div class="nav-section-label">الشهادات والتقارير</div>
+        <a href="certificates.html" class="nav-link" data-page="certificates"><i class="fas fa-certificate"></i><span>الشهادات</span></a>
+        <a href="reports.html" class="nav-link" data-page="reports"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+        <div class="nav-section-label">التواصل</div>
+        <a href="contacts.html" class="nav-link" data-page="contacts"><i class="fas fa-envelope"></i><span>طلبات التواصل</span></a>
+        <a href="partners.html" class="nav-link" data-page="partners"><i class="fas fa-handshake"></i><span>الشركاء</span></a>
+        <div class="nav-section-label">النظام</div>
+        <a href="settings.html" class="nav-link" data-page="settings"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+        <a href="../index.html" class="nav-link"><i class="fas fa-home"></i><span>الموقع الرئيسي</span></a>
+    </nav>
+    <div class="sidebar-footer"><button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i><span>تسجيل الخروج</span></button></div>
+</aside>
+
+<div class="main-wrap">
+    <header class="topbar">
+        <div class="topbar-right">
+            <button class="topbar-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="topbar-title"><h1>إدارة <span>التسجيلات</span></h1><p id="currentDate"></p></div>
+        </div>
+        <div class="topbar-left">
+            <div class="topbar-admin"><div class="topbar-avatar"><i class="fas fa-user-shield"></i></div><span id="topbarName">المدير</span></div>
+        </div>
+    </header>
+
+    <main class="content">
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.5rem">
+            <div class="stat-card" style="--accent:#f59e0b"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-body"><div class="stat-num" id="eStat1">—</div><div class="stat-lbl">معلقة</div></div></div>
+            <div class="stat-card" style="--accent:#10b981"><div class="stat-icon"><i class="fas fa-check"></i></div><div class="stat-body"><div class="stat-num" id="eStat2">—</div><div class="stat-lbl">مقبولة</div></div></div>
+            <div class="stat-card" style="--accent:#2563eb"><div class="stat-icon"><i class="fas fa-graduation-cap"></i></div><div class="stat-body"><div class="stat-num" id="eStat3">—</div><div class="stat-lbl">مكتملة</div></div></div>
+            <div class="stat-card" style="--accent:#ef4444"><div class="stat-icon"><i class="fas fa-times"></i></div><div class="stat-body"><div class="stat-num" id="eStat4">—</div><div class="stat-lbl">مرفوضة</div></div></div>
+        </div>
+
+        <div class="table-container">
+            <div class="tbl-head">
+                <div class="tbl-title">قائمة التسجيلات</div>
+                <div class="tbl-controls">
+                    <select class="tbl-search" onchange="filterStatus(this.value)" style="min-width:160px">
+                        <option value="">كل الحالات</option>
+                        <option value="pending">معلق</option>
+                        <option value="approved">مقبول</option>
+                        <option value="completed">مكتمل</option>
+                        <option value="rejected">مرفوض</option>
+                    </select>
+                    <input type="search" class="tbl-search" placeholder="🔍 بحث..." oninput="filterSearch(this.value)">
+                </div>
+            </div>
+            <div class="tbl-body" id="enrollTbody">
+                <div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="admin-shared.js"></script>
+<script>
+let allEnrollments = [], fStatus = '', fSearch = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await adminInit('enrollments');
+    loadEnrollments();
+});
+
+async function loadEnrollments() {
+    const { data, error } = await supabase.from('enrollments')
+        .select('*, users(full_name, email), courses(title)')
+        .order('created_at', { ascending: false });
+    if (error) { renderError('enrollTbody', error.message); return; }
+    allEnrollments = data || [];
+
+    document.getElementById('eStat1').textContent = allEnrollments.filter(e=>e.status==='pending').length;
+    document.getElementById('eStat2').textContent = allEnrollments.filter(e=>e.status==='approved').length;
+    document.getElementById('eStat3').textContent = allEnrollments.filter(e=>e.status==='completed').length;
+    document.getElementById('eStat4').textContent = allEnrollments.filter(e=>e.status==='rejected').length;
+
+    renderEnrollments();
+}
+
+function renderEnrollments() {
+    let list = allEnrollments;
+    if (fStatus) list = list.filter(e => e.status === fStatus);
+    if (fSearch) list = list.filter(e =>
+        e.users?.full_name?.toLowerCase().includes(fSearch.toLowerCase()) ||
+        e.users?.email?.toLowerCase().includes(fSearch.toLowerCase()) ||
+        e.courses?.title?.toLowerCase().includes(fSearch.toLowerCase())
+    );
+
+    if (!list.length) { document.getElementById('enrollTbody').innerHTML = emptyState('لا توجد تسجيلات','fa-user-check'); return; }
+
+    document.getElementById('enrollTbody').innerHTML = `
+    <table>
+        <thead><tr>
+            <th>#</th><th>المستخدم</th><th>الدورة</th><th>تاريخ التسجيل</th><th>الحالة</th><th>تغيير الحالة</th>
+        </tr></thead>
+        <tbody>${list.map((e,i)=>`
+            <tr>
+                <td style="color:var(--text-muted)">${i+1}</td>
+                <td>
+                    <strong style="display:block">${esc(e.users?.full_name)||'—'}</strong>
+                    <small style="color:var(--text-muted)">${esc(e.users?.email)||'—'}</small>
+                </td>
+                <td style="max-width:200px;white-space:normal">${esc(e.courses?.title)||'—'}</td>
+                <td style="color:var(--text-muted)">${fmtDate(e.created_at)}</td>
+                <td>${statusBadge(e.status)}</td>
+                <td>
+                    <select class="tbl-search" style="min-width:130px;padding:.4rem" onchange="updateStatus('${e.id}',this.value)">
+                        <option value="pending" ${e.status==='pending'?'selected':''}>معلق</option>
+                        <option value="approved" ${e.status==='approved'?'selected':''}>مقبول</option>
+                        <option value="completed" ${e.status==='completed'?'selected':''}>مكتمل</option>
+                        <option value="rejected" ${e.status==='rejected'?'selected':''}>مرفوض</option>
+                    </select>
+                </td>
+            </tr>`).join('')}
+        </tbody>
+    </table>`;
+}
+
+function filterStatus(v) { fStatus = v; renderEnrollments(); }
+function filterSearch(v) { fSearch = v; renderEnrollments(); }
+
+async function updateStatus(id, status) {
+    const { error } = await supabase.from('enrollments').update({ status }).eq('id', id);
+    if (error) { showToast('خطأ: ' + error.message, 'danger'); return; }
+    showToast('تم تحديث الحالة');
+    loadEnrollments();
+}
+</script>
+</body>
+</html>

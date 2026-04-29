@@ -882,7 +882,8 @@ function updateFormValidation() {
                     }));
 
                     alert(`مرحباً ${profile?.full_name || fullName}! تم تسجيل الدخول بنجاح.`);
-                    window.location.href = 'index.html';
+                    const dest = (profile?.user_type || userType) === 'seeker' ? 'Researcher.html' : 'employee.html';
+                    window.location.href = dest;
                     return;
                 }
 
@@ -924,7 +925,8 @@ function updateFormValidation() {
                 }));
 
                 alert(`تم إنشاء الحساب بنجاح يا ${fullName}!`);
-                window.location.href = 'index.html';
+                const dest = userType === 'seeker' ? 'Researcher.html' : 'employee.html';
+                window.location.href = dest;
             });
         });
     </script>

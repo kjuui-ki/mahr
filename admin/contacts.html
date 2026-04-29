@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلبات التواصل | مهارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabaseClient.js"></script>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="brand-text"><span class="brand-name">مهارات</span><span class="brand-sub">لوحة التحكم</span></div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    </div>
+    <div class="sidebar-admin">
+        <div class="admin-avatar-wrap"><div class="admin-avatar"><i class="fas fa-user-shield"></i></div><div class="admin-status-dot"></div></div>
+        <div class="admin-details"><span class="admin-name" id="adminName">المدير</span><span class="admin-role">مشرف النظام</span></div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">الرئيسية</div>
+        <a href="index.html" class="nav-link" data-page="overview"><i class="fas fa-chart-pie"></i><span>نظرة عامة</span></a>
+        <div class="nav-section-label">إدارة المحتوى</div>
+        <a href="courses.html" class="nav-link" data-page="courses"><i class="fas fa-book-open"></i><span>الدورات</span></a>
+        <a href="users.html" class="nav-link" data-page="users"><i class="fas fa-users"></i><span>المستخدمون</span></a>
+        <a href="enrollments.html" class="nav-link" data-page="enrollments"><i class="fas fa-user-check"></i><span>التسجيلات</span></a>
+        <div class="nav-section-label">الشهادات والتقارير</div>
+        <a href="certificates.html" class="nav-link" data-page="certificates"><i class="fas fa-certificate"></i><span>الشهادات</span></a>
+        <a href="reports.html" class="nav-link" data-page="reports"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+        <div class="nav-section-label">التواصل</div>
+        <a href="contacts.html" class="nav-link active" data-page="contacts"><i class="fas fa-envelope"></i><span>طلبات التواصل</span></a>
+        <a href="partners.html" class="nav-link" data-page="partners"><i class="fas fa-handshake"></i><span>الشركاء</span></a>
+        <div class="nav-section-label">النظام</div>
+        <a href="settings.html" class="nav-link" data-page="settings"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+        <a href="../index.html" class="nav-link"><i class="fas fa-home"></i><span>الموقع الرئيسي</span></a>
+    </nav>
+    <div class="sidebar-footer"><button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i><span>تسجيل الخروج</span></button></div>
+</aside>
+
+<div class="main-wrap">
+    <header class="topbar">
+        <div class="topbar-right">
+            <button class="topbar-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="topbar-title"><h1>طلبات <span>التواصل</span></h1><p id="currentDate"></p></div>
+        </div>
+        <div class="topbar-left">
+            <div class="topbar-admin"><div class="topbar-avatar"><i class="fas fa-user-shield"></i></div><span id="topbarName">المدير</span></div>
+        </div>
+    </header>
+
+    <main class="content">
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem">
+            <div class="stat-card" style="--accent:#ef4444"><div class="stat-icon"><i class="fas fa-envelope"></i></div><div class="stat-body"><div class="stat-num" id="ctStat1">—</div><div class="stat-lbl">جديدة</div></div></div>
+            <div class="stat-card" style="--accent:#f59e0b"><div class="stat-icon"><i class="fas fa-eye"></i></div><div class="stat-body"><div class="stat-num" id="ctStat2">—</div><div class="stat-lbl">مقروءة</div></div></div>
+            <div class="stat-card" style="--accent:#10b981"><div class="stat-icon"><i class="fas fa-reply"></i></div><div class="stat-body"><div class="stat-num" id="ctStat3">—</div><div class="stat-lbl">تم الرد</div></div></div>
+        </div>
+
+        <div class="table-container">
+            <div class="tbl-head">
+                <div class="tbl-title">الاستفسارات الواردة</div>
+                <div class="tbl-controls">
+                    <select class="tbl-search" onchange="filterStatus(this.value)" style="min-width:160px">
+                        <option value="">كل الطلبات</option>
+                        <option value="new">جديد</option>
+                        <option value="read">مقروء</option>
+                        <option value="replied">تم الرد</option>
+                    </select>
+                    <input type="search" class="tbl-search" placeholder="🔍 بحث..." oninput="filterSearch(this.value)">
+                </div>
+            </div>
+            <div class="tbl-body" id="contactsTbody">
+                <div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Message Detail Modal -->
+<div class="modal-overlay" id="msgModal">
+    <div class="modal-box">
+        <div class="modal-hdr">
+            <h3 id="msgTitle">رسالة من —</h3>
+            <button class="modal-close" onclick="closeMsgModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="msgBody"></div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeMsgModal()">إغلاق</button>
+            <button class="btn btn-success" id="msgReplyBtn"><i class="fas fa-reply"></i> تحديد كـ"تم الرد"</button>
+        </div>
+    </div>
+</div>
+
+<script src="admin-shared.js"></script>
+<script>
+let allContacts = [], fStatus = '', fSearch = '', currentMsgId = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await adminInit('contacts');
+    loadContacts();
+});
+
+async function loadContacts() {
+    const { data, error } = await supabase.from('contact_requests')
+        .select('*').order('created_at', { ascending: false });
+    if (error) { renderError('contactsTbody', error.message); return; }
+    allContacts = data || [];
+
+    document.getElementById('ctStat1').textContent = allContacts.filter(c=>c.status==='new').length;
+    document.getElementById('ctStat2').textContent = allContacts.filter(c=>c.status==='read').length;
+    document.getElementById('ctStat3').textContent = allContacts.filter(c=>c.status==='replied').length;
+
+    renderContacts();
+}
+
+function renderContacts() {
+    let list = allContacts;
+    if (fStatus) list = list.filter(c => c.status === fStatus);
+    if (fSearch) list = list.filter(c =>
+        c.name?.toLowerCase().includes(fSearch.toLowerCase()) ||
+        c.email?.toLowerCase().includes(fSearch.toLowerCase())
+    );
+
+    if (!list.length) { document.getElementById('contactsTbody').innerHTML = emptyState('لا توجد رسائل','fa-envelope'); return; }
+
+    document.getElementById('contactsTbody').innerHTML = `
+    <table>
+        <thead><tr>
+            <th>#</th><th>الاسم</th><th>البريد / الجوال</th><th>الرسالة</th>
+            <th>التاريخ</th><th>الحالة</th><th>إجراءات</th>
+        </tr></thead>
+        <tbody>${list.map((c,i)=>`
+            <tr style="${c.status==='new'?'font-weight:600':''}">
+                <td style="color:var(--text-muted)">${i+1}</td>
+                <td><strong>${esc(c.name)}</strong></td>
+                <td>
+                    <span style="display:block">${esc(c.email)||'—'}</span>
+                    <small style="color:var(--text-muted)">${esc(c.phone)||''}</small>
+                </td>
+                <td style="max-width:220px">
+                    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:220px">${esc(c.message)}</span>
+                </td>
+                <td style="color:var(--text-muted)">${fmtDate(c.created_at)}</td>
+                <td>${contactBadge(c.status)}</td>
+                <td>
+                    <div style="display:flex;gap:.3rem">
+                        <button class="btn btn-sm btn-outline btn-icon" onclick="viewMsg('${c.id}')" title="عرض"><i class="fas fa-eye"></i></button>
+                        <select class="tbl-search" style="min-width:120px;padding:.35rem;font-size:.78rem" onchange="updateContactStatus('${c.id}',this.value)">
+                            <option value="new" ${c.status==='new'?'selected':''}>جديد</option>
+                            <option value="read" ${c.status==='read'?'selected':''}>مقروء</option>
+                            <option value="replied" ${c.status==='replied'?'selected':''}>تم الرد</option>
+                        </select>
+                    </div>
+                </td>
+            </tr>`).join('')}
+        </tbody>
+    </table>`;
+}
+
+function filterStatus(v) { fStatus = v; renderContacts(); }
+function filterSearch(v) { fSearch = v; renderContacts(); }
+
+async function updateContactStatus(id, status) {
+    const { error } = await supabase.from('contact_requests').update({ status }).eq('id', id);
+    if (error) { showToast('خطأ: ' + error.message, 'danger'); return; }
+    showToast('تم تحديث الحالة');
+    loadContacts();
+}
+
+function viewMsg(id) {
+    const c = allContacts.find(x=>x.id===id);
+    if (!c) return;
+    currentMsgId = id;
+    document.getElementById('msgTitle').textContent = `رسالة من: ${c.name}`;
+    document.getElementById('msgBody').innerHTML = `
+        <div style="background:#f8fafc;border-radius:10px;padding:1.25rem;margin-bottom:1rem">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;font-size:.88rem;margin-bottom:1rem">
+                <div><strong>الاسم:</strong> ${esc(c.name)}</div>
+                <div><strong>البريد:</strong> ${esc(c.email)||'—'}</div>
+                <div><strong>الجوال:</strong> ${esc(c.phone)||'—'}</div>
+                <div><strong>التاريخ:</strong> ${fmtDateTime(c.created_at)}</div>
+            </div>
+            <div><strong>الرسالة:</strong></div>
+            <p style="margin-top:.5rem;line-height:1.8;white-space:pre-wrap">${esc(c.message)}</p>
+        </div>
+        <div>الحالة الحالية: ${contactBadge(c.status)}</div>
+    `;
+    document.getElementById('msgReplyBtn').onclick = () => { updateContactStatus(id,'replied'); closeMsgModal(); };
+    document.getElementById('msgModal').classList.add('active');
+    // Auto mark as read
+    if (c.status === 'new') updateContactStatus(id, 'read');
+}
+
+function closeMsgModal() { document.getElementById('msgModal').classList.remove('active'); }
+</script>
+</body>
+</html>

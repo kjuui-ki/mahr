@@ -323,12 +323,12 @@
         }
         .login-btn, .register-btn {
           border: none;
-          padding: 0.75rem 1.5rem;
+          padding: 0.55rem 1.25rem;
           color: white;
           text-decoration: none;
           border-radius: 25px;
           font-weight: 600;
-          font-size: 0.95rem;
+          font-size: 0.9rem;
           transition: all 0.3s ease;
           box-shadow: 0 4px 15px rgba(37,99,235,0.3);
           display: flex;
@@ -336,23 +336,38 @@
           gap: 0.5rem;
           font-family: 'Cairo', sans-serif;
           cursor: pointer;
+          flex-direction: column;
+          line-height: 1.2;
+          text-align: center;
         }
-        .login-btn {
-          background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        .btn-label {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-size: 0.92rem;
+          font-weight: 700;
         }
-        .register-btn {
-          background: linear-gradient(135deg, #10b981, #059669);
-          box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+        .btn-sub {
+          font-size: 0.68rem;
+          font-weight: 400;
+          opacity: 0.85;
+          white-space: nowrap;
         }
-        .login-btn:hover, .register-btn:hover {
-          transform: translateY(-2px);
-        }
-        .login-btn:hover {
-          box-shadow: 0 8px 25px rgba(37,99,235,0.4);
-        }
-        .register-btn:hover {
-          box-shadow: 0 8px 25px rgba(16,185,129,0.4);
-        }
+        .login-btn { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+        .register-btn { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16,185,129,0.3); }
+        .login-btn:hover, .register-btn:hover { transform: translateY(-2px); }
+        .login-btn:hover { box-shadow: 0 8px 25px rgba(37,99,235,0.4); }
+        .register-btn:hover { box-shadow: 0 8px 25px rgba(16,185,129,0.4); }
+        /* Profile nav (logged-in) */
+        .profile-nav-wrap { display: none; align-items: center; gap: 0.75rem; }
+        .profile-nav-wrap.visible { display: flex; }
+        .profile-nav-name { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
+        .profile-nav-badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: white; }
+        .badge-employee { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .badge-seeker   { background: linear-gradient(135deg, #10b981, #059669); }
+        .badge-admin    { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+        .logout-btn { padding: 0.6rem 1.2rem; border: 2px solid #ef4444; background: transparent; color: #ef4444; border-radius: 20px; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.4rem; }
+        .logout-btn:hover { background: #ef4444; color: white; }
 
         /* Auth Modal */
         .modal-overlay {
@@ -569,10 +584,142 @@
                 gap: 2rem;
             }
         }
+
+        /* ===== ACADEMY HERO ===== */
+        .academy-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+            padding: 8rem 5% 5rem;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .academy-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(96,165,250,0.15) 0%, transparent 65%);
+        }
+        .academy-hero-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        .academy-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: rgba(255,255,255,0.9);
+        }
+        .academy-hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        .academy-hero p {
+            font-size: 1.15rem;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+        }
+        /* ===== IMPROVED ABOUT CARDS ===== */
+        .about .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 6px rgba(0,0,0,0.04);
+            transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+            border: 1px solid rgba(0,0,0,0.04);
+            overflow: visible;
+            position: relative;
+        }
+        .about .card::before { display: none; }
+        .about .card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb, #0ea5e9);
+            transform: scaleX(0);
+            transition: transform 0.35s ease;
+            transform-origin: right;
+            border-radius: 0 0 20px 20px;
+        }
+        .about .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.08);
+        }
+        .about .card:hover::after { transform: scaleX(1); transform-origin: left; }
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: #2563eb;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .about .card:hover .card-icon {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            transform: scale(1.1) rotate(-5deg);
+        }
+        /* ===== IMPROVED STATS ===== */
+        .stats {
+            background: white;
+            padding: 4rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            margin: 0;
+        }
+        .stat-item { padding: 1.5rem; }
+        .stat-item h4 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #2563eb, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+        }
+        .stat-item p { color: #64748b; font-size: 1rem; font-weight: 600; }
     </style>
 </head>
 
 <body>
+    <script>
+    (function(){
+        try {
+            var p = JSON.parse(localStorage.getItem('profileData')||'{}');
+            if (p && p.name) {
+                var isAdmin = p.isAdmin === true;
+                var t = isAdmin ? 'مدير' : p.userType==='seeker' ? 'باحث عن عمل' : 'موظف';
+                var bc= isAdmin ? 'badge-admin' : p.userType==='seeker' ? 'badge-seeker' : 'badge-employee';
+                document.addEventListener('DOMContentLoaded', function(){
+                    var pn = document.getElementById('profileNav');
+                    if (pn) pn.classList.add('visible');
+                    var nn = document.getElementById('navUserName');
+                    if (nn) nn.textContent = p.name;
+                    var nb = document.getElementById('navUserBadge');
+                    if (nb) { nb.textContent = t; nb.className = 'profile-nav-badge '+bc; }
+                    if (isAdmin) { var ab=document.getElementById('adminDashBtn'); if(ab) ab.style.display='inline-flex'; }
+                });
+            }
+        }catch(e){}
+    })();
+    </script>
     <nav class="navbar" id="navbar">
         <div class="right-side">
              <ul class="nav-links">
@@ -584,98 +731,47 @@
         </div>
 
         <div class="left-side">
-            <div class="login-buttons">
-                <button id="loginBtnTrigger" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>تسجيل دخول</span>
-                </button>
-                <button id="registerBtnTrigger" class="register-btn">
-                    <i class="fas fa-user-plus"></i>
-                    <span>تسجيل</span>
+
+            <!-- Logged in -->
+            <div class="profile-nav-wrap" id="profileNav">
+                <a href="admin/index.html" id="adminDashBtn" style="display:none;text-decoration:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:white;padding:0.45rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:600;font-family:'Cairo',sans-serif;gap:0.4rem;align-items:center;">
+                    <i class="fas fa-shield-alt"></i> لوحة التحكم
+                </a>
+                <span class="profile-nav-name" id="navUserName"></span>
+                <span class="profile-nav-badge" id="navUserBadge"></span>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> خروج
                 </button>
             </div>
         </div>
     </nav>
 
-    <div id="authModal" class="modal-overlay">
-      <div class="auth-modal">
-        <div class="modal-header">
-          <h3>تسجيل الدخول / التسجيل</h3>
-          <button class="modal-close" id="modalClose">&times;</button>
+    <section class="academy-hero">
+        <div class="academy-hero-inner">
+            <div class="academy-hero-badge"><i class="fas fa-graduation-cap"></i> عن الأكاديمية</div>
+            <h1>أكاديمية مهارات</h1>
+            <p>الوجهة الأولى لتطوير المهارات المهنية والاحترافية في عالم يتغيّر بسرعة</p>
         </div>
-        <div class="modal-tabs">
-          <button class="tab-btn active" data-tab="login">تسجيل دخول</button>
-          <button class="tab-btn" data-tab="register">تسجيل جديد</button>
-        </div>
-        
-        <form id="loginForm" class="modal-form active">
-          <div class="form-group">
-            <label>البريد الإلكتروني</label>
-            <input type="email" id="loginEmail" required placeholder="example@domain.com" data-msg="هذا الحقل مطلوب">
-            <div class="error-msg" id="loginEmailError"></div>
-          </div>
-          <div class="form-group">
-            <label>كلمة المرور</label>
-            <input type="password" id="loginPassword" required placeholder="••••••••">
-          </div>
-          <button type="submit" class="submit-btn">
-            <i class="fas fa-sign-in-alt"></i> <span>دخول</span>
-          </button>
-        </form>
-
-        <form id="registerForm" class="modal-form">
-          <div class="form-group">
-            <label>الاسم الكامل</label>
-            <input type="text" id="regName" required placeholder="أحمد محمد" data-msg="هذا الحقل مطلوب">
-            <div class="error-msg" id="regNameError"></div>
-          </div>
-          <div class="form-group">
-            <label>البريد الإلكتروني</label>
-            <input type="email" id="regEmail" required placeholder="example@domain.com" data-msg="هذا الحقل مطلوب">
-            <div class="error-msg" id="regEmailError"></div>
-          </div>
-          <div class="form-group">
-            <label>رقم الهاتف</label>
-            <input type="tel" id="regPhone" required placeholder="05xxxxxxxx" data-msg="هذا الحقل مطلوب">
-            <div class="error-msg" id="regPhoneError"></div>
-          </div>
-          <div class="form-group">
-            <label>كلمة المرور</label>
-            <input type="password" id="regPassword" required placeholder="••••••••">
-          </div>
-          <button type="submit" class="submit-btn">
-            <i class="fas fa-user-plus"></i> <span>تسجيل</span>
-          </button>
-        </form>
-      </div>
-    </div>
-
-    <header class="hero">
-        <h1>عن أكاديمية مهارات</h1>
-        <p>الوجهة الأولى لتطوير المهارات المهنية والاحترافية في العالم العربي</p>
-        <a href="#about" class="btn-primary">
-            <i class="fas fa-arrow-down"></i> تعرف على المزيد
-        </a>
-    </header>
+    </section>
 
     <section class="about" id="about">
         <div class="card">
-            <i class="fas fa-history" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <div class="card-icon"><i class="fas fa-history"></i></div>
             <h3>تأسيسنا</h3>
             <p>تأسست أكاديمية مهارات في 2023 بهدف تمكين الشباب العربي من المنافسة العالمية من خلال برامج تدريبية عالية الجودة.</p>
         </div>
         <div class="card">
-            <i class="fas fa-bullseye" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <div class="card-icon"><i class="fas fa-bullseye"></i></div>
             <h3>رؤيتنا</h3>
             <p>أن نكون الرائدين في تطوير المهارات المهنية في المنطقة العربية ونساهم في بناء قادة المستقبل.</p>
         </div>
         <div class="card">
-            <i class="fas fa-users-cog" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <div class="card-icon"><i class="fas fa-users-cog"></i></div>
             <h3>فريقنا</h3>
             <p>30 خبير ومدرب معتمد بمعدل خبرة 12 سنة في مجالات الإدارة والتكنولوجيا والتسويق.</p>
         </div>
         <div class="card">
-            <i class="fas fa-award" style="font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+            <div class="card-icon"><i class="fas fa-award"></i></div>
             <h3>إنجازاتنا</h3>
             <p>أكثر من 5000 متدرب ناجح وشراكات مع 25 جهة دولية معترف بها.</p>
         </div>
@@ -736,151 +832,57 @@
             if(navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
         });
 
-        // Auth Modal Functionality
-        function openModal() {
-            const authModal = document.getElementById('authModal');
-            if(authModal) {
-                authModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        }
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Navbar scroll
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
+            });
+            // Auth state
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const authButtons = document.getElementById('authButtons');
+                const profileNav  = document.getElementById('profileNav');
+                if (session) {
+                    let profile = JSON.parse(localStorage.getItem('profileData') || '{}');
+                    // *** إعادة جلب is_admin من DB مباشرة ***
+                    try {
+                        const { data: dbUser } = await supabase
+                            .from('users')
+                            .select('full_name, user_type, is_admin')
+                            .eq('id', session.user.id)
+                            .single();
+                        if (dbUser) {
+                            profile = {
+                                ...profile,
+                                name: dbUser.full_name || profile.name || '',
+                                userType: dbUser.user_type || profile.userType || 'employee',
+                                isAdmin: dbUser.is_admin === true
+                            };
+                            localStorage.setItem('profileData', JSON.stringify(profile));
+                        }
+                    } catch(e) {}
 
-        function closeModal() {
-            const authModal = document.getElementById('authModal');
-            if(authModal) {
-                authModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-            // Clear forms and errors
-            document.querySelectorAll('.modal-form input').forEach(input => input.value = '');
-            document.querySelectorAll('.error-msg').forEach(msg => msg.style.display = 'none');
-        }
-
-        function switchTab(tab) {
-            // Update tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            const selectedTab = document.querySelector(`[data-tab="${tab}"]`);
-            if(selectedTab) selectedTab.classList.add('active');
-            
-            // Update forms
-            document.querySelectorAll('.modal-form').forEach(form => form.classList.remove('active'));
-            const selectedForm = document.getElementById(tab + 'Form');
-            if(selectedForm) selectedForm.classList.add('active');
-        }
-
-        function validateField(input, errorId, rules) {
-            const value = input.value.trim();
-            let isValid = true;
-            let errorMsg = '';
-
-            if (rules.required && !value) {
-                isValid = false;
-                errorMsg = input.getAttribute('data-msg') || 'هذا الحقل مطلوب';
-            } else if (rules.minLength && value.length < rules.minLength) {
-                isValid = false;
-                errorMsg = 'الحد الأدنى للطول غير كافي';
-            } else if (rules.email && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|sa)$/i.test(value)) {
-                isValid = false;
-                errorMsg = 'صيغة البريد الإلكتروني غير صحيحة (يجب انتهاء بـ .com أو .sa)';
-            } else if (rules.phone && !/^05\d{8}$/.test(value.replace(/\D/g, ''))) {
-                isValid = false;
-                errorMsg = 'رقم الهاتف يجب أن يكون 10 أرقام يبدأ بـ 05';
-            }
-
-            const errorEl = document.getElementById(errorId);
-            if (errorEl) {
-                if (!isValid) {
-                    errorEl.textContent = errorMsg;
-                    errorEl.style.display = 'block';
-                } else {
-                    errorEl.style.display = 'none';
+                    const userType  = profile.userType || 'employee';
+                    const isAdmin   = profile.isAdmin === true;
+                    const typeLabel = isAdmin ? 'مدير' : userType === 'seeker' ? 'باحث عن عمل' : 'موظف';
+                    const badgeClass= isAdmin ? 'badge-admin' : userType === 'seeker' ? 'badge-seeker' : 'badge-employee';
+                    if (profileNav) profileNav.classList.add('visible');
+                    document.getElementById('navUserName').textContent = profile.name || 'مستخدم';
+                    const badge = document.getElementById('navUserBadge');
+                    badge.textContent = typeLabel;
+                    badge.className = 'profile-nav-badge ' + badgeClass;
+                    if (profile.isAdmin) {
+                        const adminBtn = document.getElementById('adminDashBtn');
+                        if (adminBtn) adminBtn.style.display = 'inline-flex';
+                    }
+                    document.getElementById('logoutBtn').addEventListener('click', async () => {
+                        await supabase.auth.signOut();
+                        localStorage.removeItem('profileData');
+                        window.location.href = 'index.html';
+                    });
                 }
-            }
-            return isValid;
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Auth Modal Events
-            const loginBtnTrigger = document.getElementById('loginBtnTrigger');
-            if(loginBtnTrigger) {
-                loginBtnTrigger.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    openModal();
-                    switchTab('login');
-                });
-            }
-
-            const registerBtnTrigger = document.getElementById('registerBtnTrigger');
-            if(registerBtnTrigger) {
-                registerBtnTrigger.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    openModal();
-                    switchTab('register');
-                });
-            }
-
-            const modalClose = document.getElementById('modalClose');
-            if(modalClose) modalClose.addEventListener('click', closeModal);
-            
-            const authModal = document.getElementById('authModal');
-            if(authModal) {
-                authModal.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('modal-overlay')) closeModal();
-                });
-            }
-
-            // Tab switching
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    switchTab(btn.dataset.tab);
-                });
-            });
-
-            // Form validation
-            document.querySelectorAll('.modal-form input').forEach(input => {
-                input.addEventListener('input', () => {
-                    const rules = {
-                        loginEmail: { email: true, required: true },
-                        regName: { required: true, minLength: 2 },
-                        regEmail: { email: true, required: true },
-                        regPhone: { phone: true, required: true }
-                    }[input.id] || {};
-                    validateField(input, input.id + 'Error', rules);
-                });
-            });
-
-            // Form submissions
-            const loginForm = document.getElementById('loginForm');
-            if(loginForm) {
-                loginForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const emailValid = validateField(document.getElementById('loginEmail'), 'loginEmailError', {email: true, required: true});
-                    if (emailValid && document.getElementById('loginPassword').value) {
-                        alert('تم تسجيل الدخول بنجاح! (محاكاة)');
-                        closeModal();
-                    }
-                });
-            }
-
-            const registerForm = document.getElementById('registerForm');
-            if(registerForm) {
-                registerForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const nameValid = validateField(document.getElementById('regName'), 'regNameError', {required: true, minLength: 2});
-                    const emailValid = validateField(document.getElementById('regEmail'), 'regEmailError', {email: true, required: true});
-                    const phoneValid = validateField(document.getElementById('regPhone'), 'regPhoneError', {phone: true, required: true});
-                    if (nameValid && emailValid && phoneValid && document.getElementById('regPassword').value) {
-                        alert('تم التسجيل بنجاح! (محاكاة)');
-                        closeModal();
-                    }
-                });
-            }
-
-            // Close on ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') closeModal();
-            });
+            } catch(e) { console.warn('Auth check failed:', e); }
         });
     </script>
 </body>

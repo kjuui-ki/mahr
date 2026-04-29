@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الشركاء | مهارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../supabaseClient.js"></script>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="brand-text"><span class="brand-name">مهارات</span><span class="brand-sub">لوحة التحكم</span></div>
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    </div>
+    <div class="sidebar-admin">
+        <div class="admin-avatar-wrap"><div class="admin-avatar"><i class="fas fa-user-shield"></i></div><div class="admin-status-dot"></div></div>
+        <div class="admin-details"><span class="admin-name" id="adminName">المدير</span><span class="admin-role">مشرف النظام</span></div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">الرئيسية</div>
+        <a href="index.html" class="nav-link" data-page="overview"><i class="fas fa-chart-pie"></i><span>نظرة عامة</span></a>
+        <div class="nav-section-label">إدارة المحتوى</div>
+        <a href="courses.html" class="nav-link" data-page="courses"><i class="fas fa-book-open"></i><span>الدورات</span></a>
+        <a href="users.html" class="nav-link" data-page="users"><i class="fas fa-users"></i><span>المستخدمون</span></a>
+        <a href="enrollments.html" class="nav-link" data-page="enrollments"><i class="fas fa-user-check"></i><span>التسجيلات</span></a>
+        <div class="nav-section-label">الشهادات والتقارير</div>
+        <a href="certificates.html" class="nav-link" data-page="certificates"><i class="fas fa-certificate"></i><span>الشهادات</span></a>
+        <a href="reports.html" class="nav-link" data-page="reports"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+        <div class="nav-section-label">التواصل</div>
+        <a href="contacts.html" class="nav-link" data-page="contacts"><i class="fas fa-envelope"></i><span>طلبات التواصل</span></a>
+        <a href="partners.html" class="nav-link active" data-page="partners"><i class="fas fa-handshake"></i><span>الشركاء</span></a>
+        <div class="nav-section-label">النظام</div>
+        <a href="settings.html" class="nav-link" data-page="settings"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+        <a href="../index.html" class="nav-link"><i class="fas fa-home"></i><span>الموقع الرئيسي</span></a>
+    </nav>
+    <div class="sidebar-footer"><button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i><span>تسجيل الخروج</span></button></div>
+</aside>
+
+<div class="main-wrap">
+    <header class="topbar">
+        <div class="topbar-right">
+            <button class="topbar-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="topbar-title"><h1>إدارة <span>الشركاء</span></h1><p id="currentDate"></p></div>
+        </div>
+        <div class="topbar-left">
+            <button class="btn btn-primary btn-sm" onclick="openModal()"><i class="fas fa-plus"></i> إضافة شريك</button>
+            <div class="topbar-admin"><div class="topbar-avatar"><i class="fas fa-user-shield"></i></div><span id="topbarName">المدير</span></div>
+        </div>
+    </header>
+
+    <main class="content">
+        <div class="table-container">
+            <div class="tbl-head">
+                <div class="tbl-title">قائمة الشركاء</div>
+                <input type="search" class="tbl-search" placeholder="🔍 بحث..." oninput="filterPartners(this.value)">
+            </div>
+            <div class="tbl-body" id="partnersTbody">
+                <div class="loading-row"><i class="fas fa-circle-notch fa-spin"></i> جاري التحميل...</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div class="modal-overlay" id="partnerModal">
+    <div class="modal-box">
+        <div class="modal-hdr">
+            <h3 id="pModalTitle">إضافة شريك جديد</h3>
+            <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="partnerForm" onsubmit="savePartner(event)">
+            <div class="form-group"><label>اسم الشريك *</label><input type="text" id="pName" required placeholder="اسم الشركة أو الجهة"></div>
+            <div class="form-group"><label>رابط الشعار (Logo URL)</label><input type="text" id="pLogo" placeholder="../img-z/partner.png"><div class="form-hint">رابط صورة الشعار</div></div>
+            <div class="form-group"><label>الموقع الإلكتروني</label><input type="url" id="pWebsite" placeholder="https://..."></div>
+            <div class="form-group"><label>ترتيب العرض</label><input type="number" id="pOrder" value="0" min="0"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> حفظ</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="admin-shared.js"></script>
+<script>
+let allPartners = [], editId = null, fSearch = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await adminInit('partners');
+    loadPartners();
+});
+
+async function loadPartners() {
+    const { data, error } = await supabase.from('partners').select('*').order('display_order');
+    if (error) { renderError('partnersTbody', error.message); return; }
+    allPartners = data || [];
+    renderPartners();
+}
+
+function renderPartners() {
+    let list = allPartners;
+    if (fSearch) list = list.filter(p=>p.name.toLowerCase().includes(fSearch.toLowerCase()));
+
+    if (!list.length) { document.getElementById('partnersTbody').innerHTML = emptyState('لا يوجد شركاء بعد','fa-handshake'); return; }
+
+    document.getElementById('partnersTbody').innerHTML = `
+    <table>
+        <thead><tr><th>الشعار</th><th>الاسم</th><th>الموقع</th><th>الترتيب</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>${list.map(p=>`
+            <tr>
+                <td><img src="${esc(p.logo_url)}" style="height:40px;max-width:80px;object-fit:contain" onerror="this.style.display='none'"></td>
+                <td><strong>${esc(p.name)}</strong></td>
+                <td>${p.website_url?`<a href="${esc(p.website_url)}" target="_blank" rel="noopener" style="color:var(--primary)">${esc(p.website_url).substring(0,40)}...</a>`:'—'}</td>
+                <td style="color:var(--text-muted)">${p.display_order}</td>
+                <td>${p.is_active?'<span class="badge badge-active">نشط</span>':'<span class="badge badge-inactive">معطل</span>'}</td>
+                <td>
+                    <div style="display:flex;gap:.35rem">
+                        <button class="btn btn-sm btn-outline btn-icon" onclick="editPartner('${p.id}')" title="تعديل"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-icon ${p.is_active?'btn-warning':'btn-success'}" onclick="togglePartner('${p.id}',${p.is_active})" title="${p.is_active?'تعطيل':'تفعيل'}">
+                            <i class="fas ${p.is_active?'fa-eye-slash':'fa-eye'}"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-icon" onclick="deletePartner('${p.id}')" title="حذف"><i class="fas fa-trash"></i></button>
+                    </div>
+                </td>
+            </tr>`).join('')}
+        </tbody>
+    </table>`;
+}
+
+function filterPartners(v) { fSearch = v; renderPartners(); }
+
+function openModal() {
+    editId = null;
+    document.getElementById('pModalTitle').textContent = 'إضافة شريك جديد';
+    document.getElementById('partnerForm').reset();
+    document.getElementById('partnerModal').classList.add('active');
+}
+
+function closeModal() { document.getElementById('partnerModal').classList.remove('active'); editId = null; }
+
+function editPartner(id) {
+    const p = allPartners.find(x=>x.id===id);
+    if (!p) return;
+    editId = id;
+    document.getElementById('pModalTitle').textContent = 'تعديل الشريك';
+    document.getElementById('pName').value = p.name||'';
+    document.getElementById('pLogo').value = p.logo_url||'';
+    document.getElementById('pWebsite').value = p.website_url||'';
+    document.getElementById('pOrder').value = p.display_order||0;
+    document.getElementById('partnerModal').classList.add('active');
+}
+
+async function savePartner(e) {
+    e.preventDefault();
+    const payload = {
+        name: document.getElementById('pName').value.trim(),
+        logo_url: document.getElementById('pLogo').value.trim(),
+        website_url: document.getElementById('pWebsite').value.trim(),
+        display_order: parseInt(document.getElementById('pOrder').value)||0
+    };
+    const { error } = editId
+        ? await supabase.from('partners').update(payload).eq('id', editId)
+        : await supabase.from('partners').insert(payload);
+    if (error) { showToast('خطأ: '+error.message,'danger'); return; }
+    showToast(editId?'تم تحديث الشريك':'تمت إضافة الشريك');
+    closeModal(); loadPartners();
+}
+
+async function togglePartner(id, current) {
+    const { error } = await supabase.from('partners').update({ is_active: !current }).eq('id', id);
+    if (error) { showToast('خطأ: '+error.message,'danger'); return; }
+    showToast(current?'تم تعطيل الشريك':'تم تفعيل الشريك', current?'warning':'success');
+    loadPartners();
+}
+
+async function deletePartner(id) {
+    if (!confirm('حذف هذا الشريك؟')) return;
+    const { error } = await supabase.from('partners').delete().eq('id', id);
+    if (error) { showToast('خطأ: '+error.message,'danger'); return; }
+    showToast('تم الحذف','danger'); loadPartners();
+}
+</script>
+</body>
+</html>
